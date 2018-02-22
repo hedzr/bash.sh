@@ -1,7 +1,3 @@
----
-typora-copy-images-to: ./_images
-typora-root-url: ./_images
----
 # bash.sh
 
 
@@ -38,7 +34,7 @@ Copy [bash.sh](bash.sh) and rename as your main entry, and go ahead.
 
 ## Samples
 
-![2018-02-22 12.30.11](/2018-02-22 12.30.11.png)
+![](./_images/2018-02-22 12.30.11.png)
 
 ## License
 
