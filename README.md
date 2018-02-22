@@ -34,7 +34,7 @@ Copy [bash.sh](bash.sh) and rename as your main entry, and go ahead.
 
 ## Samples
 
-![](./_images/2018-02-22 12.30.11.png)
+![](./_images/2018-02-22_12.30.11.png)
 
 ## License
 
