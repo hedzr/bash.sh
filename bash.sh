@@ -19,8 +19,6 @@
 #  $ HAS_END=false ./bash.sh
 #
 
-cool(){ echo cool; }
-sleeping(){ echo sleeping; }
 _my.main.do.sth(){
   local cmd=${1:-sleeping} && { [ $# -ge 1 ] && shift; } || :
   # for linux only: 
@@ -29,6 +27,10 @@ _my.main.do.sth(){
   debug "$cmd - $@"
   eval "$cmd $@" || :
 }
+#### write your functions here, and invoke them by: `./bash.sh <your-func-name>`
+cool(){ echo cool; }
+sleeping(){ echo sleeping; }
+
 
 
 #### HZ Tail BEGIN ####
