@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+[ -f ../bash.config ] && . ../bash.config || { [ -f /usr/local/bin/bash.config ] && . /usr/local/bin/bash.config || :; }
+
+_my.main.do.sth(){
+  local cmd=${1:-sleeping} && { [ $# -ge 1 ] && shift; } || :
+  # for linux only: 
+  # local cmd=${1:-sleeping} && shift || :
+  
+  debug "$cmd - $@"
+  eval "$cmd $@" || :
+}
+#### write your functions here, and invoke them by: `./bash.sh <your-func-name>`
+cool(){ echo cool; }
+sleeping(){ echo sleeping; }
+
+#### HZ Tail BEGIN ####
+main.do.sth "$@"
+#### HZ Tail END ####

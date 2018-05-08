@@ -28,13 +28,21 @@ $ HAS_END=false ./bash.sh
 
 ### Use It
 
+#### 1. Simple
+
 Copy [bash.sh](bash.sh) and rename as your main entry, and go ahead.
 
 > Modify `_my_main.do.sth()` as you want.
 
+#### 2. Global
 
+Copy `bash.config` to `/usr/local/bin/` and `source` it from your script file:
 
+```bash
+sudo cp bash.config /usr/local/bin
+```
 
+Some examples [here](./examples/).
 
 ## Samples
 
@@ -127,6 +135,6 @@ cross impl for linux `realpath`.
 
 ## License
 
-MIT.
+MIT for free.
 
 Enjoy It!
