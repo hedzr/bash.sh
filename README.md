@@ -36,11 +36,17 @@ Copy [bash.sh](bash.sh) and rename as your main entry, and go ahead.
 
 #### 2. Global
 
-Copy `bash.config` to `/usr/local/bin/` and `source` it from your script file:
+##### Use `installer`:
 
 ```bash
-sudo cp bash.config /usr/local/bin
+curl -sSL https://hedzr.com/bash.sh/installer | sudo bash -s
 ```
+
+`installer` will copy `bash.config` to `/usr/local/bin`.
+
+##### Manually:
+
+Copy `bash.config` to `/usr/local/bin/` or anywhere, and `source` it from your script file:
 
 Some examples [here](./examples/).
 

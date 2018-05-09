@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 #
 # HZ: Standard Template for bash/zsh developing.
-# Version: 20180222
+# Version: 20180509
 # License: MIT
+# Site: https://github/hedzr/bash.sh
 #
 
 # Usages:

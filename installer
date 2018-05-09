@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# Install:
+#   $ curl -sSL https://hedzr.com/bash.sh/installer | sudo bash -si
+#   $ curl -sSL https://hedzr.com/bash.sh/installer | sudo bash -s
+#
+#
+#
+#
+#
+#
+#
+#set -e
+#set -x
+
+echo "Install....$0 $@"
+OPS_NAME="${OPS_NAME:-bash.sh}"
+URL_BASE="${OPS_URL_BASE:-https://hedzr.com/$OPS_NAME/}"
+INSTALL_PREFIX="${INSTALL_TARGET:-/usr/local/bin}"
+INSTALL_TARGET="$INSTALL_PREFIX"
+N=""
+
+
+function self_download () {
+	if [ -z $# ]; then
+		false
+	elif [ $# -gt 1 ]; then
+		echo "try"
+		for file in $*; do
+			self_download $file
+		done
+	else
+		local context=$1
+		local cdir=$(dirname $context)
+		local cname=$(basename $context)
+		if [[ $context != */* ]]; then
+			cdir="."
+			cname=$context
+		fi
+		echo "#### Downloading $context...    dir: $cdir, name: $cname, @: $INSTALL_TARGET, PWD: $PWD"
+		[ ! -d $INSTALL_TARGET/$cdir ] && mkdir -p $INSTALL_TARGET/$cdir
+		#curl -sSL https://ops.suweia.net/suwei-init/$context -o $INSTALL_TARGET/$cdir/$cname
+		wget -q $URL_BASE/$context -O $INSTALL_TARGET/$cdir/$cname
+		[ "$N" == "" ] && N=$INSTALL_TARGET/$cdir/$cname
+	fi
+}
+
+
+self_download "bash.config"
+
+cat <<EOF
+
+====================================================================
+'$OPS_NAME' was installed as '$N'.
+
+All folks, Enjoy it!
+
+EOF
+
+
