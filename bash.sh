@@ -69,6 +69,32 @@ debug-info()     {
 	EOF
 	debug-end
 }
+commander ()    {
+  local self=$1; shift;
+  local cmd=${1:-usage}; [ $# -eq 0 ] || shift;
+  #local self=${FUNCNAME[0]}
+  case $cmd in
+    help|usage|--help|-h|-H) "$self-usage" "$@"; ;;
+    funcs|--funcs|--functions|--fn|-fn)  script.functions "^$self"; ;;
+    *)
+      if [ "$(type -t $self-$cmd-entry)" == "function" ]; then
+        "$self-$cmd-entry" "$@"
+      else
+        "$self-$cmd" "$@"
+      fi
+      ;;
+  esac
+}
+script.functions () {
+  # shellcheck disable=SC2155
+  local fncs=$(declare -F -p | cut -d " " -f 3|grep -vP "^[_-]"|grep -vP "\\."|grep -vP "^[A-Z]"); # Get function list
+  if [ $# -eq 0 ]; then
+  	echo "$fncs"; # not quoted here to create shell "argument list" of funcs.
+  else
+  	echo "$fncs"|grep -P "$@"
+  fi
+  #declare MyFuncs=($(script.functions));
+}
 main.do.sth()    {
 	set -e
 	trap 'previous_command=$this_command; this_command=$BASH_COMMAND' DEBUG

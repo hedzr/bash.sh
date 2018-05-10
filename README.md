@@ -118,6 +118,58 @@ is_darwin && grep -E 'LISTEN|UDP' somefile || grep -P 'LISTEN|UDP' somefile
 cross impl for linux `realpath`.
 
 
+## Use `commander()` in your scripts
+
+here is a example file `ops`:
+
+```bash
+
+dns()        { dns-entry "$@"; }
+dns-entry () { commander dns "$@";}
+dns-usage () {
+  cat <<EOF
+Usage: $0 $self <sub-command> [...]
+Sub-commands:
+  ls [--all|-a|--cname|--txt|--one|-1] [string]   list all/most-of-all/generics matched dns-records
+  dump                    [RESERVED] dump dns-records [just for dns01]
+  nsupdate                [DNS] [DYN] [MODIFY]
+  fix-nameservers         [ali] general fix nameservers, step 1
+  vpc-fix                 [ali] for VPC envir
+  profile                 [ali] make a query perf test and report
+  check                   [ali] check dns query is ok [version 1]
+  check-2                 [ali] check dns query is ok [version 2]
+  check-resolv-conf       [ali] check resolv.conf is right
+
+Examples:
+  $ ops dns ls          # just print the pyhsical ECS' A records
+  $ ops dns ls --all
+  $ ops dns ls --cname
+  $ ops dns ls --txt
+  $ ops dns ls sw0
+  $ ops dns nsupdate-add sw0ttt00 10.0.24.30
+  $ ops dns nsupdate-del sw0ttt00
+  $ ops dns nsupdate-add mongo cname mgo.ops.local
+  $ ops dns nsupdate-del mongo cname
+
+EOF
+}
+
+dns-check(){
+    echo "dns check"
+}
+dns-check-2(){
+    echo "dns check 2"
+}
+```
+
+and the usage of `ops` command will be:
+
+```bash
+ops dns ls
+ops dns check
+ops dns check-2
+```
+
 
 ### Environment Variables
 
