@@ -140,8 +140,8 @@ here is a example file `ops`:
 
 ```bash
 
-dns()        { dns-entry "$@"; }
-dns_entry () { commander dns "$@";}
+#dns()        { dns_entry "$@"; }
+dns_entry () { commander ${FUNCNAME[0]//_entry/} "$@";}
 dns_usage () {
   cat <<EOF
 Usage: $0 $self <sub-command> [...]
@@ -177,7 +177,7 @@ dns_check_2(){
     echo "dns check 2"
 }
 dns_ls(){ :; }
-dns_dump(){ :; }
+dns_dump(){ echo dump dns; }
 dns_nsupdate(){ :; }
 dns_ls(){ :; }
 dns_vpc_fix(){ :; }
@@ -185,8 +185,8 @@ dns_profile(){ :; }
 dns_check_resolv_conf(){ :; }
 
 # sub of sub-commands
-dns_fix()        { dns-entry "$@"; }
-dns_fix_entry () { commander dns "$@";}
+#dns_fix()        { dns_entry "$@"; }
+dns_fix_entry () { commander ${FUNCNAME[0]//_entry/} "$@";}
 dns_fix_usage () {
   cat <<EOF
 Usage: $0 $self <sub-command> [...]
@@ -200,8 +200,8 @@ Examples:
 
 EOF
 }
-dns_fix_nameservers(){ :; }
-dns_fix_resolv_conf(){ :; }
+dns_fix_nameservers(){ echo dns_fix_nameservers; }
+dns_fix_resolv_conf(){ echo dns_fix_resolv_conf; }
 ```
 
 and the usage of `ops` command will be:
@@ -210,12 +210,15 @@ and the usage of `ops` command will be:
 ops dns ls
 ops dns check
 ops dns check_2
+ops dns dump
 
 # sub of sub-commands
 ops dns fix nameservers
 ops dns fix resolv_conf
 ops dns fix_nameservers
 ```
+
+> See also [example/dns-tool](example/dns-tool)
 
 
 ### Environment Variables
