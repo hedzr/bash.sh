@@ -20,6 +20,12 @@
 #  $ HAS_END=false ./bash.sh
 #
 
+#### write your functions here, and invoke them by: `./bash.sh <your-func-name>`
+cool(){ echo cool; }
+sleeping(){ echo sleeping; }
+
+
+
 _my_main_do_sth(){
   local cmd=${1:-sleeping} && { [ $# -ge 1 ] && shift; } || :
   # for linux only: 
@@ -28,9 +34,6 @@ _my_main_do_sth(){
   debug "$cmd - $@"
   eval "$cmd $@" || :
 }
-#### write your functions here, and invoke them by: `./bash.sh <your-func-name>`
-cool(){ echo cool; }
-sleeping(){ echo sleeping; }
 
 
 
