@@ -39,8 +39,10 @@ Copy [bash.sh](bash.sh) and rename as your main entry, and go ahead.
 ##### Use `installer`:
 
 ```bash
-curl -sSL https://hedzr.com/bash.sh/installer | sudo bash -s
+curl -sSL https://hedzr.com/bash/bash.sh/installer | sudo bash -s
 ```
+
+> The old <https://hedzr.com/bash.sh/installer> has been obseleted.
 
 `installer` will copy `bash.config` to `/usr/local/bin`.
 
@@ -188,6 +190,15 @@ ops dns check-2
 #### `SCRIPT`: full path of `bash.sh`
 
 
+## Under zsh Shell
+
+advantage.
+
+## Changelog
+
+### 20190215
+
+### 20180509
 
 
 
