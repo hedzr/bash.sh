@@ -40,22 +40,23 @@ _my_main_do_sth(){
 #### HZ Tail BEGIN ####
 in_debug()       { [[ $DEBUG -eq 1 ]]; }
 is_root()        { [ "$(id -u)" = "0" ]; }
-is_bash()        { [ -n "$BASH_VERSION" ]; }
+is_bash()        { is_bash_t1 && is_bush_t2; }
+is_bash_t1()     { [ -n "$BASH_VERSION" ]; }
 is_bash_t2()     { [ ! -n "$BASH" ]; }
 is_zsh()         { [[ $SHELL == */zsh ]]; }
 is_zsh_t2()      { [ -n "$ZSH_NAME" ]; }
 is_darwin()      { [[ $OSTYPE == *darwin* ]]; }
 is_linux()       { [[ $OSTYPE == *linux* ]]; }
-in_sourcing()    { is_zsh && [[ $ZSH_EVAL_CONTEXT == 'toplevel' ]] || [[ $(basename -- "$0") != $(basename -- "${BASH_SOURCE[0]}") ]]; }
-headline()       { printf "\e[0;1m$@\e[0m:\n"; }
-headline_begin() { printf "\e[0;1m"; }  # for more color, see: shttps://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
-headline_end()   { printf "\e[0m:\n"; } # https://misc.flogisoft.com/bash/tip_colors_and_formatting
+in_sourcing()    { is_zsh && [[ "$ZSH_EVAL_CONTEXT" == toplevel* ]] || [[ $(basename -- "$0") != $(basename -- "${BASH_SOURCE[0]}") ]]; }
 is_interactive_shell () { [[ $- == *i* ]]; }
 is_not_interactive_shell () { [[ $- != *i* ]]; }
 is_ps1 () { [ -z "$PS1" ]; }
 is_not_ps1 () { [ ! -z "$PS1" ]; }
 is_stdin () { [ -t 0 ]; }
 is_not_stdin () { [ ! -t 0 ]; }
+headline()       { printf "\e[0;1m$@\e[0m:\n"; }
+headline_begin() { printf "\e[0;1m"; }  # for more color, see: shttps://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
+headline_end()   { printf "\e[0m:\n"; } # https://misc.flogisoft.com/bash/tip_colors_and_formatting
 printf_black()   { printf "\e[0;30m$@\e[0m:\n"; }
 printf_red()     { printf "\e[0;31m$@\e[0m:\n"; }
 printf_green()   { printf "\e[0;32m$@\e[0m:\n"; }
@@ -73,9 +74,8 @@ debug_info()     {
 	             in_debug: $(in_debug && echo Y || echo '-')
 	              is_root: $(is_root && echo Y || echo '-')
 	              is_bash: $(is_bash && echo Y || echo '-')
-	           is_bash_t2: $(is_bash_t2 && echo Y || echo '-')
 	               is_zsh: $(is_zsh && echo Y || echo '-')
-	          in_sourcing: $(in_sourcing && echo Y || echo '-')
+	          in_sourcing: $(in_sourcing && echo Y || echo '-')   # ZSH_EVAL_CONTEXT = $ZSH_EVAL_CONTEXT
 	 is_interactive_shell: $(is_interactive_shell && echo Y || echo '-')
 	EOF
 	debug_end
@@ -85,24 +85,24 @@ commander ()    {
   local cmd=${1:-usage}; [ $# -eq 0 ] || shift;
   #local self=${FUNCNAME[0]}
   case $cmd in
-    help|usage|--help|-h|-H) "${self}_usage" "$@"; ;;
-    funcs|--funcs|--functions|--fn|-fn)  script_functions "^$self"; ;;
-    *)
-      if [ "$(type -t ${self}_${cmd}_entry)" == "function" ]; then
-        "${self}_${cmd}_entry" "$@"
-      else
-        "${self}_${cmd}" "$@"
-      fi
-      ;;
+	help|usage|--help|-h|-H) "${self}_usage" "$@"; ;;
+	funcs|--funcs|--functions|--fn|-fn)  script_functions "^$self"; ;;
+	*)
+	  if [ "$(type -t ${self}_${cmd}_entry)" == "function" ]; then
+		"${self}_${cmd}_entry" "$@"
+	  else
+		"${self}_${cmd}" "$@"
+	  fi
+	  ;;
   esac
 }
 script_functions () {
   # shellcheck disable=SC2155
   local fncs=$(declare -F -p | cut -d " " -f 3|grep -vP "^[_-]"|grep -vP "\\."|grep -vP "^[A-Z]"); # Get function list
   if [ $# -eq 0 ]; then
-  	echo "$fncs"; # not quoted here to create shell "argument list" of funcs.
+	echo "$fncs"; # not quoted here to create shell "argument list" of funcs.
   else
-  	echo "$fncs"|grep -P "$@"
+	echo "$fncs"|grep -P "$@"
   fi
   #declare MyFuncs=($(script.functions));
 }
