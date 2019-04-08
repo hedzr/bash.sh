@@ -68,6 +68,7 @@ printf_white()   { printf "\e[0;37m$@\e[0m:\n"; }
 debug()          { in_debug && printf "\e[0;38;2;133;133;133m$@\e[0m\n" || :; }
 debug_begin()    { printf "\e[0;38;2;133;133;133m"; }
 debug_end()      { printf "\e[0m\n"; }
+dbg()            { ((DEBUG)) && printf ">>> \e[0;38;2;133;133;133m$@\e[0m\n" || :; }
 debug_info()     {
 	debug_begin
 	cat <<-EOF
@@ -116,7 +117,7 @@ main_do_sth()    {
 	in_debug && { debug_info; echo "$SHELL : $ZSH_NAME - $ZSH_VERSION | BASH_VERSION = $BASH_VERSION"; [ -n "$ZSH_NAME" ] && echo "x!"; }
 	$MAIN_ENTRY "$@"
 	trap - EXIT
-	${HAS_END:-$(false)} && debug_begin && echo -n 'Success!' && debug_end
+	${HAS_END:-$(false)} && { debug_begin;echo -n 'Success!';debug_end; } || :
 }
 DEBUG=${DEBUG:-0}
 is_darwin && realpathx(){ [[ $1 == /* ]] && echo "$1" || echo "$PWD/${1#./}"; } || realpathx () { readlink -f $*; }
