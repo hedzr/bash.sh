@@ -120,7 +120,8 @@ main_do_sth()    {
 	${HAS_END:-$(false)} && { debug_begin;echo -n 'Success!';debug_end; } || :
 }
 DEBUG=${DEBUG:-0}
-is_darwin && realpathx(){ [[ $1 == /* ]] && echo "$1" || echo "$PWD/${1#./}"; } || realpathx () { readlink -f $*; }
+trans_readlink(){ DIR="${1%/*}"; (cd $DIR && pwd -P); }
+is_darwin && realpathx(){ [[ $1 == /* ]] && echo "$1" || { DIR="${1%/*}"; DIR=$(cd $DIR && pwd -P); echo "$DIR/$(basename $1)"; }; } || realpathx () { readlink -f $*; }
 in_sourcing && { CD=${CD}; debug ">> IN SOURCING, \$0=$0, \$_=$_"; } || { SCRIPT=$(realpathx $0) && CD=$(dirname $SCRIPT) && debug ">> '$SCRIPT' in '$CD', \$0='$0','$1'."; }
 main_do_sth "$@"
 #### HZ Tail END ####
