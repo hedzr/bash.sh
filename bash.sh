@@ -54,6 +54,9 @@ is_ps1 () { [ -z "$PS1" ]; }
 is_not_ps1 () { [ ! -z "$PS1" ]; }
 is_stdin () { [ -t 0 ]; }
 is_not_stdin () { [ ! -t 0 ]; }
+fn_exists()         { LC_ALL=C type $1 | grep -q 'shell function'; }
+fn_builtin_exists() { LC_ALL=C type $1 | grep -q 'shell builtin'; }
+fn_aliased_exists() { LC_ALL=C type $1 | grep -qE '(alias for)|(aliased to)'; }
 headline()       { printf "\e[0;1m$@\e[0m:\n"; }
 headline_begin() { printf "\e[0;1m"; }  # for more color, see: shttps://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 headline_end()   { printf "\e[0m:\n"; } # https://misc.flogisoft.com/bash/tip_colors_and_formatting

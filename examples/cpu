@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 [ -f ../bash.config ] && . ../bash.config || { [ -f /usr/local/bin/bash.config ] && . /usr/local/bin/bash.config || :; }
 is_darwin && {
   ps -A -o %cpu | awk '{s+=$1} END {print s "%"}'
