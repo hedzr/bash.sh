@@ -120,6 +120,14 @@ is_debian_series(){ is_apt; }
 #
 #
 #
+uname_kernel(){ uname -s; }   # Linux
+uname_cpu(){ uname -p; }      # processor: x86_64
+uname_mach(){ uname -m; }     # machine:   x86_64, ...
+uname_rev(){ uname -r; }      # kernel-release: 5.8.15-301.fc33.x86_64
+uname_ver(){ uname -v; }      # kernel-version: 
+#
+#
+#
 headline()       { printf "\e[0;1m$@\e[0m:\n"; }
 headline_begin() { printf "\e[0;1m"; }  # for more color, see: shttps://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 headline_end()   { printf "\e[0m:\n"; } # https://misc.flogisoft.com/bash/tip_colors_and_formatting
