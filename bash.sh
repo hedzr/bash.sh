@@ -57,6 +57,69 @@ is_not_stdin () { [ ! -t 0 ]; }
 fn_exists()         { LC_ALL=C type $1 | grep -q 'shell function'; }
 fn_builtin_exists() { LC_ALL=C type $1 | grep -q 'shell builtin'; }
 fn_aliased_exists() { LC_ALL=C type $1 | grep -qE '(alias for)|(aliased to)'; }
+if_nix () {
+    case "$OSTYPE" in
+        *linux*|*hurd*|*msys*|*cygwin*|*sua*|*interix*) sys="gnu";;
+        *bsd*|*darwin*) sys="bsd";;
+        *sunos*|*solaris*|*indiana*|*illumos*|*smartos*) sys="sun";;
+    esac
+    [[ "${sys}" == "$1" ]];
+}
+if_mac () { [[ $OSTYPE == *darwin* ]]; }
+if_ubuntu () {
+  if [[ $OSTYPE == *linux* ]]; then
+    [ -f /etc/os-release ] && grep -qi 'ubuntu' /etc/os-release
+  else
+    false
+  fi
+}
+if_vagrant () {
+  [ -d /vagrant ];
+}
+if_centos () {
+  if [[ $OSTYPE == *linux* ]]; then
+    if [ -f /etc/centos-release ]; then
+      :
+    else
+      [ -f /etc/issue ] && grep -qPi '(centos|(Amazon Linux AMI))' /etc/issue
+    fi
+  else
+    false
+  fi
+}
+#
+#
+#
+osid(){      # fedora / ubuntu
+  [[ -f /etc/os-release ]] && {
+    grep -Eo '^ID="?(.+)"?' /etc/os-release|sed -r -e 's/^ID="?(.+)"?/\1/'
+  }
+}
+versionid(){ # 33 / 20.04
+  [[ -f /etc/os-release ]] && {
+    grep -Eo '^VERSION_ID="?(.+)"?' /etc/os-release|sed -r -e 's/^VERSION_ID="?(.+)"?/\1/'
+  }
+}
+variantid(){ # server, desktop
+  [[ -f /etc/os-release ]] && {
+    grep -Eo '^VARIANT_ID="?(.+)"?' /etc/os-release|sed -r -e 's/^VARIANT_ID="?(.+)"?/\1/'
+  }
+}
+#
+is_fedora(){ [[ "$osid" == fedora ]]; }
+is_centos(){ [[ "$osid" == centos ]]; }
+is_redhat(){ [[ "$osid" == redhat ]]; }
+is_debian(){ [[ "$osid" == debian ]]; }
+is_ubuntu(){ [[ "$osid" == ubuntu ]]; }
+is_debian(){ [[ "$osid" == debian ]]; }
+is_yum   (){ which yum 2>/dev/null; }
+is_dnf   (){ which dnf 2>/dev/null; }
+is_apt   (){ which apt 2>/dev/null; }
+is_redhat_series(){ is_yum || is_dnf; }
+is_debian_series(){ is_apt; }
+#
+#
+#
 headline()       { printf "\e[0;1m$@\e[0m:\n"; }
 headline_begin() { printf "\e[0;1m"; }  # for more color, see: shttps://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 headline_end()   { printf "\e[0m:\n"; } # https://misc.flogisoft.com/bash/tip_colors_and_formatting

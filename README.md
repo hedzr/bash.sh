@@ -127,6 +127,13 @@ is_linux && echo 'in linux'
 is_darwin && grep -E 'LISTEN|UDP' somefile || grep -P 'LISTEN|UDP' somefile
 ```
 
+> **UPDATED**
+> 
+> More testers added:
+> is_yum, is_dnf, is_apt,  
+> is_debian_series, is_redhat_series,  
+> is_debian, is_ubuntu, is_centod, is_fedora, is_redhat,  
+> is_nix, ...  
 
 
 ### `realpathx`
