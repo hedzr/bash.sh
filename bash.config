@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: 20211230
+#   Version: 20211231
 #   License: MIT
 #   Site: https://github/hedzr/bash.sh
 #
