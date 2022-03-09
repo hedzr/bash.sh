@@ -51,6 +51,7 @@ is_bash_t2() { [ ! -n "$BASH" ]; }
 is_zsh() { [ -n "$ZSH_NAME" ]; }
 is_zsh_t1() { [[ $SHELL == */zsh ]]; }
 is_zsh_t2() { [ -n "$ZSH_NAME" ]; }
+is_fish() { [ -n "$FISH_VERSION" ]; }
 is_darwin() { [[ $OSTYPE == *darwin* ]]; }
 is_linux() { [[ $OSTYPE == *linux* ]]; }
 in_sourcing() { is_zsh && [[ "$ZSH_EVAL_CONTEXT" == toplevel* ]] || [[ $(basename -- "$0") != $(basename -- "${BASH_SOURCE[0]}") ]]; }
