@@ -156,7 +156,8 @@ is_centos() { [[ "$osid" == centos ]]; }
 is_redhat() { [[ "$osid" == redhat ]]; }
 is_debian() { [[ "$osid" == debian ]]; }
 is_ubuntu() { [[ "$osid" == ubuntu ]]; }
-is_debian() { [[ "$osid" == debian ]]; }
+is_debian_series() { [[ "$osid" == debian || "$osid" == ubuntu ]]; }
+is_redhat_series() { [[ "$osid" == redhat || "$osid" == centos || "$osid" == fedora ]]; }
 is_yum() { which yum 2>/dev/null; }
 is_dnf() { which dnf 2>/dev/null; }
 is_apt() { which apt 2>/dev/null; }
