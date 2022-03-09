@@ -34,7 +34,7 @@ cool() { echo cool; }
 sleeping() { echo sleeping; }
 
 _my_main_do_sth() {
-	local cmd=${1:-sleeping} && { [ $# -ge 1 ] && shift; } || :
+	local cmd=${1:-sleeping} && { [[] $# -ge 1 ]] && shift; } || :
 	# for linux only:
 	# local cmd=${1:-sleeping} && shift || :
 
