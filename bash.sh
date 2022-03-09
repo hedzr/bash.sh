@@ -173,7 +173,20 @@ uname_rev() { uname -r; }    # kernel-release: 5.8.15-301.fc33.x86_64
 uname_ver() { uname -v; }    # kernel-version:
 lscpu_call() { lscpu $*; }
 lshw_cpu() { sudo lshw -c cpu; }
-i386_amd64() { dpkg --print-architecture; }
+i386_amd64() {
+	ar=""
+	case $(uname -m) in
+	i386 | i686) ar="386" ;;
+	x86_64) ar="amd64" ;;
+	armv7*) ar="arm" ;;
+	arm)
+		is_debian_series && {
+			dpkg --print-architecture | grep -q "arm64" && ar="arm64" || ar="arm"
+		} || { ar="arm64"; }
+		;;
+	esac
+	echo $ar
+}
 x86_64() { uname -m; }
 #
 #
