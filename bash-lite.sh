@@ -51,6 +51,7 @@ is_zsh() { [ -n "$ZSH_NAME" ]; }
 is_darwin() { [[ $OSTYPE == *darwin* ]]; }
 is_linux() { [[ $OSTYPE == *linux* ]]; }
 in_sourcing() { is_zsh && [[ "$ZSH_EVAL_CONTEXT" == toplevel* ]] || [[ $(basename -- "$0") != $(basename -- "${BASH_SOURCE[0]}") ]]; }
+is_git_dirty() { git diff --stat --quiet; }
 headline() { printf "\e[0;1m$@\e[0m:\n"; }
 debug() { in_debug && printf "\e[0;38;2;133;133;133m$@\e[0m\n" || :; }
 dbg() { ((DEBUG)) && printf ">>> \e[0;38;2;133;133;133m$@\e[0m\n" || :; }
@@ -69,6 +70,6 @@ main_do_sth() {
 DEBUG=${DEBUG:-0}
 trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }
 is_darwin && realpathx() { [[ $1 == /* ]] && echo "$1" || { DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $1)"; }; } || realpathx() { readlink -f $*; }
-in_sourcing && { CD=${CD} && debug ">> IN SOURCING, \$0=$0, \$_=$_"; } || { SCRIPT=$(realpathx $0) && CD=$(dirname $SCRIPT) && debug ">> '$SCRIPT' in '$CD', \$0='$0','$1'."; }
+in_sourcing && { CD=${CD} && debug ">> IN SOURCING, \$0=$0, \$_=$_"; } || { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug ">> '$SCRIPT' in '$CD', \$0='$0','$1'."; }
 main_do_sth "$@"
 #### HZ Tail END ####
