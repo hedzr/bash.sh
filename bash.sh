@@ -59,8 +59,19 @@ is_interactive_shell() { [[ $- == *i* ]]; }
 is_not_interactive_shell() { [[ $- != *i* ]]; }
 is_ps1() { [ -z "$PS1" ]; }
 is_not_ps1() { [ ! -z "$PS1" ]; }
-is_stdin() { [ -t 0 ]; }
-is_not_stdin() { [ ! -t 0 ]; }
+# The [ -t 1 ] check only works when the function is not called from
+# a subshell (like in `$(...)` or `(...)`, so this hack redefines the
+# function at the top level to always return false when stdout is not
+# a tty.
+if [ -t 1 ]; then
+	is_stdin() { true; }
+	is_not_stdin() { false; }
+	is_tty() { true; }
+else
+	is_stdin() { false; }
+	is_not_stdin() { true; }
+	is_tty() { false; }
+fi
 fn_exists() { LC_ALL=C type $1 | grep -q 'shell function'; }
 fn_builtin_exists() { LC_ALL=C type $1 | grep -q 'shell builtin'; }
 fn_aliased_exists() { LC_ALL=C type $1 | grep -qE '(alias for)|(aliased to)'; }
