@@ -228,6 +228,17 @@ i386_amd64() {
 	echo $ar
 }
 x86_64() { uname -m; }
+if_hosttype() {
+	case "$HOSTTYPE" in
+	*x86_64*) sys="x64" ;;
+	*) sys="x86" ;;
+	esac
+	[[ "${sys}" == "$1" ]]
+}
+#
+#
+#
+is_git_dirty() { git diff --stat --quiet; }
 #
 #
 #
