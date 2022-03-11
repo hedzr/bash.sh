@@ -81,16 +81,45 @@ fn_name() {
 	}
 }
 fn_name_dyn() {
-	local currentShell=$(ps -p $$ | awk "NR==2" | awk '{ print $4 }' | tr -d '-')
-	if [[ $currentShell == 'bash' ]]; then
+	# local currentShell=$(ps -p $$ | awk "NR==2" | awk '{ print $4 }' | tr -d '-')
+	local currentShell=$(find_shell_by_pidtree)
+	if [[ $currentShell == *'bash' ]]; then
 		echo ${FUNCNAME[1]}
-	elif [[ $currentShell == 'zsh' ]]; then
+	elif [[ $currentShell == *'zsh' ]]; then
 		echo ${funcstack[2]}
 	else
 		echo "unknown func name ($currentShell)"
 	fi
 }
+ps_get_procname() { ps -hp ${1:-$$} | awk '{print $4}'; }
+ps_get_fullprocname() { ps -hp ${1:-$$} | awk '{ for (i=5;i<=NF-1;i++) { printf "%s ", $i }; printf "\n" }'; }
+ps_get_procpath() { ps -hp ${1:-$$} | awk '{ if(NF>6) print $6; else print $5 }'; }
 user_shell() { grep -E "^${1:-$USER}:" /etc/passwd | awk -F: '{print $7}'; }
+top_level_parent_pid() {
+	# Look up the parent of the given PID.
+	local pid=${1:-$$}
+	local ppid="$(awk '/^PPid:/ { print $2 }' </proc/"$pid"/status)"
+	# /sbin/init always has a PID of 1, so if you reach that, the current PID is
+	# the top-level parent. Otherwise, keep looking.
+	if [[ ${ppid} -eq 1 ]]; then
+		echo "${pid}"
+	else
+		top_level_parent_pid "${ppid}"
+	fi
+}
+find_shell_by_pidtree() {
+	local pid=${1:-$$}
+	local ppid="$(awk '/^PPid:/ { print $2 }' </proc/"$pid"/status)"
+	local ppath="$(ps_get_procpath ${pid})"
+	local pbin="${ppath%% *}" # get first part by space separated
+	grep -qE "${pbin}" /etc/shells
+	[[ $? -eq 0 ]] && local isshell=1 || local isshell=0
+	if [[ $isshell -eq 1 || ${ppid} -eq 1 ]]; then
+		echo "${pbin}"
+	else
+		find_shell_by_pidtree "${ppid}"
+	fi
+}
 home_dir() { grep -E "^${1:-$USER}:" /etc/passwd | awk -F: '{print $6}'; }
 homedir_s() {
 	local name=${1:-$USER}
