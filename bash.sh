@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20220311
+#   Version: v20220506
 #   License: MIT
 #   Site: https://github/hedzr/bash.sh
 #
@@ -34,7 +34,7 @@ cool() { echo cool; }
 sleeping() { echo sleeping; }
 
 _my_main_do_sth() {
-	local cmd=${1:-sleeping} && { [[] $# -ge 1 ]] && shift; } || :
+	local cmd=${1:-sleeping} && { [[ $# -ge 1 ]] && shift; } || :
 	# for linux only:
 	# local cmd=${1:-sleeping} && shift || :
 
@@ -49,14 +49,14 @@ is_bash() { is_bash_t1 || is_bush_t2; }
 is_bash_t1() { [ -n "$BASH_VERSION" ]; }
 is_bash_t2() { [ ! -n "$BASH" ]; }
 is_zsh() { [ -n "$ZSH_NAME" ]; }
-is_zsh_t1() { [[ $SHELL == */zsh ]]; }
+is_zsh_t1() { [ "$SHELL" = */zsh ]; }
 is_zsh_t2() { [ -n "$ZSH_NAME" ]; }
 is_fish() { [ -n "$FISH_VERSION" ]; }
-is_darwin() { [[ $OSTYPE == *darwin* ]]; }
-is_linux() { [[ $OSTYPE == *linux* ]]; }
-in_sourcing() { is_zsh && [[ "$ZSH_EVAL_CONTEXT" == toplevel* ]] || [[ $(basename -- "$0") != $(basename -- "${BASH_SOURCE[0]}") ]]; }
-is_interactive_shell() { [[ $- == *i* ]]; }
-is_not_interactive_shell() { [[ $- != *i* ]]; }
+is_darwin() { [ "$OSTYPE" = *darwin* ]; }
+is_linux() { [ "$OSTYPE" = *linux* ]; }
+in_sourcing() { is_zsh && [ "$ZSH_EVAL_CONTEXT" = toplevel* ] || [ $(basename -- "$0") != $(basename -- "${BASH_SOURCE[0]}") ]; }
+is_interactive_shell() { [ $- = *i* ]; }
+is_not_interactive_shell() { [ $- != *i* ]; }
 is_ps1() { [ -z "$PS1" ]; }
 is_not_ps1() { [ ! -z "$PS1" ]; }
 # The [ -t 1 ] check only works when the function is not called from
@@ -80,9 +80,10 @@ fn_name() {
 		is_bash && echo "${FUNCNAME[1]}"
 	}
 }
+currentShell=
 fn_name_dyn() {
 	# local currentShell=$(ps -p $$ | awk "NR==2" | awk '{ print $4 }' | tr -d '-')
-	local currentShell=$(find_shell_by_pidtree)
+	currentShell=${currentShell:-$(find_shell_by_pidtree)}
 	if [[ $currentShell == *'bash' ]]; then
 		echo ${FUNCNAME[1]}
 	elif [[ $currentShell == *'zsh' ]]; then
@@ -92,7 +93,7 @@ fn_name_dyn() {
 	fi
 }
 ps_get_procname() { ps -hp ${1:-$$} | awk '{print $4}'; }
-ps_get_fullprocname() { ps -hp ${1:-$$} | awk '{ for (i=5;i<=NF-1;i++) { printf "%s ", $i }; printf "\n" }'; }
+ps_get_fullprocname() { ps -fhp ${1:-$$} | awk '{ for (i=5;i<=NF-1;i++) { printf "%s ", $i }; printf "\n" }'; }
 ps_get_procpath() { ps -hp ${1:-$$} | awk '{ if(NF>6) print $6; else print $5 }'; }
 user_shell() { grep -E "^${1:-$USER}:" /etc/passwd | awk -F: '{print $7}'; }
 top_level_parent_pid() {
@@ -110,10 +111,13 @@ top_level_parent_pid() {
 find_shell_by_pidtree() {
 	local pid=${1:-$$}
 	local ppid="$(awk '/^PPid:/ { print $2 }' </proc/"$pid"/status)"
-	local ppath="$(ps_get_procpath ${pid})"
+	local ppath="$(ps_get_fullprocname ${pid})"
 	local pbin="${ppath%% *}" # get first part by space separated
-	grep -qE "${pbin}" /etc/shells
-	[[ $? -eq 0 ]] && local isshell=1 || local isshell=0
+	[[ "$pbin" =~ ^- ]] && { echo bad >>/tmp/tmp_pids && local isshell=0; } || {
+		grep -qE "${pbin}" /etc/shells
+		[[ $? -eq 0 ]] && local isshell=1 || local isshell=0
+	}
+	echo "$pid - $ppid - $ppath - $pbin - $isshell" >>/tmp/tmp_pids
 	if [[ $isshell -eq 1 || ${ppid} -eq 1 ]]; then
 		echo "${pbin}"
 	else
