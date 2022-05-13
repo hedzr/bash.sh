@@ -8,9 +8,9 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20220506
+#   Version: v20220513
 #   License: MIT
-#   Site: https://github/hedzr/bash.sh
+#   Site: https://github.com/hedzr/bash.sh
 #
 
 # Usages:
@@ -26,20 +26,68 @@
 #  $ HAS_END=: ./bash.sh
 #  $ HAS_END=false ./bash.sh
 #
-# Use installer:
+# Use installer (Deprecated):
 #   $ curl -sSL https://hedzr.com/bash.sh/installer | sudo bash -s
 
 #### write your functions here, and invoke them by: `./bash.sh <your-func-name>`
 cool() { echo cool; }
 sleeping() { echo sleeping; }
 
+# FN_PREFIX=boot_
 _my_main_do_sth() {
 	local cmd=${1:-sleeping} && { [[ $# -ge 1 ]] && shift; } || :
+	# local FN_PREFIX=boot_
 	# for linux only:
 	# local cmd=${1:-sleeping} && shift || :
 
-	debug "$cmd - $@"
-	eval "$cmd $@" || :
+	load_import_files
+	load_env_files
+
+	in_debug && LC_ALL=C type $cmd
+	fn_exists $cmd && {
+		debug "$cmd - $@"
+		eval "$cmd $@" || :
+	} || {
+		# echo "$cmd - $@"
+		debug "$cmd - $@"
+		eval "$FN_PREFIX$cmd $@" || :
+	}
+}
+
+load_import_files() {
+	[ -d $CD/ops.d ] && {
+		if test -n "$(find $CD/ops.d -maxdepth 1 -name 'import-*.sh' -print -quit)"; then
+			for f in $CD/ops.d/import-*.sh; do source $f; done
+		fi
+	} || {
+		[ -d /vagrant/bin ] && {
+			cmd=first_install # bootstrapping a vagrant VM
+			CD=/vagrant/bin
+			if test -n "$(find $CD/ops.d -maxdepth 1 -name 'import-*.sh' -print -quit)"; then
+				for f in $CD/ops.d/import-*.sh; do source $f; done
+			fi
+		} || {
+			in_debug && ps -auxf
+			debug "--------"
+			debug "CD=$CD"
+			debug "SCRIPT=$SCRIPT"
+			debug "[NOTE] ops.d/ folder NOT FOUND, no more script files loaded."
+		}
+	}
+}
+
+load_env_files() {
+	local env=
+	for rel in '.' '..'; do
+		env="$CD/$rel/.env"
+		[ -f $env ] && source $env
+	done
+
+	# env="$HOME/.priv/k8s-istio-in-vagrant-env" # optional
+	#	[ -f $env ] && source $env
+
+	env="$CD/.env.local"
+	[ -f $env ] && source $env
 }
 
 #### HZ Tail BEGIN ####
@@ -72,7 +120,7 @@ else
 	is_not_stdin() { true; }
 	is_tty() { false; }
 fi
-fn_exists() { LC_ALL=C type $1 | grep -q 'shell function'; }
+fn_exists() { LC_ALL=C type $1 | grep -qE '(shell function)|(a function)'; }
 fn_builtin_exists() { LC_ALL=C type $1 | grep -q 'shell builtin'; }
 fn_aliased_exists() { LC_ALL=C type $1 | grep -qE '(alias for)|(aliased to)'; }
 fn_name() {
@@ -184,29 +232,41 @@ osid() { # fedora / ubuntu
 		grep -Eo '^ID="?(.+)"?' /etc/os-release | sed -r -e 's/^ID="?(.+)"?/\1/'
 	}
 }
+osidlike() { # fedora / ubuntu
+	[[ -f /etc/os-release ]] && {
+		grep -Eo '^ID_LIKE="?(.+)"?' /etc/os-release | sed -r -e 's/^ID_LIKE="?(.+)"?/\1/'
+	}
+}
+oscodename() { # fedora / ubuntu
+	[[ -f /etc/os-release ]] && {
+		grep -Eo '^VERSION_CODENAME="?(.+)"?' /etc/os-release | sed -r -e 's/^VERSION_CODENAME="?(.+)"?/\1/'
+	}
+}
 versionid() { # 33 / 20.04
 	[[ -f /etc/os-release ]] && {
-		grep -Eo '^VERSION_ID="?(.+)"?' /etc/os-release | sed -r -e 's/^VERSION_ID="?(.+)"?/\1/'
+		grep -Eo '^VERSION_ID="?(.+)"?' /etc/os-release | sed -r -e 's/^VERSION_ID="?(.+)"?/\1/' | sed -r -e 's/"$//'
 	}
 }
 variantid() { # server, desktop
 	[[ -f /etc/os-release ]] && {
-		grep -Eo '^VARIANT_ID="?(.+)"?' /etc/os-release | sed -r -e 's/^VARIANT_ID="?(.+)"?/\1/'
+		grep -Eo '^VARIANT_ID="?(.+)"?' /etc/os-release | sed -r -e 's/^VARIANT_ID="?(.+)"?/\1/' | sed -r -e 's/"$//'
 	}
 }
 #
-is_fedora() { [[ "$osid" == fedora ]]; }
-is_centos() { [[ "$osid" == centos ]]; }
-is_redhat() { [[ "$osid" == redhat ]]; }
-is_debian() { [[ "$osid" == debian ]]; }
-is_ubuntu() { [[ "$osid" == ubuntu ]]; }
-is_debian_series() { [[ "$osid" == debian || "$osid" == ubuntu ]]; }
-is_redhat_series() { [[ "$osid" == redhat || "$osid" == centos || "$osid" == fedora ]]; }
-is_yum() { which yum 2>/dev/null; }
-is_dnf() { which dnf 2>/dev/null; }
-is_apt() { which apt 2>/dev/null; }
-is_redhat_series() { is_yum || is_dnf; }
-is_debian_series() { is_apt; }
+is_fedora() { [[ "$(osid)" == fedora ]]; }
+is_centos() { [[ "$(osid)" == centos ]]; }
+is_redhat() { [[ "$(osid)" == redhat ]]; }
+is_debian() { [[ "$(osid)" == debian ]]; }
+is_ubuntu() { [[ "$(osid)" == ubuntu ]]; }
+# is_debian_series() { [[ "$(osid)" == debian || "$(osid)" == ubuntu ]]; }
+# is_redhat_series() { [[ "$(osid)" == redhat || "$(osid)" == centos || "$(osid)" == fedora ]]; }
+is_yum() { which yum 1>/dev/null 2>&1; }
+is_dnf() { which dnf 1>/dev/null 2>&1; }
+is_apt() { which apt-get 1>/dev/null 2>&1; }
+# is_redhat_series() { is_yum || is_dnf; }
+# is_debian_series() { is_apt; }
+is_redhat_series() { [[ "$(osidlike)" == redhat ]]; }
+is_debian_series() { [[ "$(osidlike)" == debian ]]; }
 #
 #
 #
@@ -301,6 +361,8 @@ script_functions() {
 	fi
 	#declare MyFuncs=($(script.functions));
 }
+list_all_env_variables() { declare -xp; }
+list_all_variables() { declare -p; }
 main_do_sth() {
 	set -e
 	trap 'previous_command=$this_command; this_command=$BASH_COMMAND' DEBUG

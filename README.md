@@ -1,10 +1,15 @@
 # bash.sh
 
-
-
 `bash.sh` is a starting template for shell developing.
 
+## History
 
+- v20220513:
+  - improved/fixed: osid, is_debian_series, ...
+  - added: osidlike, oscodename, ...
+  - fixed: fn_exists
+  - added: load_import_files && load_env_files to load and source extra files
+  - more...
 
 ## Usages
 
@@ -29,8 +34,6 @@ $ HAS_END=: ./bash.sh
 $ HAS_END=false ./bash.sh
 ```
 
-
-
 ### Use It
 
 #### 1. Simple
@@ -49,7 +52,7 @@ DEBUG=1 ./installsamba
 
 #### 2. Global
 
-##### Use `installer`:
+##### Use `installer`: [~~**DEPRECATED**~~]
 
 ```bash
 curl -sSL https://hedzr.com/bash/bash.sh/installer | sudo bash -s
@@ -69,8 +72,6 @@ Some examples [here](./examples/).
 
 ![](./_images/2018-02-22_12.30.11.png)
 
-
-
 ## Knives Document
 
 ### `in_debug`
@@ -83,9 +84,7 @@ toggle environment variable `DEBUG` to switch between `normal_mode` and `debug_m
 is_debug && echo 'debug mode' || echo 'normal mode'
 ```
 
-
-
-### `debug` $*
+### `debug` $\*
 
 print string for debug. In normal mode, the string message will be stripped.
 
@@ -95,17 +94,13 @@ debug 'I am buggy but you don'''t know'
 debug "I am buggy but you don't know"
 ```
 
-
-
-### `headline` $*
+### `headline` $\*
 
 print a hilight message string.
 
 ```bash
 headline here is the hilighted title
 ```
-
-
 
 ### `is_bash` & `is_zsh`
 
@@ -115,8 +110,6 @@ check if running under bash/zsh interpretor or not
 is_bash && echo 'in bash'
 is_zsh && echo 'in zsh'
 ```
-
-
 
 ### `is_linux`, `is_darwin`
 
@@ -128,18 +121,16 @@ is_darwin && grep -E 'LISTEN|UDP' somefile || grep -P 'LISTEN|UDP' somefile
 ```
 
 > **UPDATED**
-> 
+>
 > More testers added:
 > is_yum, is_dnf, is_apt,  
 > is_debian_series, is_redhat_series,  
 > is_debian, is_ubuntu, is_centod, is_fedora, is_redhat,  
-> is_nix, ...  
-
+> is_nix, ...
 
 ### `realpathx`
 
 cross impl for linux `realpath`.
-
 
 ## Use `commander()` in your scripts
 
@@ -227,23 +218,15 @@ ops dns fix_nameservers
 
 > See also [example/dns-tool](example/dns-tool)
 
-
 ### Environment Variables
 
 #### `DEBUG` = {1|0}
 
-
-
 #### `HAS_END` = {true|:|false}
-
-
 
 #### `CD`: directory of `bash.sh`
 
-
-
 #### `SCRIPT`: full path of `bash.sh`
-
 
 ## Under zsh Shell
 
@@ -254,8 +237,6 @@ advantage.
 ### 20190215
 
 ### 20180509
-
-
 
 ## License
 
