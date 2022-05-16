@@ -4,6 +4,10 @@
 
 ## History
 
+- v20220516:
+
+  - improved/fixed: adapted into vagrant better
+
 - v20220513:
   - improved/fixed: osid, is_debian_series, ...
   - added: osidlike, oscodename, ...

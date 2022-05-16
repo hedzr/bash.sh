@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20220513
+#   Version: v20220516
 #   License: MIT
 #   Site: https://github.com/hedzr/bash.sh
 #
@@ -35,60 +35,84 @@ sleeping() { echo sleeping; }
 
 # FN_PREFIX=boot_
 _my_main_do_sth() {
-	local cmd=${1:-sleeping} && { [[ $# -ge 1 ]] && shift; } || :
+	local cmd=${1:-help} && { [ $# -ge 1 ] && shift; } || :
 	# local FN_PREFIX=boot_
 	# for linux only:
-	# local cmd=${1:-sleeping} && shift || :
+	# local cmd=${1:-sleeping} && && shift || :
 
 	load_import_files
 	load_env_files
 
-	in_debug && LC_ALL=C type $cmd
-	fn_exists $cmd && {
-		debug "$cmd - $@"
-		eval "$cmd $@" || :
-	} || {
-		# echo "$cmd - $@"
-		debug "$cmd - $@"
+	# in_debug && LC_ALL=C type $cmd || echo "$cmd not exists"
+	dbg "  cmd = $cmd"
+	fn_exists "$FN_PREFIX$cmd" && {
 		eval "$FN_PREFIX$cmd $@" || :
+	} || {
+		fn_exists "$cmd" && {
+			# echo "$cmd - $@"
+			eval "$cmd $@" || :
+		} || :
 	}
 }
 
 load_import_files() {
-	[ -d $CD/ops.d ] && {
-		if test -n "$(find $CD/ops.d -maxdepth 1 -name 'import-*.sh' -print -quit)"; then
-			for f in $CD/ops.d/import-*.sh; do source $f; done
-		fi
-	} || {
-		[ -d /vagrant/bin ] && {
-			cmd=first_install # bootstrapping a vagrant VM
-			CD=/vagrant/bin
-			if test -n "$(find $CD/ops.d -maxdepth 1 -name 'import-*.sh' -print -quit)"; then
-				for f in $CD/ops.d/import-*.sh; do source $f; done
+	local processed=0
+	for dir in $CD /vagrant/bin; do
+		if [ -d $dir/ops.d ]; then
+			if test -n "$(find $dir/ops.d -maxdepth 1 -name 'import-*.sh' -print -quit)"; then
+				for f in $dir/ops.d/import-*.sh; do dbg "  ..sourcing $f" && source $f && processed=1; done
 			fi
-		} || {
-			in_debug && ps -auxf
-			debug "--------"
-			debug "CD=$CD"
-			debug "SCRIPT=$SCRIPT"
-			debug "[NOTE] ops.d/ folder NOT FOUND, no more script files loaded."
-		}
-	}
+		fi
+	done
+	if [[ $processed -eq 0 ]]; then
+		ps -auxf
+		echo
+		echo "CD=$CD, SCRIPT=$SCRIPT"
+		echo "[NOTE] ops.d/ folder NOT FOUND, no more script files loaded."
+	else
+		:
+	fi
+}
+
+load_files() {
+	local processed=0
+	for dir in $CD /vagrant/bin; do
+		if [ -d $dir/ops.d ]; then
+			for f in $*; do
+				local s="$dir/ops.d/$f.sh"
+				dbg "  .. testing for $s ..."
+				if [ -f $s ]; then
+					dbg "  ..sourcing $s" && source $s && processed=1
+				fi
+			done
+		fi
+	done
+	if [[ $processed -eq 0 ]]; then
+		ps -auxf
+		echo
+		echo "CD=$CD, SCRIPT=$SCRIPT"
+		echo "[NOTE] ops.d/ folder NOT FOUND, no more script files loaded."
+	else
+		:
+	fi
 }
 
 load_env_files() {
 	local env=
 	for rel in '.' '..'; do
 		env="$CD/$rel/.env"
-		[ -f $env ] && source $env
+		[ -f $env ] && dbg "  ..sourcing $env" && source $env
 	done
 
-	# env="$HOME/.priv/k8s-istio-in-vagrant-env" # optional
-	#	[ -f $env ] && source $env
+	# env="$HOME/.priv/k8s-istio-in-vagrant-env"
+	# [ -f $env ] && dbg "  ..sourcing $env" && source $env
 
 	env="$CD/.env.local"
-	[ -f $env ] && source $env
+	[ -f $env ] && dbg "  ..sourcing $env" && source $env
+	:
 }
+
+##################################################
 
 #### HZ Tail BEGIN ####
 in_debug() { [[ $DEBUG -eq 1 ]]; }
@@ -326,12 +350,14 @@ debug_info() {
 	cat <<-EOF
 		             in_debug: $(in_debug && echo Y || echo '-')
 		              is_root: $(is_root && echo Y || echo '-')
-		              is_bash: $(is_bash && echo Y || echo '-')
-		               is_zsh: $(is_zsh && echo Y || echo '-')
-		          in_sourcing: $(in_sourcing && echo Y || echo '-')   # ZSH_EVAL_CONTEXT = $ZSH_EVAL_CONTEXT
+		              is_bash: $(is_bash && echo Y || echo '-')       # SHELL = $SHELL, BASH_VERSION = $BASH_VERSION
+		               is_zsh: $(is_zsh && echo Y || echo '-')       # 
+		          in_sourcing: $(in_sourcing && echo Y || echo '-')
 		 is_interactive_shell: $(is_interactive_shell && echo Y || echo '-')
 	EOF
+	is_zsh && echo "    ZSH_EVAL_CONTEXT = $ZSH_EVAL_CONTEXT, ZSH_NAME = $ZSH_NAME, ZSH_VERSION = $ZSH_VERSION" || :
 	debug_end
+	:
 }
 commander() {
 	local self=$1
@@ -366,11 +392,12 @@ list_all_variables() { declare -p; }
 main_do_sth() {
 	set -e
 	trap 'previous_command=$this_command; this_command=$BASH_COMMAND' DEBUG
-	trap '[ $? -ne 0 ] && echo FAILED COMMAND: $previous_command with exit code $?' EXIT
+	trap '[ $? -ne 0 ] && echo FAILED COMMAND: "$previous_command" with exit code $?' EXIT
 	MAIN_DEV=${MAIN_DEV:-eth0}
 	MAIN_ENTRY=${MAIN_ENTRY:-_my_main_do_sth}
 	# echo $MAIN_ENTRY - "$@"
-	in_debug && { debug_info && echo "$SHELL : $ZSH_NAME - $ZSH_VERSION | BASH_VERSION = $BASH_VERSION" && [ -n "$ZSH_NAME" ] && echo "x!"; }
+	in_debug && debug_info || :
+	dbg "$MAIN_ENTRY - $@" && dbg "CD: $CD, SCRIPT: $SCRIPT"
 	$MAIN_ENTRY "$@"
 	trap - EXIT
 	${HAS_END:-$(false)} && { debug_begin && echo -n 'Success!' && debug_end; } || :
@@ -379,5 +406,6 @@ DEBUG=${DEBUG:-0}
 trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }
 is_darwin && realpathx() { [[ $1 == /* ]] && echo "$1" || { DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $1)"; }; } || realpathx() { readlink -f $*; }
 in_sourcing && { CD=${CD} && debug ">> IN SOURCING, \$0=$0, \$_=$_"; } || { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug ">> '$SCRIPT' in '$CD', \$0='$0','$1'."; }
+if_vagrant && [ "$SCRIPT" == "/tmp/vagrant-shell" ] && CD=/vagrant/bin
 main_do_sth "$@"
 #### HZ Tail END ####
