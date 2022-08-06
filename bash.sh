@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20220516
+#   Version: v20220807
 #   License: MIT
 #   Site: https://github.com/hedzr/bash.sh
 #
@@ -45,19 +45,21 @@ _my_main_do_sth() {
 
 	# in_debug && LC_ALL=C type $cmd || echo "$cmd not exists"
 	dbg "  cmd = $cmd"
-	fn_exists "$FN_PREFIX$cmd" && {
-		eval "$FN_PREFIX$cmd $@" || :
-	} || {
-		fn_exists "$cmd" && {
+	if fn_exists "boot_$cmd"; then
+		eval "boot_$cmd $@"
+	else
+		if fn_exists "$cmd"; then
 			# echo "$cmd - $@"
-			eval "$cmd $@" || :
-		} || :
-	}
+			eval "$cmd $@"
+		else
+			echo "command '$cmd' has not been defined."
+		fi
+	fi
 }
 
 load_import_files() {
 	local processed=0
-	for dir in $CD /vagrant/bin; do
+	for dir in $CD; do
 		if [ -d $dir/ops.d ]; then
 			if test -n "$(find $dir/ops.d -maxdepth 1 -name 'import-*.sh' -print -quit)"; then
 				for f in $dir/ops.d/import-*.sh; do dbg "  ..sourcing $f" && source $f && processed=1; done
@@ -65,10 +67,10 @@ load_import_files() {
 		fi
 	done
 	if [[ $processed -eq 0 ]]; then
-		ps -auxf
-		echo
-		echo "CD=$CD, SCRIPT=$SCRIPT"
-		echo "[NOTE] ops.d/ folder NOT FOUND, no more script files loaded."
+		# in_debug && is_darwin && ps -a || ps -auxf
+		dbg
+		dbg "CD=$CD, SCRIPT=$SCRIPT"
+		dbg "[NOTE] ops.d/ folder NOT FOUND, no more script files loaded."
 	else
 		:
 	fi
@@ -76,11 +78,11 @@ load_import_files() {
 
 load_files() {
 	local processed=0
-	for dir in $CD /vagrant/bin; do
+	for dir in $CD; do
 		if [ -d $dir/ops.d ]; then
 			for f in $*; do
 				local s="$dir/ops.d/$f.sh"
-				dbg "  .. testing for $s ..."
+				dbg "  ..testing for $s ..."
 				if [ -f $s ]; then
 					dbg "  ..sourcing $s" && source $s && processed=1
 				fi
@@ -88,10 +90,10 @@ load_files() {
 		fi
 	done
 	if [[ $processed -eq 0 ]]; then
-		ps -auxf
-		echo
-		echo "CD=$CD, SCRIPT=$SCRIPT"
-		echo "[NOTE] ops.d/ folder NOT FOUND, no more script files loaded."
+		# in_debug && is_darwin && ps -a || ps -auxf
+		dbg
+		dbg "CD=$CD, SCRIPT=$SCRIPT"
+		dbg "[NOTE] ops.d/ folder NOT FOUND, no more script files loaded."
 	else
 		:
 	fi
@@ -103,12 +105,9 @@ load_env_files() {
 		env="$CD/$rel/.env"
 		[ -f $env ] && dbg "  ..sourcing $env" && source $env
 	done
-
-	# env="$HOME/.priv/k8s-istio-in-vagrant-env"
-	# [ -f $env ] && dbg "  ..sourcing $env" && source $env
-
-	env="$CD/.env.local"
-	[ -f $env ] && dbg "  ..sourcing $env" && source $env
+	for env in "$CD/ops.d/.env" "$CD/.env.local" "$CD/ops.d/.env.local" "$HOME/.config/ops.sh/env"; do
+		[ -f $env ] && dbg "  ..sourcing $env" && source $env
+	done
 	:
 }
 
@@ -120,15 +119,19 @@ is_root() { [ "$(id -u)" = "0" ]; }
 is_bash() { is_bash_t1 || is_bush_t2; }
 is_bash_t1() { [ -n "$BASH_VERSION" ]; }
 is_bash_t2() { [ ! -n "$BASH" ]; }
-is_zsh() { [ -n "$ZSH_NAME" ]; }
-is_zsh_t1() { [ "$SHELL" = */zsh ]; }
+is_zsh() { [[ -n "$ZSH_NAME" || "$SHELL" = */zsh ]]; }
+is_zsh_t1() { [[ "$SHELL" = */zsh ]]; }
 is_zsh_t2() { [ -n "$ZSH_NAME" ]; }
 is_fish() { [ -n "$FISH_VERSION" ]; }
-is_darwin() { [ "$OSTYPE" = *darwin* ]; }
-is_linux() { [ "$OSTYPE" = *linux* ]; }
-in_sourcing() { is_zsh && [ "$ZSH_EVAL_CONTEXT" = toplevel* ] || [ $(basename -- "$0") != $(basename -- "${BASH_SOURCE[0]}") ]; }
-is_interactive_shell() { [ $- = *i* ]; }
-is_not_interactive_shell() { [ $- != *i* ]; }
+is_darwin() { [[ $OSTYPE =~ darwin* ]]; }
+is_linux() { [[ $OSTYPE =~ linux* ]]; }
+is_win() { in_wsl; }
+in_wsl() { [[ "$(uname -r)" = *windows_standard* ]]; }
+in_sourcing() { is_zsh && [[ "$ZSH_EVAL_CONTEXT" =~ toplevel* ]] || [ $(basename -- "$0") != $(basename -- "${BASH_SOURCE[0]}") ]; }
+in_vscode() { [[ "$TERM_PROGRAM" == "vscode" ]]; }
+in_jetbrain() { [ "$TERMINAL_EMULATOR" = *JetBrains ]; }
+is_interactive_shell() { [[ $- =~ *i* ]]; }
+is_not_interactive_shell() { [[ $- != *i* ]]; }
 is_ps1() { [ -z "$PS1" ]; }
 is_not_ps1() { [ ! -z "$PS1" ]; }
 # The [ -t 1 ] check only works when the function is not called from
@@ -144,9 +147,9 @@ else
 	is_not_stdin() { true; }
 	is_tty() { false; }
 fi
-fn_exists() { LC_ALL=C type $1 | grep -qE '(shell function)|(a function)'; }
-fn_builtin_exists() { LC_ALL=C type $1 | grep -q 'shell builtin'; }
-fn_aliased_exists() { LC_ALL=C type $1 | grep -qE '(alias for)|(aliased to)'; }
+fn_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(shell function)|(a function)'; }
+fn_builtin_exists() { LC_ALL=C type $1 2>/dev/null | grep -q 'shell builtin'; }
+fn_aliased_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(alias for)|(aliased to)'; }
 fn_name() {
 	is_zsh && echo "${funcstack[2]}" || {
 		is_bash && echo "${FUNCNAME[1]}"
@@ -185,6 +188,7 @@ find_shell_by_pidtree() {
 	local ppid="$(awk '/^PPid:/ { print $2 }' </proc/"$pid"/status)"
 	local ppath="$(ps_get_fullprocname ${pid})"
 	local pbin="${ppath%% *}" # get first part by space separated
+	[ -f /tmp/tmp_pids ] && $SUDO chown $USER: /tmp/tmp_pids
 	[[ "$pbin" =~ ^- ]] && { echo bad >>/tmp/tmp_pids && local isshell=0; } || {
 		grep -qE "${pbin}" /etc/shells
 		[[ $? -eq 0 ]] && local isshell=1 || local isshell=0
@@ -226,9 +230,9 @@ if_nix() {
 	esac
 	[[ "${sys}" == "$1" ]]
 }
-if_mac() { [[ $OSTYPE == *darwin* ]]; }
+if_mac() { [[ $OSTYPE =~ darwin* ]]; }
 if_ubuntu() {
-	if [[ $OSTYPE == *linux* ]]; then
+	if [[ $OSTYPE == linux* ]]; then
 		[ -f /etc/os-release ] && grep -qi 'ubuntu' /etc/os-release
 	else
 		false
@@ -238,7 +242,7 @@ if_vagrant() {
 	[ -d /vagrant ]
 }
 if_centos() {
-	if [[ $OSTYPE == *linux* ]]; then
+	if [[ $OSTYPE == linux* ]]; then
 		if [ -f /etc/centos-release ]; then
 			:
 		else
@@ -348,14 +352,19 @@ dbg() { ((DEBUG)) && printf ">>> \e[0;38;2;133;133;133m$@\e[0m\n" || :; }
 debug_info() {
 	debug_begin
 	cat <<-EOF
-		             in_debug: $(in_debug && echo Y || echo '-')
-		              is_root: $(is_root && echo Y || echo '-')
-		              is_bash: $(is_bash && echo Y || echo '-')       # SHELL = $SHELL, BASH_VERSION = $BASH_VERSION
-		               is_zsh: $(is_zsh && echo Y || echo '-')       # 
-		          in_sourcing: $(in_sourcing && echo Y || echo '-')
-		 is_interactive_shell: $(is_interactive_shell && echo Y || echo '-')
+		               in_debug: $(in_debug && echo Y || echo '-')
+		                is_root: $(is_root && echo Y || echo '-')
+		                is_bash: $(is_bash && echo Y || echo '-')       # SHELL = $SHELL, BASH_VERSION = $BASH_VERSION
+		       is_zsh/is_zsh_t1: $(is_zsh && echo Y || echo '-') / $(is_zsh_t1 && echo Y || echo '-')   # $(is_zsh && echo "ZSH_EVAL_CONTEXT = $ZSH_EVAL_CONTEXT, ZSH_NAME = $ZSH_NAME, ZSH_VERSION = $ZSH_VERSION" || :)
+		                is_fish: $(is_fish && echo Y || echo '-')       # FISH_VERSION = $FISH_VERSION
+		            in_sourcing: $(in_sourcing && echo Y || echo '-')
+		              in_vscode: $(in_vscode && echo Y || echo '-')
+		            in_jetbrain: $(in_jetbrain && echo Y || echo '-')
+		  darwin/linux/win(wsl): $(is_darwin && echo Y || echo '-') / $(is_linux && echo Y || echo '-') / $(is_win && echo Y || echo '-')
+		   is_interactive_shell: $(is_interactive_shell && echo Y || echo '-')
+		  
+		NOTE: bash.sh can only work in bash/zsh mode, even if run it in fish shell.
 	EOF
-	is_zsh && echo "    ZSH_EVAL_CONTEXT = $ZSH_EVAL_CONTEXT, ZSH_NAME = $ZSH_NAME, ZSH_VERSION = $ZSH_VERSION" || :
 	debug_end
 	:
 }
@@ -390,22 +399,28 @@ script_functions() {
 list_all_env_variables() { declare -xp; }
 list_all_variables() { declare -p; }
 main_do_sth() {
+	[ ${VERBOSE:-0} -eq 1 ] && set -x
 	set -e
-	trap 'previous_command=$this_command; this_command=$BASH_COMMAND' DEBUG
-	trap '[ $? -ne 0 ] && echo FAILED COMMAND: "$previous_command" with exit code $?' EXIT
+	# set -o errexit
+	# set -o nounset
+	# set -o pipefail
 	MAIN_DEV=${MAIN_DEV:-eth0}
 	MAIN_ENTRY=${MAIN_ENTRY:-_my_main_do_sth}
 	# echo $MAIN_ENTRY - "$@"
-	in_debug && debug_info || :
-	dbg "$MAIN_ENTRY - $@" && dbg "CD: $CD, SCRIPT: $SCRIPT"
+	if in_debug; then
+		debug_info && dbg "$MAIN_ENTRY - $@ [CD: $CD, SCRIPT: $SCRIPT]"
+	fi
+	#
+	trap 'previous_command=$this_command; this_command=$BASH_COMMAND' DEBUG
+	trap '[ $? -ne 0 ] && echo FAILED COMMAND: "$previous_command" with exit code $?' EXIT
 	$MAIN_ENTRY "$@"
 	trap - EXIT
-	${HAS_END:-$(false)} && { debug_begin && echo -n 'Success!' && debug_end; } || :
+	${HAS_END:-$(false)} && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
 }
 DEBUG=${DEBUG:-0}
-trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }
+# trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }
 is_darwin && realpathx() { [[ $1 == /* ]] && echo "$1" || { DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $1)"; }; } || realpathx() { readlink -f $*; }
 in_sourcing && { CD=${CD} && debug ">> IN SOURCING, \$0=$0, \$_=$_"; } || { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug ">> '$SCRIPT' in '$CD', \$0='$0','$1'."; }
-if_vagrant && [ "$SCRIPT" == "/tmp/vagrant-shell" ] && CD=/vagrant/bin
+if_vagrant && [ "$SCRIPT" == "/tmp/vagrant-shell" ] && { [ -d $CD/ops.d ] || CD=/vagrant/bin; }
 main_do_sth "$@"
 #### HZ Tail END ####

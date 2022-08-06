@@ -4,8 +4,16 @@
 
 ## History
 
-- v20220516:
+- v20220807:
+  - imp'd/fixed: dbg the warnings in `load_import_files`/`load_env_files`
+  - imp'd: safer `is_zsh`
+  - added: `is_win` (=`in_wsl`)
+  - added: `in_vscode`, `in_jetbrains` (for clion/goland/...)
+  - imp'd: disable stdout for testing by `fn_exists`/`fn_builtin_exists`/`fn_aliased_exists`
+  - imp'd: better `debug_info`
+  - imp'd: beeter `main_do_sth`
 
+- v20220516:
   - improved/fixed: adapted into vagrant better
 
 - v20220513:
@@ -14,6 +22,12 @@
   - fixed: fn_exists
   - added: load_import_files && load_env_files to load and source extra files
   - more...
+
+
+- ...
+- 20190215
+- 20180509
+- ...
 
 ## Usages
 
@@ -236,11 +250,7 @@ ops dns fix_nameservers
 
 advantage.
 
-## Changelog
 
-### 20190215
-
-### 20180509
 
 ## License
 
