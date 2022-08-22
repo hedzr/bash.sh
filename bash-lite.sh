@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20220311
+#   Version: v20220822
 #   License: MIT
 #   Site: https://github/hedzr/bash.sh
 #
@@ -52,7 +52,7 @@ debug_info() {
 	:
 }
 
-#### write your functions here, and invoke them by: `./bash.sh <your-func-name>`
+#### write your functions here, and invoke them by: `./bash-lite.sh <your-func-name>`
 cool() { echo cool; }
 sleeping() { echo sleeping; }
 
