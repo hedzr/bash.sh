@@ -31,6 +31,27 @@
 
 #
 
+# erase this function and start yours
+debug_info() {
+	debug_begin
+	cat <<-EOF
+		               in_debug: $(in_debug && echo Y || echo '-')
+		                is_root: $(is_root && echo Y || echo '-')
+		                is_bash: $(is_bash && echo Y || echo '-')       # SHELL = $SHELL, BASH_VERSION = $BASH_VERSION
+		       is_zsh/is_zsh_t1: $(is_zsh && echo Y || echo '-') / $(is_zsh_t1 && echo Y || echo '-')   # $(is_zsh && echo "ZSH_EVAL_CONTEXT = $ZSH_EVAL_CONTEXT, ZSH_NAME = $ZSH_NAME, ZSH_VERSION = $ZSH_VERSION" || :)
+		                is_fish: $(is_fish && echo Y || echo '-')       # FISH_VERSION = $FISH_VERSION
+		            in_sourcing: $(in_sourcing && echo Y || echo '-')
+		              in_vscode: $(in_vscode && echo Y || echo '-')
+		            in_jetbrain: $(in_jetbrain && echo Y || echo '-')
+		  darwin/linux/win(wsl): $(is_darwin && echo Y || echo '-') / $(is_linux && echo Y || echo '-') / $(is_win && echo Y || echo '-')
+		   is_interactive_shell: $(is_interactive_shell && echo Y || echo '-')
+		  
+		NOTE: bash.sh can only work in bash/zsh mode, even if run it in fish shell.
+	EOF
+	debug_end
+	:
+}
+
 #### write your functions here, and invoke them by: `./bash.sh <your-func-name>`
 cool() { echo cool; }
 sleeping() { echo sleeping; }
@@ -47,13 +68,29 @@ _my_main_do_sth() {
 in_debug() { [[ $DEBUG -eq 1 ]]; }
 is_root() { [ "$(id -u)" = "0" ]; }
 is_bash() { is_bash_t1 || is_bush_t2; }
-is_zsh() { [ -n "$ZSH_NAME" ]; }
-is_darwin() { [[ $OSTYPE == *darwin* ]]; }
-is_linux() { [[ $OSTYPE == *linux* ]]; }
-in_sourcing() { is_zsh && [[ "$ZSH_EVAL_CONTEXT" == toplevel* ]] || [[ $(basename -- "$0") != $(basename -- "${BASH_SOURCE[0]}") ]]; }
-is_git_dirty() { git diff --stat --quiet; }
+is_bash_t1() { [ -n "$BASH_VERSION" ]; }
+is_bash_t2() { [ ! -n "$BASH" ]; }
+is_zsh() { [[ -n "$ZSH_NAME" || "$SHELL" = */zsh ]]; }
+is_zsh_t1() { [[ "$SHELL" = */zsh ]]; }
+is_zsh_t2() { [ -n "$ZSH_NAME" ]; }
+is_fish() { [ -n "$FISH_VERSION" ]; }
+is_darwin() { [[ $OSTYPE =~ darwin* ]]; }
+is_linux() { [[ $OSTYPE =~ linux* ]]; }
+is_win() { in_wsl; }
+in_wsl() { [[ "$(uname -r)" = *windows_standard* ]]; }
+in_sourcing() { is_zsh && [[ "$ZSH_EVAL_CONTEXT" =~ toplevel* ]] || [ $(basename -- "$0") != $(basename -- "${BASH_SOURCE[0]}") ]; }
+in_vscode() { [[ "$TERM_PROGRAM" == "vscode" ]]; }
+in_jetbrain() { [ "$TERMINAL_EMULATOR" = *JetBrains ]; }
+is_interactive_shell() { [[ $- =~ *i* ]]; }
+is_not_interactive_shell() { [[ $- != *i* ]]; }
+is_ps1() { [ -z "$PS1" ]; }
+is_not_ps1() { [ ! -z "$PS1" ]; }
+is_git_clean() { git diff-index --quiet $* HEAD -- 2>/dev/null; }
+is_git_dirty() { is_git_clean && return -1 || return 0; }
 headline() { printf "\e[0;1m$@\e[0m:\n"; }
 debug() { in_debug && printf "\e[0;38;2;133;133;133m$@\e[0m\n" || :; }
+debug_begin() { printf "\e[0;38;2;133;133;133m"; }
+debug_end() { printf "\e[0m\n"; }
 dbg() { ((DEBUG)) && printf ">>> \e[0;38;2;133;133;133m$@\e[0m\n" || :; }
 main_do_sth() {
 	set -e
