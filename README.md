@@ -5,7 +5,7 @@
 ## History
 
 - v20220822:
-  - fixed: `is_git_dirty`
+  - fixed: `is_git_dirty`, added `is_git_clean`
 
 - v20220807:
   - imp'd/fixed: dbg the warnings in `load_import_files`/`load_env_files`

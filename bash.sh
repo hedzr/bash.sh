@@ -330,8 +330,9 @@ if_hosttype() {
 #
 #
 #
-# is_git_dirty() { git diff-index --quiet --cached HEAD -- 2>/dev/null && false || true; }
-is_git_dirty() { git diff-index --quiet $* HEAD -- 2>/dev/null && false || true; }
+# is_git_clean() { git diff-index --quiet --cached HEAD -- 2>/dev/null; }
+is_git_clean() { git diff-index --quiet $* HEAD -- 2>/dev/null; }
+is_git_dirty() { is_git_clean && return -1 || return 0; }
 #
 #
 #
