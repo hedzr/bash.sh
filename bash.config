@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20220807
+#   Version: v20220822
 #   License: MIT
 #   Site: https://github.com/hedzr/bash.sh
 #
@@ -330,7 +330,8 @@ if_hosttype() {
 #
 #
 #
-is_git_dirty() { git diff --stat --quiet; }
+# is_git_dirty() { git diff-index --quiet --cached HEAD -- 2>/dev/null && false || true; }
+is_git_dirty() { git diff-index --quiet $* HEAD -- 2>/dev/null && false || true; }
 #
 #
 #

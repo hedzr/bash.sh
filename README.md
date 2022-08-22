@@ -4,6 +4,9 @@
 
 ## History
 
+- v20220822:
+  - fixed: `is_git_dirty`
+
 - v20220807:
   - imp'd/fixed: dbg the warnings in `load_import_files`/`load_env_files`
   - imp'd: safer `is_zsh`
