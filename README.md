@@ -4,6 +4,11 @@
 
 ## History
 
+- v20220908:
+  - fixed: `debug_info` cannot print '-' sometimes, replace with '.'
+  - fixed: `in_sourcing', `is_bash`, `in_jetbrain`
+  - improved: bash.config can be directly sourced in from .zshrc
+
 - v20220822:
   - fixed: `is_git_dirty`, added `is_git_clean`
   - updated: bash-lite.sh
