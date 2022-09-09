@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20220822
+#   Version: v20220909
 #   License: MIT
 #   Site: https://github/hedzr/bash.sh
 #
@@ -43,7 +43,7 @@ debug_info() {
 		            in_sourcing: $(in_sourcing && echo Y || echo '.')
 		              in_vscode: $(in_vscode && echo Y || echo '.')
 		            in_jetbrain: $(in_jetbrain && echo Y || echo '.')
-		  darwin/linux/win(wsl): $(is_darwin && echo Y || echo '.') / $(is_linux && echo Y || echo '-') / $(is_win && echo Y || echo '.')
+		  darwin/linux/win(wsl): $(is_darwin && echo Y || echo '.') / $(is_linux && echo Y || echo '.') / $(is_win && echo Y || echo '.')
 		   is_interactive_shell: $(is_interactive_shell && echo Y || echo '.')
 		  
 		NOTE: bash.sh can only work in bash/zsh mode, even if running it in fish shell.
@@ -80,7 +80,7 @@ is_win() { in_wsl; }
 in_wsl() { [[ "$(uname -r)" == *windows_standard* ]]; }
 in_sourcing() {
 	if is_zsh; then
-		[[ "$ZSH_EVAL_CONTEXT" != toplevel* ]]
+		[[ "$ZSH_EVAL_CONTEXT" == toplevel:* || "$ZSH_EVAL_CONTEXT" == *:file:* ]]
 	else
 		[[ $(basename -- "$0") != $(basename -- "${BASH_SOURCE[0]}") ]]
 	fi

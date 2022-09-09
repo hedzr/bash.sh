@@ -4,6 +4,9 @@
 
 ## History
 
+- v20220909:
+  - fixed: `in_sourcing', `is_bash`, `in_jetbrain`
+
 - v20220908:
   - fixed: `debug_info` cannot print '-' sometimes, replace with '.'
   - fixed: `in_sourcing', `is_bash`, `in_jetbrain`
