@@ -4,6 +4,9 @@
 
 ## History
 
+- v20220911:
+  - fixed: `in_sourcing' under zsh
+
 - v20220909:
   - fixed: `in_sourcing', `is_bash`, `in_jetbrain`
 

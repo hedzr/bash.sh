@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20220909
+#   Version: v20220911
 #   License: MIT
 #   Site: https://github.com/hedzr/bash.sh
 #
@@ -129,7 +129,7 @@ is_win() { in_wsl; }
 in_wsl() { [[ "$(uname -r)" == *windows_standard* ]]; }
 in_sourcing() {
 	if is_zsh; then
-		[[ "$ZSH_EVAL_CONTEXT" == toplevel:* || "$ZSH_EVAL_CONTEXT" == *:file:* ]]
+		[[ "$ZSH_EVAL_CONTEXT" == *:file:* ]]
 	else
 		[[ $(basename -- "$0") != $(basename -- "${BASH_SOURCE[0]}") ]]
 	fi
