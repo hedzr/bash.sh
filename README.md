@@ -4,6 +4,11 @@
 
 ## History
 
+- v20221019:
+  - added: `BASH_SH_VERSION`(=`v20221019`,...)
+  - imp'd: better `realpathx()` under macOS
+  - imp'd: solved `$SCRIPT` and `$CD` if the script is a symbolic link itself.
+
 - v20220911:
   - fixed: `in_sourcing' under zsh
 
