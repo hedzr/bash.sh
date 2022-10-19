@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20220911
+#   Version: v20221019
 #   License: MIT
 #   Site: https://github.com/hedzr/bash.sh
 #
@@ -406,6 +406,22 @@ script_functions() {
 }
 list_all_env_variables() { declare -xp; }
 list_all_variables() { declare -p; }
+if is_darwin; then
+	realpathx() {
+		if [[ $1 == /* ]]; then
+			# debug "case 1"
+			echo "$@"
+		elif DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P); then
+			# debug "case 1"
+			echo "$DIR/$(basename "$@")"
+		else
+			# debug "case 3"
+			readlink "$@"
+		fi
+	}
+else
+	realpathx() { readlink -f "$@"; }
+fi
 main_do_sth() {
 	[ ${VERBOSE:-0} -eq 1 ] && set -x
 	set -e
@@ -429,10 +445,12 @@ main_do_sth() {
 	fi
 	${HAS_END:-$(false)} && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
 }
+BASH_SH_VERSION=v20221019
 DEBUG=${DEBUG:-0}
 # trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }
-is_darwin && realpathx() { [[ $1 == /* ]] && echo "$1" || { DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $1)"; }; } || realpathx() { readlink -f $*; }
-in_sourcing && { CD=${CD} && debug ">> IN SOURCING, \$0=$0, \$_=$_"; } || { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug ">> '$SCRIPT' in '$CD', \$0='$0','$1'."; }
+# is_darwin && realpathx() { [[ $1 == /* ]] && echo "$1" || { DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $1)"; }; } || realpathx() { readlink -f $*; }
+in_sourcing && { CD="${CD}" && debug ">> IN SOURCING, \$0=$0, \$_=$_"; } || { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug ">> '$SCRIPT' in '$CD', \$0='$0','$1'."; }
 if_vagrant && [ "$SCRIPT" == "/tmp/vagrant-shell" ] && { [ -d $CD/ops.d ] || CD=/vagrant/bin; }
+[ -L "$SCRIPT" ] && debug linked script found && SCRIPT=$(realpathx "$SCRIPT") && CD=$(dirname "$SCRIPT")
 in_sourcing || main_do_sth "$@"
 #### HZ Tail END ####
