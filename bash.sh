@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20221019
+#   Version: v20221020
 #   License: MIT
 #   Site: https://github.com/hedzr/bash.sh
 #
@@ -28,6 +28,15 @@
 #
 # Use installer (Deprecated):
 #   $ curl -sSL https://hedzr.com/bash.sh/installer | sudo bash -s
+
+# It's safe to delete 'bump'
+bump() {
+	VERSION="v$(date +%Y%m%d)"
+	for f in bash*; do
+		echo bumping for $f ...
+		sed -i '' -E -e "s/v2022[0-9]+/$VERSION/g" $f
+	done
+}
 
 #### write your functions here, and invoke them by: `./bash.sh <your-func-name>`
 cool() { echo cool; }
@@ -409,14 +418,21 @@ list_all_variables() { declare -p; }
 if is_darwin; then
 	realpathx() {
 		if [[ $1 == /* ]]; then
-			# debug "case 1"
+			# dbg " .. case 1: '$1'"
 			echo "$@"
-		elif DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P); then
-			# debug "case 1"
-			echo "$DIR/$(basename "$@")"
 		else
-			# debug "case 3"
-			readlink "$@"
+			local DIR="${1%/*}" d p
+			if [ -d "$DIR" ]; then
+				# dbg " .. case 2: '$1' / DIR = '$DIR' pwd=$(pwd -P)"
+				DIR=$(cd $DIR && pwd -P)
+				d="$DIR/$(basename $1)"
+				p="$(readlink "$d")"
+			else
+				# dbg " .. case 3: '$1'"
+				p="$(readlink "$@")"
+			fi
+			# dbg " p: '$p', d: '$d'"
+			[[ $p == /* ]] && echo "$p" || { local DIR="${p%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $p)"; }
 		fi
 	}
 else
@@ -445,7 +461,7 @@ main_do_sth() {
 	fi
 	${HAS_END:-$(false)} && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
 }
-BASH_SH_VERSION=v20221019
+BASH_SH_VERSION=v20221020
 DEBUG=${DEBUG:-0}
 # trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }
 # is_darwin && realpathx() { [[ $1 == /* ]] && echo "$1" || { DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $1)"; }; } || realpathx() { readlink -f $*; }
