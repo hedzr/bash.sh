@@ -4,6 +4,10 @@
 
 ## History
 
+- v20221020:
+  - bash.sh use bump() to upgrade the release now
+  - imp'd: fixed `realpathx()` under macOS
+
 - v20221019:
   - added: `BASH_SH_VERSION`(=`v20221019`,...)
   - imp'd: better `realpathx()` under macOS
