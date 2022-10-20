@@ -432,19 +432,59 @@ if is_darwin; then
 				p="$(readlink "$@")"
 			fi
 			# dbg " p: '$p', d: '$d'"
-			[[ $p == /* ]] && echo "$p" || { local DIR="${p%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $p)"; }
+			[[ $p == /* ]] && echo "$p" || {
+				[[ "$p" == "" ]] && echo || {
+					local DIR="${p%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $p)"
+				}
+			}
 		fi
 	}
+	hex2mask() {
+		local hexmask=$(echo $1 | sed -e 's/^0x//')
+		local i
+		# printf "(%s)" $hexmask
+		for ((i = 0; i < ${#hexmask}; i += 2)); do
+			if (($i > 1)); then
+				# use a . to separate octets
+				# but don't print a leading .
+				printf "%s" "."
+			fi
+			printf "%d" "0x${hexmask:$i:2}"
+		done
+		printf "\n"
+	}
+	default_dev() { route get default | awk '/interface:/{print $2}'; }
+	gw() { route get default | awk '/gateway:/{print $2}'; }
+	lan_ip() { ifconfig | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}'; }
+	lan_ip6() { ifconfig | grep 'inet6 ' | grep -FvE '::1|%lo|fe80::' | awk '{print $2}'; }
+	netmask_hex() { ifconfig $(default_dev) | awk '/netmask /{print $4}'; }
+	netmask() { hex2mask $(netmask_hex); }
 else
 	realpathx() { readlink -f "$@"; }
+	default_dev() { ip route show default | grep -oE 'dev \w+' | awk '{print $2}'; }
+	gw() { ip route show default | awk '{print $3}'; }
+	lan_ip() { ip a | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}'; }
+	lan_ip6() { ip a | grep 'inet6 ' | grep -FvE '::1|%lo|fe80::' | awk '{print $2}'; }
+	netmask() { ifconfig $(default_dev) | awk '/netmask /{print $4}'; }
 fi
+wanip() { host myip.opendns.com 208.67.220.222 | tail -1 | awk '{print $4}'; }
+wanip6() { host -t AAAA myip.opendns.com resolver1.ipv6-sandbox.opendns.com | grep -oE "^myip\.opendns\.com.*" | awk '{print $5}'; }
+# use a tool script 'externalip' is better choice.
+# try more sources for yourself:
+#  http://ipecho.net/plain
+#  http://ifcfg.me/
+#  ...
+wanip_http() { curl -s http://whatismyip.akamai.com/; }
+# the best and exact way is asking a dns server by dig/host:
+wanip_exact() { dig @resolver4.opendns.com myip.opendns.com +short; }
+wanip6_exact() { dig @resolver1.ipv6-sandbox.opendns.com AAAA myip.opendns.com +short -6; }
 main_do_sth() {
 	[ ${VERBOSE:-0} -eq 1 ] && set -x
 	set -e
 	# set -o errexit
 	# set -o nounset
 	# set -o pipefail
-	MAIN_DEV=${MAIN_DEV:-eth0}
+	MAIN_DEV=${MAIN_DEV:-$(default_dev)}
 	MAIN_ENTRY=${MAIN_ENTRY:-_my_main_do_sth}
 	# echo $MAIN_ENTRY - "$@"
 	if in_debug; then
