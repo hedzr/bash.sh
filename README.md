@@ -4,6 +4,10 @@
 
 ## History
 
+- v20221021:
+  - added: `default_dev`, `netmask`, `gw`, `lanip`, 'lanip6', `wanip`, `wanip6`, ...
+  - imp'd: fixed `realpathx()` under macOS
+
 - v20221020:
   - bash.sh use bump() to upgrade the release now
   - imp'd: fixed `realpathx()` under macOS

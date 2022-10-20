@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20221020
+#   Version: v20221021
 #   License: MIT
 #   Site: https://github/hedzr/bash.sh
 #
@@ -121,8 +121,10 @@ if is_darwin; then
 			[[ $p == /* ]] && echo "$p" || { local DIR="${p%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $p)"; }
 		fi
 	}
+	default_dev() { route get default | awk '/interface:/{print $2}'; }
 else
 	realpathx() { readlink -f "$@"; }
+	default_dev() { ip route show default | grep -oE 'dev \w+' | awk '{print $2}'; }
 fi
 main_do_sth() {
 	[ ${VERBOSE:-0} -eq 1 ] && set -x
@@ -130,7 +132,7 @@ main_do_sth() {
 	# set -o errexit
 	# set -o nounset
 	# set -o pipefail
-	MAIN_DEV=${MAIN_DEV:-eth0}
+	MAIN_DEV=${MAIN_DEV:-$(default_dev)}
 	MAIN_ENTRY=${MAIN_ENTRY:-_my_main_do_sth}
 	# echo $MAIN_ENTRY - "$@"
 	if in_debug; then
@@ -147,7 +149,7 @@ main_do_sth() {
 	fi
 	${HAS_END:-$(false)} && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
 }
-BASH_SH_VERSION=v20221020
+BASH_SH_VERSION=v20221021
 DEBUG=${DEBUG:-0}
 # trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }
 # is_darwin && realpathx() { [[ $1 == /* ]] && echo "$1" || { DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $1)"; }; } || realpathx() { readlink -f $*; }

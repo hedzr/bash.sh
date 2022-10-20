@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20221020
+#   Version: v20221021
 #   License: MIT
 #   Site: https://github.com/hedzr/bash.sh
 #
@@ -455,16 +455,16 @@ if is_darwin; then
 	}
 	default_dev() { route get default | awk '/interface:/{print $2}'; }
 	gw() { route get default | awk '/gateway:/{print $2}'; }
-	lan_ip() { ifconfig | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}'; }
-	lan_ip6() { ifconfig | grep 'inet6 ' | grep -FvE '::1|%lo|fe80::' | awk '{print $2}'; }
+	lanip() { ifconfig | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}'; }
+	lanip6() { ifconfig | grep 'inet6 ' | grep -FvE '::1|%lo|fe80::' | awk '{print $2}'; }
 	netmask_hex() { ifconfig $(default_dev) | awk '/netmask /{print $4}'; }
 	netmask() { hex2mask $(netmask_hex); }
 else
 	realpathx() { readlink -f "$@"; }
 	default_dev() { ip route show default | grep -oE 'dev \w+' | awk '{print $2}'; }
 	gw() { ip route show default | awk '{print $3}'; }
-	lan_ip() { ip a | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}'; }
-	lan_ip6() { ip a | grep 'inet6 ' | grep -FvE '::1|%lo|fe80::' | awk '{print $2}'; }
+	lanip() { ip a | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}'; }
+	lanip6() { ip a | grep 'inet6 ' | grep -FvE '::1|%lo|fe80::' | awk '{print $2}'; }
 	netmask() { ifconfig $(default_dev) | awk '/netmask /{print $4}'; }
 fi
 wanip() { host myip.opendns.com 208.67.220.222 | tail -1 | awk '{print $4}'; }
@@ -501,7 +501,7 @@ main_do_sth() {
 	fi
 	${HAS_END:-$(false)} && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
 }
-BASH_SH_VERSION=v20221020
+BASH_SH_VERSION=v20221021
 DEBUG=${DEBUG:-0}
 # trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }
 # is_darwin && realpathx() { [[ $1 == /* ]] && echo "$1" || { DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $1)"; }; } || realpathx() { readlink -f $*; }
