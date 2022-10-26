@@ -4,6 +4,9 @@
 
 ## History
 
+- v20221027:
+  - imp'd: fixed `realpathx()` under macOS
+
 - v20221021:
   - added: `default_dev`, `netmask`, `gw`, `lanip`, 'lanip6', `wanip`, `wanip6`, ...
   - imp'd: fixed `realpathx()` under macOS
