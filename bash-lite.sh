@@ -102,6 +102,11 @@ debug_begin() { printf "\e[0;38;2;133;133;133m"; }
 debug_end() { printf "\e[0m\n"; }
 dbg() { ((DEBUG)) && printf ">>> \e[0;38;2;133;133;133m$@\e[0m\n" || :; }
 if is_darwin; then
+	readlinkx() {
+		local p="$@"
+		[ -L "$@" ] && p="$(readlink "$@")"
+		echo "$p"
+	}
 	realpathx() {
 		if [[ $1 == /* ]]; then
 			# dbg " .. case 1: '$1'"
@@ -110,15 +115,21 @@ if is_darwin; then
 			local DIR="${1%/*}" d p
 			if [ -d "$DIR" ]; then
 				# dbg " .. case 2: '$1' / DIR = '$DIR' pwd=$(pwd -P)"
-				DIR=$(cd $DIR && pwd -P)
-				d="$DIR/$(basename $1)"
-				p="$(readlink "$d")"
+				DIR="$(cd $DIR && pwd -P)"
+				d="$DIR/$(basename "$1")"
+				p="$(readlinkx "$d")"
 			else
 				# dbg " .. case 3: '$1'"
-				p="$(readlink "$@")"
+				p="$(readlinkx "$@")"
 			fi
 			# dbg " p: '$p', d: '$d'"
-			[[ $p == /* ]] && echo "$p" || { local DIR="${p%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $p)"; }
+			[[ $p == /* ]] && echo "$p" || {
+				[[ "$p" == "" ]] && echo || {
+					local DIR="${p%/*}" && {
+						[ -d "$DIR" ] && { DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $p)"; } || echo "$p"
+					}
+				}
+			}
 		fi
 	}
 	default_dev() { route get default | awk '/interface:/{print $2}'; }
