@@ -4,6 +4,9 @@
 
 ## History
 
+- v20221104:
+  - added: `url_exists`, `git_clone`
+
 - v20221027:
   - imp'd: fixed `realpathx()` under macOS
 
