@@ -359,7 +359,7 @@ git_clone() {
 }
 #
 #
-url_exists() { curl --head --silent -S --fail "$1" 1>/dev/null 2>&1; }
+url_exists() { curl --head --silent -S --fail --output /dev/null "$@" 1>/dev/null 2>&1; }
 #
 #
 #
