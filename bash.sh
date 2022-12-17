@@ -486,6 +486,8 @@ else
 	lanip6() { ip a | grep 'inet6 ' | grep -FvE '::1|%lo|fe80::' | awk '{print $2}'; }
 	netmask() { ifconfig $(default_dev) | awk '/netmask /{print $4}'; }
 fi
+# alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
+# alias ip-wan=wanip
 wanip() { host myip.opendns.com 208.67.220.222 | tail -1 | awk '{print $4}'; }
 wanip6() { host -t AAAA myip.opendns.com resolver1.ipv6-sandbox.opendns.com | grep -oE "^myip\.opendns\.com.*" | awk '{print $5}'; }
 # use a tool script 'externalip' is better choice.
