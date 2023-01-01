@@ -135,3 +135,39 @@ proxy_set() {
 #alias proxy_unset_http="unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY; echo 'HTTP Proxy off (http)';"
 #alias proxy_set_all="export all_proxy=http://127.0.0.1:8001; echo 'HTTP Proxy on (all-proxy)';"
 #alias proxy_unset_all="unset all_proxy http_proxy https_proxy HTTP_PROXY HTTPS_PROXY; echo 'HTTP Proxy off (all-proxy)';"
+
+zsh_theme_set() {
+	local theme_name=${1:-af-magic}
+	perl -i -pe "s/ZSH_THEME=\".+\"/ZSH_THEME=\"$theme_name\"/" ~/.zshrc
+}
+
+print_path() { print -rl $path; }
+print_fpath() { print -rl $fpath; }
+#alias qq=$HOME/hzw/golang-dev/src/github.com/hedzr/cmdr-examples/bin/flags_darwin_amd64
+#alias zz=$HOME/hzw/golang-dev/src/github.com/hedzr/cmdr/bin/fluent
+alias reset_zsh_autocomp='rm ~/.zcompdump*; compinit'
+reload_zsh_autocomp() {
+	local f
+	f=(~/.zsh.autocomp/i/*(.))
+	unfunction $f:t 2>/dev/null
+	autoload -U $f:t
+	# from: gotchas at https://www.dolthub.com/blog/2021-11-15-zsh-completions-with-subcommands/
+}
+reload_zsh_autocomp_full() {
+	autoload -U compinit
+	compinit
+}
+alias zsh.child='[ -f ~/.zcompdump ] && rm ~/.zcompdump*; zsh -i'
+ll_zsh_comp() { ll ~/.zsh.autocomp/i/; }
+find_zsh_autocomp_script() {
+	local f=${1:-git}
+	for d in $(print_fpath); do
+		[ -d $d ] && echo "---- $d" && ll $d | grep "$f"
+	done
+}
+ls_zsh_autocomp_script() {
+	local f=${1:-git}
+	for d in $(print_fpath); do
+		[ -d $d ] && echo "---- $d" && ll $d
+	done
+}
