@@ -4,6 +4,10 @@
 
 ## History
 
+- v20230101:
+  - load after.sh; imp: load_import_files & load_files
+  - added into tool.sh: zsh_theme, realod_zsh_autocomp, ..., print_path, print_fpath
+
 - v20221217:
   - imp'd, comments
 
