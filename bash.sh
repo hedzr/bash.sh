@@ -50,6 +50,7 @@ _my_main_do_sth() {
 	# local cmd=${1:-sleeping} && && shift || :
 
 	load_import_files
+	# load_files '*'
 	load_env_files
 
 	# in_debug && LC_ALL=C type $cmd || echo "$cmd not exists"
@@ -64,15 +65,29 @@ _my_main_do_sth() {
 			echo "command '$cmd' has not been defined."
 		fi
 	fi
+
+	if [ -f "$CD/bin/after.sh"]; then
+		headline "Sourcing and Running after.sh ..."
+		source "$CD/bin/after.sh"
+		if fn_exists "after"; then
+			eval "after $@"
+		else
+			:
+		fi
+	fi
 }
 
 load_import_files() {
-	local processed=0
+	local f dir processed=0
 	for dir in $CD; do
 		if [ -d $dir/ops.d ]; then
 			if test -n "$(find $dir/ops.d -maxdepth 1 -name 'import-*.sh' -print -quit)"; then
 				for f in $dir/ops.d/import-*.sh; do dbg "  ..sourcing $f" && source $f && processed=1; done
+			else
+				:
 			fi
+		else
+			:
 		fi
 	done
 	if [[ $processed -eq 0 ]]; then
@@ -86,16 +101,24 @@ load_import_files() {
 }
 
 load_files() {
-	local processed=0
-	for dir in $CD; do
-		if [ -d $dir/ops.d ]; then
-			for f in $*; do
+	local f ff dir processed=0
+	dbg "  > load_files $@ <"
+	for dir in "$CD"; do
+		if [ -d "$dir/ops.d" ]; then
+			for f in "$@"; do
 				local s="$dir/ops.d/$f.sh"
 				dbg "  ..testing for $s ..."
-				if [ -f $s ]; then
-					dbg "  ..sourcing $s" && source $s && processed=1
+				if test -n "$(find $dir/ops.d -maxdepth 1 -name $f'.sh' -print -quit)"; then
+					for ff in $dir/ops.d/$f.sh; do dbg "  ..sourcing $ff" && source $ff && processed=1; done
+				else
+					:
 				fi
+				# if [ -f $s ]; then
+				# 	dbg "  ..sourcing $s" && source $s && processed=1
+				# fi
 			done
+		else
+			:
 		fi
 	done
 	if [[ $processed -eq 0 ]]; then
@@ -109,13 +132,13 @@ load_files() {
 }
 
 load_env_files() {
-	local env=
+	local rel env=
 	for rel in '.' '..'; do
 		env="$CD/$rel/.env"
-		[ -f $env ] && dbg "  ..sourcing $env" && source $env
+		[ -f $env ] && { dbg "  ..sourcing $env" && source $env; } || :
 	done
 	for env in "$CD/ops.d/.env" "$CD/.env.local" "$CD/ops.d/.env.local" "$HOME/.config/ops.sh/env"; do
-		[ -f $env ] && dbg "  ..sourcing $env" && source $env
+		[ -f $env ] && { dbg "  ..sourcing $env" && source $env; } || :
 	done
 	:
 }
