@@ -4,6 +4,10 @@
 
 ## History
 
+- v20230104:
+  - add'd: strip_l, strip_r
+  - imp'd: make `commander` fit for zsh too
+
 - v20230101:
   - load after.sh; imp: load_import_files & load_files
   - added into tool.sh: zsh_theme, realod_zsh_autocomp, ..., print_path, print_fpath
@@ -198,7 +202,7 @@ here is a example file `ops`:
 ```bash
 
 #dns()        { dns_entry "$@"; }
-dns_entry () { commander ${FUNCNAME[0]//_entry/} "$@";}
+dns_entry () { commander $(strip_r $(fn_name) _entry) "$@";}
 dns_usage () {
   cat <<EOF
 Usage: $0 $self <sub-command> [...]
@@ -243,7 +247,7 @@ dns_check_resolv_conf(){ :; }
 
 # sub of sub-commands
 #dns_fix()        { dns_entry "$@"; }
-dns_fix_entry () { commander ${FUNCNAME[0]//_entry/} "$@";}
+dns_fix_entry () { commander $(strip_r $(fn_name) _entry) "$@";}
 dns_fix_usage () {
   cat <<EOF
 Usage: $0 $self <sub-command> [...]
