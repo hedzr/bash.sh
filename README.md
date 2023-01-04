@@ -38,11 +38,11 @@
   - fixed: `in_sourcing' under zsh
 
 - v20220909:
-  - fixed: `in_sourcing', `is_bash`, `in_jetbrain`
+  - fixed: `in_sourcing',`is_bash`,`in_jetbrain`
 
 - v20220908:
   - fixed: `debug_info` cannot print '-' sometimes, replace with '.'
-  - fixed: `in_sourcing', `is_bash`, `in_jetbrain`
+  - fixed: `in_sourcing',`is_bash`,`in_jetbrain`
   - improved: bash.config can be directly sourced in from .zshrc
 
 - v20220822:
@@ -67,7 +67,6 @@
   - fixed: fn_exists
   - added: load_import_files && load_env_files to load and source extra files
   - more...
-
 
 - ...
 - 20190215
@@ -125,7 +124,7 @@ curl -sSL https://hedzr.com/bash/bash.sh/installer | sudo bash -s
 
 `installer` will copy `bash.config` to `/usr/local/bin`.
 
-##### Manually:
+##### Manually
 
 Copy `bash.config` to `/usr/local/bin/` or anywhere, and `source` it from your script file:
 
@@ -133,7 +132,7 @@ Some examples [here](./examples/).
 
 ## Samples
 
-![](./_images/2018-02-22_12.30.11.png)
+![sample](./_images/2018-02-22_12.30.11.png)
 
 ## Knives Document
 
@@ -294,8 +293,6 @@ ops dns fix_nameservers
 ## Under zsh Shell
 
 advantage.
-
-
 
 ## License
 
