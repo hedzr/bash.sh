@@ -292,20 +292,29 @@ if_centos() {
 		false
 	fi
 }
+in_vm() {
+	if hostnamectl | grep -P 'chassis: ' | grep ' vm'; then
+		true
+	elif hostnamectl | grep -P 'Virtualization: '; then
+		true
+	else
+		false
+	fi
+}
 #
 #
 #
-osid() { # fedora / ubuntu
+osid() { # fedora / ubuntu / debian / ...
 	[[ -f /etc/os-release ]] && {
 		grep -Eo '^ID="?(.+)"?' /etc/os-release | sed -r -e 's/^ID="?(.+)"?/\1/'
 	}
 }
-osidlike() { # fedora / ubuntu
+osidlike() { # redhat / debian / ...
 	[[ -f /etc/os-release ]] && {
 		grep -Eo '^ID_LIKE="?(.+)"?' /etc/os-release | sed -r -e 's/^ID_LIKE="?(.+)"?/\1/'
 	}
 }
-oscodename() { # fedora / ubuntu
+oscodename() { # focal / xenial / ...   # = `lsb_release -cs`
 	[[ -f /etc/os-release ]] && {
 		grep -Eo '^VERSION_CODENAME="?(.+)"?' /etc/os-release | sed -r -e 's/^VERSION_CODENAME="?(.+)"?/\1/'
 	}
@@ -338,11 +347,12 @@ is_debian_series() { [[ "$(osidlike)" == debian ]]; }
 #
 #
 #
-uname_kernel() { uname -s; } # Linux
-uname_cpu() { uname -p; }    # processor: x86_64
-uname_mach() { uname -m; }   # machine:   x86_64, ...
-uname_rev() { uname -r; }    # kernel-release: 5.8.15-301.fc33.x86_64
-uname_ver() { uname -v; }    # kernel-version:
+lsb_release_cs() { lsb_release -cs; } # focal, ... # = oscodename
+uname_kernel() { uname -s; }          # Linux
+uname_cpu() { uname -p; }             # processor: x86_64
+uname_mach() { uname -m; }            # machine:   x86_64, ...
+uname_rev() { uname -r; }             # kernel-release: 5.8.15-301.fc33.x86_64
+uname_ver() { uname -v; }             # kernel-version:
 lscpu_call() { lscpu $*; }
 lshw_cpu() { sudo lshw -c cpu; }
 i386_amd64() {
