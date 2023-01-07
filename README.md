@@ -4,6 +4,9 @@
 
 ## History
 
+- v20230107:
+  - added in_vm, lsb_release_cs, uname_kernel;
+
 - v20230104:
   - add'd: strip_l, strip_r
   - imp'd: make `commander` fit for zsh too
