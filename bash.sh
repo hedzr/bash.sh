@@ -564,8 +564,8 @@ main_do_sth() {
 	#   So, a failure test on HAS_END shouldn't take bad effect onto the whole provisioning script exit status.
 	# You might always change this logic or comment the following line, no obsezzing on it.
 	# Or, if your provisioning script with bash.sh has not any entranance arguments,
-	# disabling this logic is still simple by defining HAS_END=$(true).
-	${HAS_END:-$(false)} && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
+	# disabling this logic is still simple by defining HAS_END=1.
+	[[ ${HAS_END:-0} -ne 0 ]] && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
 }
 BASH_SH_VERSION=v20230108
 DEBUG=${DEBUG:-0}
