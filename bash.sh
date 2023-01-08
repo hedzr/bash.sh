@@ -558,6 +558,13 @@ main_do_sth() {
 		$MAIN_ENTRY "$@"
 		trap - EXIT
 	fi
+	# Why use `{ [ $# -eq 0 ] && :; }`?
+	#   While bash.sh/provision.sh/ops was been invoking with command-line args,
+	#   we would assume that's normal status if `trap` caluse doesn't catch any errors.
+	#   So, a failure test on HAS_END shouldn't take bad effect onto the whole provisioning script exit status.
+	# You might always change this logic or comment the following line, no obsezzing on it.
+	# Or, if your provisioning script with bash.sh has not any entranance arguments,
+	# disabling this logic is still simple by defining HAS_END=1.
 	${HAS_END:-$(false)} && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
 }
 BASH_SH_VERSION=v20230107
