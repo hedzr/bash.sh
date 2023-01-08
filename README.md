@@ -12,7 +12,7 @@
     >   So, a failure test on HAS_END shouldn't take bad effect onto the whole provisioning script exit status.
     > You might always change this logic or comment the following line, no obsezzing on it.
     > Or, if your provisioning script with bash.sh has not any entranance arguments,
-    > disabling this logic is still simple by defining HAS_END=1.
+    > disabling this logic is still simple by defining HAS_END=$(true).
   - added new file `after.sh.sample`;
   - fixed the location testing of `after.sh`
 
