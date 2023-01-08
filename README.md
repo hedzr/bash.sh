@@ -4,6 +4,10 @@
 
 ## History
 
+- v20230109:
+  - fixed checker by setting `HAS_END=1`
+  - added `pad()`: usage like `cat 1.txt|pad 4`
+
 - v20230108:
   - add comment for HAS_END testing at ending of the whole provisioning script:
     > Why use `{ [ $# -eq 0 ] && :; }`?
