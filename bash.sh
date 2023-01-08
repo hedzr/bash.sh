@@ -68,11 +68,11 @@ _my_main_do_sth() {
 		fi
 	fi
 
-	if [ -f "$CD/bin/after.sh" ]; then
+	if [ -f "$CD/after.sh" ]; then
 		headline "Sourcing and Running after.sh ..."
-		source "$CD/bin/after.sh"
-		if fn_exists "after"; then
-			eval "after $@"
+		source "$CD/after.sh"
+		if fn_exists "after_provision"; then
+			eval "after_provision" "$@"
 		else
 			:
 		fi
