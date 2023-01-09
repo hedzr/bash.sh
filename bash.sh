@@ -55,7 +55,6 @@ help() {
 cool() { echo cool; }
 sleeping() { echo sleeping; }
 
-# FN_PREFIX=boot_
 _my_main_do_sth() {
 	local cmd=${1:-help} && { [ $# -ge 1 ] && shift; } || :
 	# local FN_PREFIX=boot_
@@ -68,18 +67,29 @@ _my_main_do_sth() {
 	# load_files '*'
 	load_env_files
 
-	in_provisioning || DEBUG="$DBG_SAVE" # && echo "DEBUG: $DEBUG"
+	in_provisioning || [ "$cmd" = "first-install" ] || DEBUG="$DBG_SAVE" # && echo "DEBUG: $DEBUG"
+	# echo "4. DEBUG: $DEBUG, cmd: $cmd"
 
 	# in_debug && LC_ALL=C type $cmd || echo "$cmd not exists"
-	in_provisioning && dbg "  cmd = $cmd"
+	# dbg "  cmd = $cmd"
 	if fn_exists "boot_$cmd"; then
-		eval "boot_$cmd $@"
+		eval boot_$cmd "$@" #&& dbg ":DONE:boot_$cmd"
+	elif fn_exists "$cmd"; then
+		eval $cmd "$@" #&& dbg ":DONE:$cmd"
 	else
-		if fn_exists "$cmd"; then
-			# echo "$cmd - $@"
-			eval "$cmd $@"
+		local f="$CD/ops.d/run/$cmd.sh"
+		# dbg "  ..finding $f"
+		if [ -f "$f" ]; then
+			dbg "  ..sourcing $f.." && source "$f" && dbg "  ..OK"
+			if fn_exists "${cmd}_entry"; then
+				# dbg "  ..eval '${cmd}_entry' $@"
+				${cmd}_entry "$@"
+			else
+				eval $cmd "$@"
+			fi
 		else
-			echo "command '$cmd' has not been defined."
+			err "command '$cmd' has not been defined. (CD=$CD)"
+			return
 		fi
 	fi
 
@@ -93,6 +103,18 @@ _my_main_do_sth() {
 				:
 			fi
 		fi
+		if [ -f "$CD/user-customizations.sh" ]; then
+			headline "Sourcing and Running user-customizations.sh ..."
+			source "$CD/user-customizations.sh"
+			if fn_exists "user_custom"; then
+				eval "user_custom" "$@"
+			else
+				:
+			fi
+		fi
+		dbg ":DONE:END:$(fn_name_dyn):$?"
+	else
+		HAS_END=0
 	fi
 }
 
