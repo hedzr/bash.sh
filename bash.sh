@@ -84,15 +84,15 @@ _my_main_do_sth() {
 	fi
 
 	if in_provisioning; then
-	if [ -f "$CD/after.sh" ]; then
-		headline "Sourcing and Running after.sh ..."
-		source "$CD/after.sh"
-		if fn_exists "after_provision"; then
-			eval "after_provision" "$@"
-		else
-			:
+		if [ -f "$CD/after.sh" ]; then
+			headline "Sourcing and Running after.sh ..."
+			source "$CD/after.sh"
+			if fn_exists "after_provision"; then
+				eval "after_provision" "$@"
+			else
+				:
+			fi
 		fi
-	fi
 	fi
 }
 
@@ -577,7 +577,7 @@ wanip_http() { curl -s http://whatismyip.akamai.com/; }
 wanip_exact() { dig @resolver4.opendns.com myip.opendns.com +short; }
 wanip6_exact() { dig @resolver1.ipv6-sandbox.opendns.com AAAA myip.opendns.com +short -6; }
 main_do_sth() {
-	[ ${VERBOSE:-0} -eq 1 ] && set -x
+	[[ ${VERBOSE:-0} -eq 1 ]] && set -x
 	set -e
 	# set -o errexit
 	# set -o nounset
@@ -604,7 +604,7 @@ main_do_sth() {
 	# You might always change this logic or comment the following line, no obsezzing on it.
 	# Or, if your provisioning script with bash.sh has not any entranance arguments,
 	# disabling this logic is still simple by defining HAS_END=1.
-	[[ ${HAS_END:-0} -ne 0 ]] && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
+	((${HAS_END:-0})) && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
 }
 BASH_SH_VERSION=v20230108
 DEBUG=${DEBUG:-0}
