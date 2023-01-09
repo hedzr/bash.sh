@@ -40,6 +40,17 @@ bump() {
 	done
 }
 
+help() {
+	cat <<-EOF
+		Who am I?
+
+		I'm magicalembracer.
+
+		D:
+	EOF
+	err "Here Am I."
+}
+
 #### write your functions here, and invoke them by: `./bash.sh <your-func-name>`
 cool() { echo cool; }
 sleeping() { echo sleeping; }
