@@ -446,6 +446,8 @@ debug() { in_debug && printf "\e[0;38;2;133;133;133m$@\e[0m\n" || :; }
 debug_begin() { printf "\e[0;38;2;133;133;133m"; }
 debug_end() { printf "\e[0m\n"; }
 dbg() { ((DEBUG)) && printf ">>> \e[0;38;2;133;133;133m$@\e[0m\n" || :; }
+tip() { printf "\e[0;38;2;133;133;133m>>> $@\e[0m\n"; }
+err() { printf "\e[0;33;1;133;133;133m>>> $@\e[0m\n" 1>&2; }
 debug_info() {
 	debug_begin
 	cat <<-EOF
