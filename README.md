@@ -4,6 +4,14 @@
 
 ## History
 
+- v20230111:
+  - improved `_my_main_do_sth`
+  - fixed test for `HAS_END` and `VERBOSE`
+  - added `tip`, `err`, and `pad`
+  - fixed `fn_name/_dyn` in mac
+  - added `in_provisioning` stub codes
+  - more improvments and bug fixes
+
 - v20230109:
   - fixed checker by setting `HAS_END=1`
   - added `pad()`: usage like `cat 1.txt|pad 4`
