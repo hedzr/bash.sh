@@ -118,6 +118,13 @@ _my_main_do_sth() {
 	fi
 }
 
+try_source_in() {
+	local f
+	for f in "$@"; do
+		[ -f "$f" ] && shift && dbg "  ..sourcing $f" && DEBUG=0 VERBOSE=0 source "$f"
+	done
+}
+
 load_import_files() {
 	local f dir processed=0
 	for dir in $CD; do
@@ -188,7 +195,7 @@ load_env_files() {
 
 #### HZ Tail BEGIN ####
 in_debug() { (($DEBUG)); }
-in_provisioning() { (($PROVISIONING)); }
+in_provisioning() { (($PROVISIONING)); } ## return exit status as true if $PROVISIONING is not equal to 0
 is_root() { [ "$(id -u)" = "0" ]; }
 is_bash() { is_bash_t1 || is_bash_t2; }
 is_bash_t1() { [ -n "$BASH_VERSION" ]; }
