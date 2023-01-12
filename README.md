@@ -1,6 +1,6 @@
 # bash.sh
 
-`bash.sh` is a starting template for shell developing.
+`bash.sh` is a starter template for shell developing.
 
 ## History
 
@@ -141,7 +141,7 @@ DEBUG=1 ./installsamba
 
 #### 2. Global
 
-##### Use `installer`: [~~**DEPRECATED**~~]
+##### Use OLD `installer`: [~~**DEPRECATED**~~]
 
 ```bash
 curl -sSL https://hedzr.com/bash/bash.sh/installer | sudo bash -s
@@ -149,7 +149,7 @@ curl -sSL https://hedzr.com/bash/bash.sh/installer | sudo bash -s
 
 > The old <https://hedzr.com/bash.sh/installer> has been obseleted.
 
-`installer` will copy `bash.config` to `/usr/local/bin`.
+~~`installer` will copy `bash.config` to `/usr/local/bin`~~.
 
 ##### Manually
 
@@ -159,7 +159,7 @@ Some examples [here](./examples/).
 
 ## Samples
 
-![sample](./_images/2018-02-22_12.30.11.png)
+![Sample](./_images/2018-02-22_12.30.11.png)
 
 ## Knives Document
 
@@ -173,14 +173,33 @@ toggle environment variable `DEBUG` to switch between `normal_mode` and `debug_m
 is_debug && echo 'debug mode' || echo 'normal mode'
 ```
 
-### `debug` $\*
+### `debug` $\*, `dbg`, `tip`, `err`
 
-print string for debug. In normal mode, the string message will be stripped.
+Prints string as darker text for debugging (if env var `DEBUG` == 1). In normal mode, the string message will be stripped.
 
 ```bash
 debug I am buggy but you don't know
 debug 'I am buggy but you don'''t know'
 debug "I am buggy but you don't know"
+
+dbg "debug line"
+
+tip "A simple message to tip you something happened: $event"
+err "Error occurred whlie executed the command line: $cmd '$@'"
+```
+
+- `tip` and `err` will always prints message.
+- `err` will prints message to stderr device.
+- `dbg` available on DEBUG=1, it's slight differant with `debug`
+
+You may use the splitted version: `debug_begin` and `debug_end`:
+
+```bash
+if ((DEBUG)); then
+  debug_begin
+  cat /etc/os_release # this file will be printed with darker color.
+  debug_end
+fi
 ```
 
 ### `headline` $\*
@@ -223,10 +242,11 @@ cross impl for linux `realpath`.
 
 ## Use `commander()` in your scripts
 
-here is a example file `ops`:
+`commander` provides a multi-level subcommands skeleton for you.
+
+Here is a example code fragment in an `ops`:
 
 ```bash
-
 #dns()        { dns_entry "$@"; }
 dns_entry () { commander $(strip_r $(fn_name) _entry) "$@";}
 dns_usage () {
