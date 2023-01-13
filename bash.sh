@@ -55,6 +55,7 @@ help() {
 cool() { echo cool; }
 sleeping() { echo sleeping; }
 
+# FN_PREFIX=boot_
 _my_main_do_sth() {
 	local cmd=${1:-help} && { [ $# -ge 1 ] && shift; } || :
 	# local FN_PREFIX=boot_
