@@ -2,7 +2,17 @@
 
 `bash.sh` is a starter template for shell developing.
 
+File `bash.config` can be applied and sourced into your zshell environment directly. See [Import bash.config into your zsh env](#3-import-bashconfig-into-your-zsh-env). 
+Why? Because we will have a clean zsh initializing environment and many tools can be lazy-loaded now.
+
 ## History
+
+- v20230120:
+  - improved `bash.config`
+  - improved `load_import_files`
+  - func name `in_jetbrain` changed to `in_jetbrains`
+  - added: `in_homebrew`, `pmid`
+  - improved: `osid`, ...
 
 - v20230111:
   - improved `_my_main_do_sth`
