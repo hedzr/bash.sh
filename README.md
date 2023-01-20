@@ -157,6 +157,56 @@ Copy `bash.config` to `/usr/local/bin/` or anywhere, and `source` it from your s
 
 Some examples [here](./examples/).
 
+#### 3. Import `bash.config` into your zsh env
+
+You may import `bash.config` into your local zshell environment. This brings a extensible structure to you: the bash.sh loader (in `darwin-only.sh`) will source in the scripts at these places (macOS only):
+
+1. `/path/to/bash.sh/ops.d/*.sh`
+2. `/path/to/bash.sh/ops.d/{darwin,windows,ubuntu,...}/*.sh`
+3. `/path/to/bash.sh/ops.d/{brew,apt,dnf,yum,...}*.sh`
+4. `$HOME/.local/bin/.zsh/*.sh`
+
+Since we shipped `bash.sh` with `./ops.d/darwin/*.sh`, so the
+features above will be available. As an extra feature, `Lazy loading`
+machanism is available too. Just put your .sh tool
+into this folder:
+
+1. `$HOME/.local/bin/.zsh/lazy/`
+
+It will be loaded and invoked on-demand.
+
+> As a sample, you could save [`vm.sh`](https://gist.github.com/hedzr/ea2626fb290e5ca74687967d0d768cdb) into `~/.local/bin/.zsh`,
+> and save [`vagrant_run.sh`](https://gist.github.com/hedzr/a24592879ac90239be6c8b1746feebd4) into `~/.local/bin/.zsh/lazy`, 
+> and run it:
+>
+> ```bash
+> vm ls
+> vm run u20s.local
+> vm sizes
+> ```
+>
+> function `vm` (in vm.sh) will be invoked directly, and
+> function `vagrant_run` will be lazy-loaded and invoked
+> implicitly.
+>
+> Do same action on [`vmware_run.sh`](https://gist.github.com/hedzr/956cb892069b0353f915b395a9504ebf).
+>
+> We have serveral posts in chinese to introduce `vm()` ([HERE](https://hedzr.com/devops/linux/manage-vms-from-command-line/)).
+
+##### How?
+
+Put these codes in your `$HOME/.zshenv`:
+
+```bash
+### BASH.SH/.CONFIG ####################################
+{
+  local dir f="/path/to/bash.sh/bash.config"
+  [ -f "$f" ] && DEBUG=1 VERBOSE=0 source "$f" >>/tmp/sourced.list
+  unset cool sleeping _my_main_do_sth main_do_sth f DEBUG VERBOSE
+}
+### BASH.SH/.CONFIG END ################################
+```
+
 ## Samples
 
 ![Sample](./_images/2018-02-22_12.30.11.png)
