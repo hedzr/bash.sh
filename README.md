@@ -217,6 +217,12 @@ Put these codes in your `$HOME/.zshenv`:
 ### BASH.SH/.CONFIG END ################################
 ```
 
+It can be simplified to one-liner:
+
+```bash
+. "/path/to/bash.sh/bash.config" && unset cool sleeping _my_main_do_sth main_do_sth f DEBUG VERBOSE
+```
+
 ## Samples
 
 ![Sample](./_images/2018-02-22_12.30.11.png)
