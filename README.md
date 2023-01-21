@@ -212,7 +212,7 @@ Put these codes in your `$HOME/.zshenv`:
 {
   local dir f="/path/to/bash.sh/bash.config"
   [ -f "$f" ] && DEBUG=1 VERBOSE=0 source "$f" >>/tmp/sourced.list
-  unset cool sleeping _my_main_do_sth main_do_sth f DEBUG VERBOSE
+  unset cool sleeping _my_main_do_sth main_do_sth dir f DEBUG VERBOSE
 }
 ### BASH.SH/.CONFIG END ################################
 ```
@@ -220,7 +220,7 @@ Put these codes in your `$HOME/.zshenv`:
 It can be simplified to one-liner:
 
 ```bash
-. "/path/to/bash.sh/bash.config" && unset cool sleeping _my_main_do_sth main_do_sth f DEBUG VERBOSE
+. "/path/to/bash.sh/bash.config" && unset cool sleeping _my_main_do_sth main_do_sth DEBUG VERBOSE
 ```
 
 ## Samples
