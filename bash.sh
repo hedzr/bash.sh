@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20230120
+#   Version: v20230126
 #   License: MIT
 #   Site: https://github.com/hedzr/bash.sh
 #
@@ -670,7 +670,7 @@ main_do_sth() {
 	# disabling this logic is still simple by defining HAS_END=1.
 	((${HAS_END:-0})) && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
 }
-BASH_SH_VERSION=v20230120
+BASH_SH_VERSION=v20230126
 DEBUG=${DEBUG:-0}
 PROVISIONING=${PROVISIONING:-0}
 # trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }
