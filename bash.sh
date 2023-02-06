@@ -206,7 +206,7 @@ load_env_files() {
 	:
 }
 
-##################################################
+########################################################
 
 #### HZ Tail BEGIN ####
 in_debug() { (($DEBUG)); }
@@ -224,6 +224,7 @@ is_linux() { [[ $OSTYPE == linux* ]]; }
 is_win() { in_wsl; }
 in_wsl() { [[ "$(uname -r)" == *windows_standard* ]]; }
 in_sourcing() {
+	# https://stackoverflow.com/questions/2683279/how-to-detect-if-a-script-is-being-sourced
 	if is_zsh; then
 		[[ "$ZSH_EVAL_CONTEXT" == *:file:* ]]
 	else
@@ -533,9 +534,31 @@ debug_info() {
 }
 strip_l() { echo ${1#"$2"}; }
 strip_r() { echo ${1%"$2"}; }
-pad() { # sample: cat 1.txt | pad 2
-	local line p=$1 && shift
-	while read line; do printf '%-'$p"s%s\n" ' ' $line; done # <<< "$@"
+pad() {
+	# pad 'pre', 'line' and 'post' as 3-column.
+	#   the 1st arg is the count of indent spaces
+	#   the 2nd and 3rd args are 'pre'-text and 'post'-text
+	#   NOTE that the 'line' itself will be read from stdin.
+	# sample: cat 1.txt | pad 2
+	#     or: find . -iname '*.log' -print -delete | pad 4 '' ' deleted.'
+	local line p=$1 && (($#)) && shift
+	local pre=$1 && (($#)) && shift
+	local post=$1 && (($#)) && shift
+	while read line; do printf '%-'$p"s%s%s%s\n" ' ' "$pre" "$line" "$post"; done # <<< "$@"
+}
+pad3() {
+	# pad 'pre', 'line' and 'post' as 3-column.
+	#   the 1st arg is the count of indent spaces
+	#   the 2nd arg is the width of 'line'
+	#   the 3rd and 4th args are 'pre'-text and 'post'-text
+	#   NOTE that the 'line' itself will be read from stdin.
+	# sample: ls -la | pad3 4 '-72' '' ' | desc here'
+	local line
+	local p=$1 && (($#)) && shift
+	local linewidth="${1:--1}" && (($#)) && shift
+	local pre=$1 && (($#)) && shift
+	local post=$1 && (($#)) && shift
+	while read line; do printf '%-'$p"s%s%${linewidth}s%s\n" ' ' "$pre" "$line" "$post"; done # <<< "$@"
 }
 commander() {
 	local self=$1
