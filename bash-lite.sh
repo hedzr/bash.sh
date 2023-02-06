@@ -65,7 +65,10 @@ _my_main_do_sth() {
 	eval "$cmd $@" || :
 }
 
-in_debug() { [[ $DEBUG -eq 1 ]]; }
+########################################################
+
+in_debug() { (($DEBUG)); }
+in_provisioning() { (($PROVISIONING)); } ## return exit status as true if $PROVISIONING is not equal to 0
 is_root() { [ "$(id -u)" = "0" ]; }
 is_bash() { is_bash_t1 || is_bash_t2; }
 is_bash_t1() { [ -n "$BASH_VERSION" ]; }
@@ -87,20 +90,100 @@ in_sourcing() {
 	fi
 }
 in_vscode() { [[ "$TERM_PROGRAM" == "vscode" ]]; }
-in_jetbrain() { [[ "$TERMINAL_EMULATOR" == *JetBrains* ]]; }
+in_jetbrains() { [[ "$TERMINAL_EMULATOR" == *JetBrains* ]]; }
 is_interactive_shell() { [[ $- == *i* ]]; }
 is_not_interactive_shell() { [[ $- != *i* ]]; }
 is_ps1() { [ -z "$PS1" ]; }
 is_not_ps1() { [ ! -z "$PS1" ]; }
+# The [ -t 1 ] check only works when the function is not called from
+# a subshell (like in `$(...)` or `(...)`, so this hack redefines the
+# function at the top level to always return false when stdout is not
+# a tty.
+if [ -t 1 ]; then
+	is_stdin() { true; }
+	is_not_stdin() { false; }
+	is_tty() { true; }
+else
+	is_stdin() { false; }
+	is_not_stdin() { true; }
+	is_tty() { false; }
+fi
+fn_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(shell function)|(a function)'; }
+fn_builtin_exists() { LC_ALL=C type $1 2>/dev/null | grep -q 'shell builtin'; }
+fn_aliased_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(alias for)|(aliased to)'; }
+fn_name() {
+	is_zsh && local fn_="${funcstack[2]}"
+	if [ "$fn_" = "" ]; then
+		is_bash && echo "${FUNCNAME[1]}"
+	else
+		echo "$fn_"
+	fi
+	# is_zsh && echo "${funcstack[2]}" || {
+	# 	is_bash && echo "${FUNCNAME[1]}"
+	# }
+}
 #
 is_git_clean() { git diff-index --quiet $* HEAD -- 2>/dev/null; }
 is_git_dirty() { is_git_clean && return -1 || return 0; }
 #
 headline() { printf "\e[0;1m$@\e[0m:\n"; }
+headline_begin() { printf "\e[0;1m"; } # for more color, see: shttps://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
+headline_end() { printf "\e[0m:\n"; }  # https://misc.flogisoft.com/bash/tip_colors_and_formatting
 debug() { in_debug && printf "\e[0;38;2;133;133;133m$@\e[0m\n" || :; }
 debug_begin() { printf "\e[0;38;2;133;133;133m"; }
 debug_end() { printf "\e[0m\n"; }
 dbg() { ((DEBUG)) && printf ">>> \e[0;38;2;133;133;133m$@\e[0m\n" || :; }
+tip() { printf "\e[0;38;2;133;133;133m>>> $@\e[0m\n"; }
+err() { printf "\e[0;33;1;133;133;133m>>> $@\e[0m\n" 1>&2; }
+#
+strip_l() { echo ${1#"$2"}; }
+strip_r() { echo ${1%"$2"}; }
+pad() {
+	# pad 'pre', 'line' and 'post' as 3-column.
+	#   the 1st arg is the count of indent spaces
+	#   the 2nd and 3rd args are 'pre'-text and 'post'-text
+	#   NOTE that the 'line' itself will be read from stdin.
+	# sample: cat 1.txt | pad 2
+	#     or: find . -iname '*.log' -print -delete | pad 4 '' ' deleted.'
+	local line p=$1 && (($#)) && shift
+	local pre=$1 && (($#)) && shift
+	local post=$1 && (($#)) && shift
+	while read line; do printf '%-'$p"s%s%s%s\n" ' ' "$pre" "$line" "$post"; done # <<< "$@"
+}
+pad3() {
+	# pad 'pre', 'line' and 'post' as 3-column.
+	#   the 1st arg is the count of indent spaces
+	#   the 2nd arg is the width of 'line'
+	#   the 3rd and 4th args are 'pre'-text and 'post'-text
+	#   NOTE that the 'line' itself will be read from stdin.
+	# sample: ls -la | pad3 4 '-72' '' ' | desc here'
+	local line
+	local p=$1 && (($#)) && shift
+	local linewidth="${1:--1}" && (($#)) && shift
+	local pre=$1 && (($#)) && shift
+	local post=$1 && (($#)) && shift
+	while read line; do printf '%-'$p"s%s%${linewidth}s%s\n" ' ' "$pre" "$line" "$post"; done # <<< "$@"
+}
+commander() {
+	local self=$1
+	[[ $# -gt 0 ]] && shift
+	local cmd=${1:-usage}
+	[[ $# -gt 0 ]] && shift
+	#local self=${FUNCNAME[0]}
+	case $cmd in
+	help | usage | --help | -h | -H) "${self}_usage" "$@" ;;
+	funcs | --funcs | --functions | --fn | -fn) script_functions "^$self" ;;
+	*)
+		# if [ "$(type -t ${self}_${cmd}_entry)" == "function" ]; then
+		if $(fn_exists ${self}_${cmd}_entry); then
+			eval ${self}_${cmd}_entry "$@"
+		else
+			eval ${self}_${cmd} "$@"
+		fi
+		;;
+	esac
+}
+#
 if is_darwin; then
 	readlinkx() {
 		local p="$@"
