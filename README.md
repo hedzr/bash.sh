@@ -7,6 +7,10 @@ Why? Because we will have a clean zsh initializing environment and many tools ca
 
 ## History
 
+- v20230206:
+  - improved `pad`, added `pad3`
+  - improved bash-lite.sh
+
 - v20230126:
   - improved lazy-loader to load kebab case func and files
   - improved `commander()`

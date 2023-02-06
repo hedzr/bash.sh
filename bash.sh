@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20230126
+#   Version: v20230206
 #   License: MIT
 #   Site: https://github.com/hedzr/bash.sh
 #
@@ -51,9 +51,10 @@ help() {
 	err "Here Am I."
 }
 
-#### write your functions here, and invoke them by: `./bash.sh <your-func-name>`
-cool() { echo cool; }
+cool() { echo cool && ls -la | pad3 4 '-72' '' ' | desc here'; }
 sleeping() { echo sleeping; }
+
+#### write your functions here, and invoke them by: `./bash.sh <your-func-name>`
 
 # FN_PREFIX=boot_
 _my_main_do_sth() {
@@ -693,7 +694,7 @@ main_do_sth() {
 	# disabling this logic is still simple by defining HAS_END=1.
 	((${HAS_END:-0})) && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
 }
-BASH_SH_VERSION=v20230126
+BASH_SH_VERSION=v20230206
 DEBUG=${DEBUG:-0}
 PROVISIONING=${PROVISIONING:-0}
 # trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }
