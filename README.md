@@ -272,7 +272,76 @@ ops dns fix_nameservers
 ops dns fix-nameservers
 ```
 
-> See also [example/dns-tool](https://github.com/hedzr/bash.sh/blob/master/example/dns-tool), Or [./ops.d/darwin/lazy/dns-ops.sh](https://github.com/hedzr/bash.sh/blob/master/ops.d/darwin/lazy/dns-ops.sh).
+> See also [example/dns-tool](https://github.com/hedzr/bash.sh/blob/master/example/dns-tool),
+> Or [./ops.d/darwin/lazy/dns-ops.sh](https://github.com/hedzr/bash.sh/blob/master/ops.d/darwin/lazy/dns-ops.sh).
+
+### Write a lazy function
+
+The best practice of writing a lazy function is, you should
+create two functions:
+ one is auto-imported, such as a name `autocmd`, and the
+ two is lazy, named as `autocmd-lazy`.
+
+The script file `autocmd.sh` of the first function be put
+into `~/.local/bin/.zsh/`, that's one of auto-loading location.
+The file `autocmd-lazy.sh` be put into `~/.local/bin/.zsh/lazy`,
+this is the lazy loading folder for its upper directory.
+
+The script codes are:
+
+```bash
+# autocmd.sh
+autocmd(){ autocmd_lazy "$@" }
+```
+
+And:
+
+```bash
+# autocmd-lazy.sh
+autocmd_lazy(){
+  : # your implementations here
+}
+```
+
+Why we split a lazy function into two implementations?
+
+Because the first function auto-imported, `autocmd`, can be recoganized with
+zsh command container in .zshrc initializing phrase.
+**So it is visible at typing command characters on zsh command-line**. That
+means, zsh-autocompletion, autosuggestions
+and others machanisms can work properly.
+
+At same time, its body is so tiny so it doesn't waste too much in zsh initializing time.
+
+And the really implementation of `autocmd` was been moved into
+`autocmd-lazy` function, it will be loaded until user typed
+`autocmd<ENTER>` at first time.
+
+### Like Kebab style?
+
+A classical bash composer would be like kebab naming as function names.
+
+```bash
+# bash only
+function cleanup-homebrew(){
+  :
+}
+```
+
+But it's invalid name in zsh env. It's sadly.
+
+Fortunately, there is a way to keep kebab name working in zsh: alias. So
+you may make a copy of a standard zsh function:
+
+```bash
+# for both bash and zsh
+function cleanup_homebrew(){
+  :
+}
+alias cleanup-homebrew=cleanup_homebrew
+```
+
+That's a trick!
 
 ## Samples
 
