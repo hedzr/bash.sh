@@ -15,13 +15,12 @@
 
 echo "Install....$0 $@"
 OPS_NAME="${OPS_NAME:-bash.sh}"
-URL_BASE="${OPS_URL_BASE:-https://hedzr.com/$OPS_NAME/}"
+URL_BASE="${OPS_URL_BASE:-https://hedzr.com/bash/$OPS_NAME/}"
 INSTALL_PREFIX="${INSTALL_TARGET:-/usr/local/bin}"
 INSTALL_TARGET="$INSTALL_PREFIX"
 N=""
 
-
-function self_download () {
+function self_download() {
 	if [ -z $# ]; then
 		false
 	elif [ $# -gt 1 ]; then
@@ -45,8 +44,7 @@ function self_download () {
 	fi
 }
 
-
-self_download "bash.config"
+self_download "bash.config" && ln -s "$INSTALL_TARGET/$OPS_NAME" "$INSTALL_TARGET/ops"
 
 cat <<EOF
 
@@ -56,5 +54,3 @@ cat <<EOF
 All folks, Enjoy it!
 
 EOF
-
-
