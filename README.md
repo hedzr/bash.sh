@@ -299,9 +299,10 @@ ops dns dump
 ops dns fix nameservers
 ops dns fix resolv_conf
 ops dns fix_nameservers
+ops dns fix-nameservers
 ```
 
-> See also [example/dns-tool](example/dns-tool)
+> See also [example/dns-tool](https://github.com/hedzr/bash.sh/blob/master/example/dns-tool), Or [./ops.d/darwin/lazy/dns-ops.sh](https://github.com/hedzr/bash.sh/blob/master/ops.d/darwin/lazy/dns-ops.sh).
 
 ### Environment Variables
 
