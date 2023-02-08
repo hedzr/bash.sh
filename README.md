@@ -5,6 +5,14 @@
 File `bash.config` can be applied and sourced into your zshell environment directly. See [Import bash.config into your zsh env](#3-import-bashconfig-into-your-zsh-env).
 Why? Because we will have a clean zsh initializing environment and many tools can be lazy-loaded now.
 
+## Features
+
+We devote ourselves to helping you to write shell script functions more easier.
+
+- Write lots of functions and make calling them easier
+- Write many functions and organize them hierarchically
+- Work for multiple devops environments: making `ops` command and its subcommands; decorating your local zshell init scripts for managing the useful utilities.
+
 ## History
 
 - v20230208:
@@ -135,94 +143,51 @@ It can be simplified to one-liner:
 . "/path/to/bash.sh/bash.config" && unset cool sleeping _my_main_do_sth main_do_sth DEBUG VERBOSE
 ```
 
-## Samples
+### Write functions and call them
 
-![Sample](./_images/2018-02-22_12.30.11.png)
+First of `bash.sh` is, we collected and organized many small functions and utilities to build a basic framework so you can pass the writing about entry point and arguments parsing, and so on.
 
-## Knives Document
-
-### `in_debug`
-
-in debug mode?
-
-toggle environment variable `DEBUG` to switch between `normal_mode` and `debug_mode`.
+Which means, you're working for checking how many nodes are online, you may write `count_nodes()` function in a blank script file `count-nodes.sh`, and append the fragment between `#### HZ Tail BEGIN ####` and `#### HZ Tail END ####` from file `bash.sh`.
 
 ```bash
-is_debug && echo 'debug mode' || echo 'normal mode'
+count_nodes() {
+  local count="$#"
+  echo "nodes count is $count, they are: $@"
+}
 ```
 
-### `debug` $\*, `dbg`, `tip`, `err`
-
-Prints string as darker text for debugging (if env var `DEBUG` == 1). In normal mode, the string message will be stripped.
+Now you have a highly extensible script, it'll be used as:
 
 ```bash
-debug I am buggy but you don't know
-debug 'I am buggy but you don'''t know'
-debug "I am buggy but you don't know"
-
-dbg "debug line"
-
-tip "A simple message to tip you something happened: $event"
-err "Error occurred whlie executed the command line: $cmd '$@'"
+# call your count_nodes()
+$ ./count-nodes.sh count_nodes
+# call it with arguments
+$ ./count-nodes.sh count_nodes rabbit.ops.local
 ```
 
-- `tip` and `err` will always prints message.
-- `err` will prints message to stderr device.
-- `dbg` available on DEBUG=1, it's slight differant with `debug`
+Any arguments will be passed into count-nodes.
 
-You may use the splitted version: `debug_begin` and `debug_end`:
+It's highly extensible. You may add second function `enter_node` in it:
 
 ```bash
-if ((DEBUG)); then
-  debug_begin
-  cat /etc/os_release # this file will be printed with darker color.
-  debug_end
-fi
+enter_node() {
+  local node="$1"
+  echo "entering $node ..., $@"
+}
 ```
 
-### `headline` $\*
-
-print a hilight message string.
+Call it is simple:
 
 ```bash
-headline here is the hilighted title
+$ ./count-nodes.sh enter_nodes redis.ops.local 1 2 3
+entering redis.ops.local ..., 1 2 3
 ```
 
-### `is_bash` & `is_zsh`
+### Use `commander()` in your scripts
 
-check if running under bash/zsh interpretor or not
+`commander` make writing multi-level subcommands simple. It assumes first argument as subcommand and try invoking the responsed function by join the subcommand to current command. So `dns add` is same of invoking `dns_add`.
 
-```bash
-is_bash && echo 'in bash'
-is_zsh && echo 'in zsh'
-```
-
-### `is_linux`, `is_darwin`
-
-check if running in Linux/macOS shell.
-
-```bash
-is_linux && echo 'in linux'
-is_darwin && grep -E 'LISTEN|UDP' somefile || grep -P 'LISTEN|UDP' somefile
-```
-
-> **UPDATED**
->
-> More testers added:
-> is_yum, is_dnf, is_apt,  
-> is_debian_series, is_redhat_series,  
-> is_debian, is_ubuntu, is_centod, is_fedora, is_redhat,  
-> is_nix, ...
-
-### `realpathx`
-
-cross impl for linux `realpath`.
-
-## Use `commander()` in your scripts
-
-`commander` provides a multi-level subcommands skeleton for you.
-
-Here is a example code fragment in an `ops`:
+Here is a example codes in an `ops`:
 
 ```bash
 dns() {
@@ -309,6 +274,89 @@ ops dns fix-nameservers
 
 > See also [example/dns-tool](https://github.com/hedzr/bash.sh/blob/master/example/dns-tool), Or [./ops.d/darwin/lazy/dns-ops.sh](https://github.com/hedzr/bash.sh/blob/master/ops.d/darwin/lazy/dns-ops.sh).
 
+## Samples
+
+![Sample](./_images/2018-02-22_12.30.11.png)
+
+## Knives Document
+
+### `in_debug`
+
+in debug mode?
+
+toggle environment variable `DEBUG` to switch between `normal_mode` and `debug_mode`.
+
+```bash
+is_debug && echo 'debug mode' || echo 'normal mode'
+```
+
+### `debug` $\*, `dbg`, `tip`, `err`
+
+Prints string as darker text for debugging (if env var `DEBUG` == 1). In normal mode, the string message will be stripped.
+
+```bash
+debug I am buggy but you don't know
+debug 'I am buggy but you don'''t know'
+debug "I am buggy but you don't know"
+
+dbg "debug line"
+
+tip "A simple message to tip you something happened: $event"
+err "Error occurred whlie executed the command line: $cmd '$@'"
+```
+
+- `tip` and `err` will always prints message.
+- `err` will prints message to stderr device.
+- `dbg` available on DEBUG=1, it's slight differant with `debug`
+
+You may use the splitted version: `debug_begin` and `debug_end`:
+
+```bash
+if ((DEBUG)); then
+  debug_begin
+  cat /etc/os_release # this file will be printed with darker color.
+  debug_end
+fi
+```
+
+### `headline` $\*
+
+print a hilight message string.
+
+```bash
+headline here is the hilighted title
+```
+
+### `is_bash` & `is_zsh`
+
+check if running under bash/zsh interpretor or not
+
+```bash
+is_bash && echo 'in bash'
+is_zsh && echo 'in zsh'
+```
+
+### `is_linux`, `is_darwin`
+
+check if running in Linux/macOS shell.
+
+```bash
+is_linux && echo 'in linux'
+is_darwin && grep -E 'LISTEN|UDP' somefile || grep -P 'LISTEN|UDP' somefile
+```
+
+> **UPDATED**
+>
+> More testers added:
+> is_yum, is_dnf, is_apt,  
+> is_debian_series, is_redhat_series,  
+> is_debian, is_ubuntu, is_centod, is_fedora, is_redhat,  
+> is_nix, ...
+
+### `realpathx`
+
+cross impl for linux `realpath`.
+
 ### Environment Variables
 
 #### `DEBUG` = {1|0}
@@ -318,10 +366,6 @@ ops dns fix-nameservers
 #### `CD`: directory of `bash.sh`
 
 #### `SCRIPT`: full path of `bash.sh`
-
-## Under zsh Shell
-
-advantage.
 
 ## License
 
