@@ -7,6 +7,11 @@ Why? Because we will have a clean zsh initializing environment and many tools ca
 
 ## History
 
+- v20230208:
+  - improved `lazy-loader`, which fits for any zsh/bash env. The loader will check `bash.sh` installed directory for stocked lazy functions, such as `dns` -> `dns-ops`
+  - improved `installer`: now `ops` symbolic link will be created and pointed to bash.sh after installed. So, the following sample codes are relinked.
+  - added `dns` sample command to show you how to write a multi-level command hierarchy, see also [`use commander()`](#use-commander-in-your-scripts)
+
 - v20230206:
   - improved `pad`, added `pad3`
   - improved bash-lite.sh

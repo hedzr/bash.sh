@@ -162,9 +162,9 @@ dns_list_one() {
 	# host -l ops.local | tail --lines=+2 | awk '{print $1,$4}' > /tmp/dns-records
 	sudo touch /tmp/dns-records{,-1,-2} && sudo chmod a+x /tmp/dns-records*
 	/usr/bin/host -l ops.local | grep ' has address ' | awk '{print $1,$4;}' | sort -u >/tmp/dns-records-2
-	#\host -l -t TXT ops.local
-	#echo ""
-	#alias host
+	# \host -l -t TXT ops.local
+	# echo ""
+	# alias host
 	# /usr/bin/host -t TXT -l ops.local
 	eval '/usr/bin/host -t TXT -l ops.local' | grep -i 'phy;' | awk '{print $1,$4;}' | sort -u >/tmp/dns-records-1
 	join -j 1 -o 2.1,1.2,2.2 /tmp/dns-records-2 /tmp/dns-records-1 2>/dev/null 1>/tmp/dns-records
