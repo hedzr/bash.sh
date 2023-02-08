@@ -291,14 +291,17 @@ The script codes are:
 
 ```bash
 # autocmd.sh
-autocmd(){ autocmd_lazy "$@" }
+autocmd() { autocmd_lazy "$@"; }
+# in its body, calling to `autocmd-lazy` will trigger a unhandled
+# function name event, so our lazy-loader can capture and try 
+# loading autocmd-lazy.sh or autocmd_lazy.sh in `lazy` folders.
 ```
 
-And:
+And its real body is:
 
 ```bash
 # autocmd-lazy.sh
-autocmd_lazy(){
+autocmd_lazy() {
   : # your implementations here
 }
 ```
@@ -323,7 +326,7 @@ A classical bash composer would be like kebab naming as function names.
 
 ```bash
 # bash only
-function cleanup-homebrew(){
+function cleanup-homebrew() {
   :
 }
 ```
@@ -335,7 +338,7 @@ you may make a copy of a standard zsh function:
 
 ```bash
 # for both bash and zsh
-function cleanup_homebrew(){
+function cleanup_homebrew() {
   :
 }
 alias cleanup-homebrew=cleanup_homebrew
