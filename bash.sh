@@ -65,9 +65,9 @@ _my_main_do_sth() {
 
 	local DBG_SAVE="$DEBUG"
 
-	load_import_files
-	# load_files '*'
-	load_env_files
+	_bash_sh_load_import_files
+	# _bash_sh_load_files '*'
+	_bash_sh_load_env_files
 
 	# in_provisioning ||
 	[ "$cmd" = "first-install" ] || DEBUG="$DBG_SAVE" # && echo "DEBUG: $DEBUG"
@@ -121,14 +121,14 @@ _my_main_do_sth() {
 	fi
 }
 
-try_source_in() {
+_bash_sh_try_source_in() {
 	local f
 	for f in "$@"; do
 		[ -f "$f" ] && shift && dbg "  ..sourcing $f" && DEBUG=0 VERBOSE=0 source "$f"
 	done
 }
 
-try_source_child_files() {
+_bash_sh_try_source_child_files() {
 	local dir="$1"
 	# processed=0
 	if [ -d $dir ]; then
@@ -142,14 +142,14 @@ try_source_child_files() {
 	fi
 }
 
-load_import_files() {
+_bash_sh_load_import_files() {
 	local dir processed=0
 	local osid="$(osid)" pmid="$(pmid)"
 	for dir in $CD; do
 		if [ -d $dir/ops.d ]; then
-			try_source_child_files "$dir/ops.d" # && tip "processed = $processed"
-			try_source_child_files "$dir/ops.d/$osid"
-			try_source_child_files "$dir/ops.d/$pmid"
+			_bash_sh_try_source_child_files "$dir/ops.d" # && tip "processed = $processed"
+			_bash_sh_try_source_child_files "$dir/ops.d/$osid"
+			_bash_sh_try_source_child_files "$dir/ops.d/$pmid"
 		else
 			dbg "[DBUG] $dir/ops.d/ folder NOT FOUND, no more script files loaded."
 		fi
@@ -164,7 +164,7 @@ load_import_files() {
 	fi
 }
 
-load_files() {
+_bash_sh_load_files() {
 	local f ff dir processed=0
 	dbg "  > load_files $@ <"
 	for dir in "$CD"; do
@@ -195,7 +195,7 @@ load_files() {
 	fi
 }
 
-load_env_files() {
+_bash_sh_load_env_files() {
 	local rel env=
 	for rel in '.' '..'; do
 		env="$CD/$rel/.env"
@@ -719,5 +719,5 @@ PROVISIONING=${PROVISIONING:-0}
 in_sourcing && { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug ">> IN SOURCING (DEBUG=$DEBUG), \$0=$0, \$_=$_"; } || { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug ">> '$SCRIPT' in '$CD', \$0='$0','$1'."; }
 if_vagrant && [ "$SCRIPT" == "/tmp/vagrant-shell" ] && { [ -d $CD/ops.d ] || CD=/vagrant/bin; }
 [ -L "$SCRIPT" ] && debug linked script found && SCRIPT=$(realpathx "$SCRIPT") && CD=$(dirname "$SCRIPT")
-in_sourcing && load_import_files || main_do_sth "$@"
+in_sourcing && _bash_sh_load_import_files || main_do_sth "$@"
 #### HZ Tail END ####

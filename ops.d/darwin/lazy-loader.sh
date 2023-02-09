@@ -1,54 +1,56 @@
 # for zsh
 lazy_loaded=()
 function command_not_found_handler() {
-	local f f1 dir processed=0 cmd="$1" && shift # a args=()
-	local osid="$(osid)" pmid="$(pmid)"
+	local command_not_found_handler_cmd="$1" && shift # a args=()
+	local command_not_found_handler_arg="$@"
+	local command_not_found_handler_processed=0
 
-	try_source_in() {
-		local dx="$1"
+	_bash_sh_lazy_try_source_in() {
+		local dx="$1" f f1
 		if [ -d $dx ]; then
-			f="$dx/$cmd.sh"
+			f="$dx/$command_not_found_handler_cmd.sh"
 			if not_in_array $f $lazy_loaded; then
 				if [ -f "$f" ]; then
-					source $f && dbg "yes: $f" && processed=1
+					source $f && dbg "  yes: $f" && command_not_found_handler_processed=1
 				else
 					f1="${f//_/-}"
 					if [ -f "$f1" ]; then
-						source $f1 && dbg "yes: $f ($f1 loaded)" && processed=1
+						source $f1 && dbg "  yes: $f ($f1 loaded)" && command_not_found_handler_processed=1
 					fi
 				fi
-				if (($processed)); then
+				if (($command_not_found_handler_processed)); then
 					lazy_loaded+=($f)
-					eval $cmd "$@"
+					eval $command_not_found_handler_cmd "$command_not_found_handler_arg"
 				fi
 			fi
 		fi
 	}
 
+	local dir osid="$(osid)" pmid="$(pmid)"
 	for dir in $HOME/.local/bin $HOME/bin /opt/bin /opt/local/bin $HOME/hack/bin $HOME/.r2env/bin; do
-		if ! (($processed)); then
+		if ! (($command_not_found_handler_processed)); then
 			local dx="$dir/.zsh/lazy"
 			if [ -d $dx ]; then
-				# dbg " dir: $dx, args: $*"
-				try_source_in "$dx"
+				dbg " lazy-loader: dir: $dx, args: $*"
+				_bash_sh_lazy_try_source_in "$dx"
 			fi
 		fi
 	done
 
-	if ! (($processed)); then
+	if ! (($command_not_found_handler_processed)); then
 		for dir in "$CD/ops.d" "$CD/ops.d/$osid" "$CD/opd.d/$pmid"; do
-			if ! (($processed)); then
+			if ! (($command_not_found_handler_processed)); then
 				if [ -d $dx ]; then
-					try_source_in "$dir/lazy"
+					_bash_sh_lazy_try_source_in "$dir/lazy"
 				fi
 			fi
 		done
 	fi
 
-	if (($processed)); then
+	if (($command_not_found_handler_processed)); then
 		return 0
 	else
-		err "COMMAND NOT FOUND: You tried to run '$cmd' with args '$@'"
+		err "COMMAND NOT FOUND: You tried to run '$command_not_found_handler_cmd' with args '$command_not_found_handler_arg'"
 		return 127
 	fi
 }
