@@ -15,6 +15,11 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20230210
+  - renamed: `_bash_sh_try_source_in`, `_bash_sh_try_source_child_files`, `_bash_sh_load_import_files`, ...
+  - added `rpad` and `repeat_char`, improved `commander`
+  - improve this doc
+
 - v20230208:
   - improved `lazy-loader`, which fits for any zsh/bash env. The loader will check `bash.sh` installed directory for stocked lazy functions, such as `dns` -> `dns-ops`
   - improved `installer`: now `ops` symbolic link will be created and pointed to bash.sh after installed. So, the following sample codes are relinked.
