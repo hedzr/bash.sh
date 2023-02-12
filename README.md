@@ -15,6 +15,9 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20230212
+  - auto-release at github
+
 - v20230210
   - renamed: `_bash_sh_try_source_in`, `_bash_sh_try_source_child_files`, `_bash_sh_load_import_files`, ...
   - added `rpad` and `repeat_char`, improved `commander`
