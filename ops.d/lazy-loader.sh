@@ -38,10 +38,12 @@ function command_not_found_handler() {
 		fi
 	done
 
+	dbg "CD: $CD"
 	if ! (($command_not_found_handler_processed)); then
 		# and if not found, loading it from bash.sh/ops.d/.../lazy/ folders
 		for dir in "$CD/ops.d" "$CD/ops.d/$osid" "$CD/opd.d/$pmid"; do
 			if ! (($command_not_found_handler_processed)); then
+				local dx="$dir/lazy"
 				if [ -d $dx ]; then
 					dbg "lazy-loader [2nd]: dir: $dx, cmd: $command_not_found_handler_cmd, args: $command_not_found_handler_arg"
 					_bash_sh_lazy_try_source_in "$dir/lazy"
