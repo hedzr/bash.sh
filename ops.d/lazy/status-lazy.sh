@@ -10,8 +10,8 @@ status_lazy() {
 		EOF
 	}
 
-	status_env() { check_env && debug_info; } # debug_info defined in bash.config
-	status_rpad() {                           # a dummy subcommand for testing
+	status_env() { check_env && echo "######################## Debug Informations Here" && debug_info; } # debug_info defined in bash.config
+	status_rpad() {                                                                                      # a dummy subcommand for testing
 		dbg "running in try_rpad"
 		rpad 32 - "something" && echo END
 		rpad 32 - "yes" && echo END
@@ -24,7 +24,7 @@ status_lazy() {
 
 check_env() {
 	cat <<-EOC
-		############### Checks
+		############### Checks Here
 		        centos: $(if_centos && echo Y)
 		        ubuntu: $(if_ubuntu && echo Y)
 		           mac: $(if_mac && echo Y)
