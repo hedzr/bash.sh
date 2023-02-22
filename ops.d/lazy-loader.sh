@@ -32,7 +32,7 @@ function command_not_found_handler() {
 		if ! (($command_not_found_handler_processed)); then
 			local dx="$dir/.zsh/lazy"
 			if [ -d $dx ]; then
-				dbg " lazy-loader: dir: $dx, args: $*"
+				dbg "lazy-loader [1st]: dir: $dx, cmd: $command_not_found_handler_cmd, args: $command_not_found_handler_arg"
 				_bash_sh_lazy_try_source_in "$dx"
 			fi
 		fi
@@ -43,6 +43,7 @@ function command_not_found_handler() {
 		for dir in "$CD/ops.d" "$CD/ops.d/$osid" "$CD/opd.d/$pmid"; do
 			if ! (($command_not_found_handler_processed)); then
 				if [ -d $dx ]; then
+					dbg "lazy-loader [2nd]: dir: $dx, cmd: $command_not_found_handler_cmd, args: $command_not_found_handler_arg"
 					_bash_sh_lazy_try_source_in "$dir/lazy"
 				fi
 			fi
