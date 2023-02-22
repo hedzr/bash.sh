@@ -25,7 +25,7 @@ if is_zsh; then
 	local dir dir_saved f
 	# $HOME/.rvm/bin $HOME/.r2env/bin
 	for dir in /opt/local/bin /opt/bin $HOME/bin $HOME/.local/bin $HOME/go/bin $HOME/hack/bin; do
-		[ -d $dir ] && {
+		if [ -d $dir ]; then
 			tip ".zshenv: checking $dir ..." >>/tmp/sourced.list
 			try_prepend_path_ex "$dir"
 			tip "   PATH: $PATH" >>/tmp/sourced.list
@@ -39,13 +39,13 @@ if is_zsh; then
 				for f in $dir/.zsh.*.sh; do source $f && echo "  sourced: $f" >>/tmp/sourced.list; done
 				dir="$dir_saved"
 			fi
-			[ -d $dir/.zsh ] && {
+			if [ -d $dir/.zsh ]; then
 				if test -n "$(find $dir/.zsh -maxdepth 1 -name '*.sh' -print -quit)"; then
 					for f in $dir/.zsh/*.sh; do source $f && echo "  sourced .zsh/*: $f" >>/tmp/sourced.list; done
 					dir="$dir_saved"
 				fi
-			}
-		}
+			fi
+		fi
 	done
 	# try_append_path $VULS_HOME/bin $PY_USER_BIN $FLUTTER_HOME/bin
 	echo '' >>/tmp/sourced.list
