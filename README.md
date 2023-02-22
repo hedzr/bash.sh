@@ -15,6 +15,14 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20230222
+  - fixed/improved `lazy-loader`
+  - fix `in_vm` for non-linux
+  - fix `if_centos`, `in_vm`, `script_functions`, `commander`
+  - shorten or normalize some if(-if)-clauses
+  - added `status` command and `status env` subcommand, for all OSes
+  - added skel file `more.sh` so you can put your function here
+
 - v20230212
   - auto-release at github
 
