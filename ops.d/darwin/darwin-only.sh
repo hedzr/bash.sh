@@ -18,8 +18,8 @@ BSH_OS=darwin
 if is_zsh; then
 	dbg "ZSH_EVAL_CONTEXT: $ZSH_EVAL_CONTEXT"
 	dbg "in_vscode: $(in_vscode && echo Y || echo .), in_jetbrains: $(in_jetbrains && echo Y || echo .)"
-	dbg "in_wsl: $(in_wsl && echo Y || echo .)"
-	dbg "stack: ${funcstack[@]}"
+	dbg "   in_wsl: $(in_wsl && echo Y || echo .)"
+	dbg "    stack: ${funcstack[@]}"
 	echo
 
 	local dir dir_saved f
