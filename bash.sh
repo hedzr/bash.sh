@@ -251,6 +251,7 @@ else
 	is_not_stdin() { true; }
 	is_tty() { false; }
 fi
+cmd_exists() { command -v $1 >/dev/null; } # it detects any builtin or external commands, aliases, and any functions
 fn_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(shell function)|(a function)'; }
 fn_builtin_exists() { LC_ALL=C type $1 2>/dev/null | grep -q 'shell builtin'; }
 fn_aliased_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(alias for)|(aliased to)'; }
@@ -341,13 +342,16 @@ if_non_zero_and_empty() {
 #
 #
 #
-if_nix() {
+if_nix_typ() {
 	case "$OSTYPE" in
 	*linux* | *hurd* | *msys* | *cygwin* | *sua* | *interix*) sys="gnu" ;;
 	*bsd* | *darwin*) sys="bsd" ;;
 	*sunos* | *solaris* | *indiana* | *illumos* | *smartos*) sys="sun" ;;
 	esac
-	[[ "${sys}" == "$1" ]]
+	echo "${sys}"
+}
+if_nix() {
+	[[ "$(if_nix_typ)" == "$1" ]]
 }
 if_mac() { [[ $OSTYPE == darwin* ]]; }
 if_ubuntu() {
@@ -355,9 +359,8 @@ if_ubuntu() {
 		[ -f /etc/os-release ] && grep -qi 'ubuntu' /etc/os-release
 	fi
 }
-if_vagrant() {
-	[ -d /vagrant ]
-}
+if_vagrant() { [ -d /vagrant ]; }
+in_vagrant() { [ -d /vagrant ]; }
 if_centos() {
 	if [[ $OSTYPE == linux* ]]; then
 		if [ -f /etc/centos-release ]; then
@@ -368,8 +371,8 @@ if_centos() {
 	fi
 }
 in_vm() {
-	if fn_exists hostnamectl; then
-		dbg "checking hostnamectl"
+	if cmd_exists hostnamectl; then
+		# dbg "checking hostnamectl"
 		if hostnamectl | grep -E 'chassis: ' | grep -q ' vm'; then
 			true
 		elif hostnamectl | grep -qE 'Virtualization: '; then
@@ -387,6 +390,8 @@ pmid() { # apt, yum, dnf, brew, ...
 	is_apt && echo "apt" && return
 	is_dnf && echo "dnf" && return
 	is_yum && echo "yum" && return
+	is_pacman && echo "pacman" && return
+	is_zypp && echo "zypp" && return
 	is_homebrew && echo "brew" && return
 	# is_snap && echo "snap" && return
 	# is_chocolatey && echo "choco" && return
@@ -394,18 +399,18 @@ pmid() { # apt, yum, dnf, brew, ...
 	# is_cargo && echo "cargo" && return
 	echo "???"
 }
-osid() { # fedora / ubuntu / debian / ...
+osid() { # fedora / ubuntu / debian / mageia / manjaro / arch ...
 	[[ -f /etc/os-release ]] && {
-		grep -Eo '^ID="?(.+)"?' /etc/os-release | sed -r -e 's/^ID="?(.+)"?/\1/'
+		grep -Eo '^ID="?(.+)"?' /etc/os-release | sed -r -e 's/^ID="?([^"]+)"?/\1/'
 	} || {
 		is_darwin && echo "darwin" || {
 			is_win && echo "windows" || echo "unknown-os"
 		}
 	}
 }
-osidlike() { # redhat / debian / ...
+osidlike() { # redhat / debian / centos / fedora / redhat / mandriva fedora / arch ...
 	[[ -f /etc/os-release ]] && {
-		grep -Eo '^ID_LIKE="?(.+)"?' /etc/os-release | sed -r -e 's/^ID_LIKE="?(.+)"?/\1/'
+		grep -Eo '^ID_LIKE="?(.+)"?' /etc/os-release | sed -r -e 's/^ID_LIKE="?([^"]+)"?/\1/'
 	} || {
 		is_darwin && echo "darwin" || {
 			is_win && echo "windows" || echo "unknown-os"
@@ -433,11 +438,16 @@ is_centos() { [[ "$(osid)" == centos ]]; }
 is_redhat() { [[ "$(osid)" == redhat ]]; }
 is_debian() { [[ "$(osid)" == debian ]]; }
 is_ubuntu() { [[ "$(osid)" == ubuntu ]]; }
+is_mageia() { [[ "$(osid)" == mageia ]]; }
+is_opensuse() { [[ "$(osid)" == opensuse* ]]; }
 # is_debian_series() { [[ "$(osid)" == debian || "$(osid)" == ubuntu ]]; }
 # is_redhat_series() { [[ "$(osid)" == redhat || "$(osid)" == centos || "$(osid)" == fedora ]]; }
 is_yum() { which yum 1>/dev/null 2>&1; }
 is_dnf() { which dnf 1>/dev/null 2>&1; }
 is_apt() { which apt-get 1>/dev/null 2>&1; }
+is_pacman() { which pacman 1>/dev/null 2>&1; }
+is_zypp() { which zypper 1>/dev/null 2>&1; }
+is_zypper() { which zypper 1>/dev/null 2>&1; }
 is_homebrew() { which brew 1>/dev/null 2>&1; }
 # is_redhat_series() { is_yum || is_dnf; }
 # is_debian_series() { is_apt; }
@@ -523,13 +533,33 @@ debug_info() {
 		       is_zsh/is_zsh_t1: $(is_zsh && echo Y || echo '.') / $(is_zsh_t1 && echo Y || echo '.')   # $(is_zsh && echo "ZSH_EVAL_CONTEXT = $ZSH_EVAL_CONTEXT, ZSH_NAME = $ZSH_NAME, ZSH_VERSION = $ZSH_VERSION" || :)
 		                is_fish: $(is_fish && echo Y || echo '.')       # FISH_VERSION = $FISH_VERSION
 		            in_sourcing: $(in_sourcing && echo Y || echo '.')
-		                  in_vm: $(in_vm && echo Y || echo '.')
+		       if_vagrant/in_vm: $(if_vagrant && echo Y || echo '.') / $(in_vm && echo Y || echo '.')
 		              in_vscode: $(in_vscode && echo Y || echo '.')
-		            in_jetbrain: $(in_jetbrains && echo Y || echo '.')
+		           in_jetbrains: $(in_jetbrains && echo Y || echo '.')
 		  darwin/linux/win(wsl): $(is_darwin && echo Y || echo '.') / $(is_linux && echo Y || echo '.') / $(is_win && echo Y || echo '.')
 		   is_interactive_shell: $(is_interactive_shell && echo Y || echo '.')
 		  
 		NOTE: bash.sh can only work in bash/zsh mode, even if running it in fish shell.
+
+		  IP(s):
+		$(lanip | pad 9)
+		  Gateway / Mask: $(gw) / $(netmask)
+
+		  OS tests: pmid='$(pmid)' osid='$(osid)' osidlike='$(osidlike)'
+		            oscodename='$(oscodename)' versionid='$(versionid)' variantid='$(variantid)'
+		            if_nix_typ='$(if_nix_typ)' (\$OSTYPE='$OSTYPE')
+	EOF
+	is_linux && cat <<-EOF
+
+		              lsb_release_cs = '$(lsb_release_cs)'
+		            uname_kernel(-s) = '$(uname_kernel)'
+		               uname_cpu(-p) = '$(uname_cpu)'
+		              uname_mach(-m) = '$(uname_mach)'
+		               uname_rev(-r) = '$(uname_rev)'
+		               uname_ver(-v) = '$(uname_ver)'
+		                  i386_amd64 = '$(i386_amd64)'
+		                      x86_64 = '$(x86_64)'
+		                 if_hosttype = '$(if_hosttype)'
 	EOF
 	debug_end
 	:
@@ -661,12 +691,23 @@ if is_darwin; then
 	netmask_hex() { ifconfig $(default_dev) | awk '/netmask /{print $4}'; }
 	netmask() { hex2mask $(netmask_hex); }
 else
+	ipcmd="$(which ip 2>/dev/null || echo 'sudo ip')"
 	realpathx() { readlink -f "$@"; }
-	default_dev() { ip route show default | grep -oE 'dev \w+' | awk '{print $2}'; }
-	gw() { ip route show default | awk '{print $3}'; }
-	lanip() { ip a | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}'; }
-	lanip6() { ip a | grep 'inet6 ' | grep -FvE '::1|%lo|fe80::' | awk '{print $2}'; }
-	netmask() { ifconfig $(default_dev) | awk '/netmask /{print $4}'; }
+	default_dev() { $ipcmd route show default | grep -oE 'dev \w+' | awk '{print $2}'; }
+	gw() { $ipcmd route show default | awk '{print $3}'; }
+	lanip() { $ipcmd a | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}'; }
+	lanip6() { $ipcmd a | grep 'inet6 ' | grep -FvE '::1|%lo|fe80::' | awk '{print $2}'; }
+	netmask() {
+		which ifconfig >/dev/null 2>&1 && { $(default_dev) | awk '/netmask /{print $4}'; } || {
+			tomask() {
+				while IFS='/' read IP S; do
+					M=$((0xffffffff ^ ((1 << (32 - S)) - 1)))
+					echo "$(((M >> 24) & 0xff)).$(((M >> 16) & 0xff)).$(((M >> 8) & 0xff)).$((M & 0xff))"
+				done
+			}
+			$ipcmd a | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}' | tomask
+		}
+	}
 fi
 # alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
 # alias ip-wan=wanip
