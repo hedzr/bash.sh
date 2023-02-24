@@ -15,6 +15,17 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20230225
+  - improved `pmid` (pacman, zypp)
+  - added `cmd_exists` -> fixed `in_vm`
+  - improved `if_nix` with new `if_nix_typ`
+  - use `in_vagrant` as synonym of `is_vagrant`
+  - added `is_mageia`, `is_opensuse`, `is_pacman`, `is_zypp`
+  - improved `debug_info` to print more system information
+  - improved `netmask`, ...
+  - added `vercomp`
+  - added `in_array`, `not_in_array`
+
 - v20230222
   - fixed/improved `lazy-loader`
   - fix `in_vm` for non-linux
