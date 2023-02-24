@@ -3,3 +3,7 @@
 *.tmp
 *.bak
 bump-version
+
+ref/
+sav/
+logs/
