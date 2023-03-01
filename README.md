@@ -15,6 +15,11 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v202302??
+  - added `is_manjaro`
+  - added `is_deb` (dpkg), `is_rpm`
+  - added `is_mandriva_series`, `is_arch_series`, `is_fedora_series`, `is_suse_series`, `is_opensuse_series`
+
 - v20230225
   - improved `pmid` (pacman, zypp)
   - added `cmd_exists` -> fixed `in_vm`

@@ -439,6 +439,7 @@ is_redhat() { [[ "$(osid)" == redhat ]]; }
 is_debian() { [[ "$(osid)" == debian ]]; }
 is_ubuntu() { [[ "$(osid)" == ubuntu ]]; }
 is_mageia() { [[ "$(osid)" == mageia ]]; }
+is_manjaro() { [[ "$(osid)" == manjaro ]]; }
 is_opensuse() { [[ "$(osid)" == opensuse* ]]; }
 # is_debian_series() { [[ "$(osid)" == debian || "$(osid)" == ubuntu ]]; }
 # is_redhat_series() { [[ "$(osid)" == redhat || "$(osid)" == centos || "$(osid)" == fedora ]]; }
@@ -453,6 +454,11 @@ is_homebrew() { which brew 1>/dev/null 2>&1; }
 # is_debian_series() { is_apt; }
 is_redhat_series() { [[ "$(osidlike)" == redhat ]]; }
 is_debian_series() { [[ "$(osidlike)" == debian ]]; }
+is_mandriva_series() { [[ "$(osidlike)" == mandriva* ]]; } # mandriva, mageia, ...
+is_arch_series() { [[ "$(osidlike)" == arch ]]; }
+is_fedora_series() { [[ "$(osidlike)" == *fedora* ]]; }
+is_suse_series() { [[ "$(osidlike)" == suse* ]]; }
+is_opensuse_series() { [[ "$(osidlike)" == *opensuse* ]]; }
 #
 #
 #
