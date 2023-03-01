@@ -40,6 +40,11 @@ bump() {
 	done
 }
 
+bump1() {
+	tip "  looking up at directory '$(safety $CD)'..."
+	tip "  looking up at directory '$(echo "$CD" | safetypipe)'..."
+}
+
 help() {
 	cat <<-EOF
 		Who am I?
@@ -65,16 +70,19 @@ _my_main_do_sth() {
 
 	local DBG_SAVE="$DEBUG"
 
+	dbg ": loading imports"
 	_bash_sh_load_import_files
+	dbg ": shell.d files imports"
 	# _bash_sh_load_files '*'
 	_bash_sh_load_env_files
+	dbg ": env imports"
 
 	# in_provisioning ||
 	[ "$cmd" = "first-install" ] || DEBUG="$DBG_SAVE" # && echo "DEBUG: $DEBUG"
 	# echo "4. DEBUG: $DEBUG, cmd: $cmd"
 
 	# in_debug && LC_ALL=C type $cmd || echo "$cmd not exists"
-	# dbg "  cmd = $cmd"
+	dbg ": invoking cmd: $cmd"
 	if fn_exists "boot_$cmd"; then
 		eval boot_$cmd "$@" #&& dbg ":DONE:boot_$cmd"
 	elif fn_exists "$cmd"; then
@@ -83,7 +91,7 @@ _my_main_do_sth() {
 		local f="$CD/ops.d/run/$cmd.sh"
 		# dbg "  ..finding $f"
 		if [ -f "$f" ]; then
-			dbg "  ..sourcing $f.." && source "$f" && dbg "  ..OK"
+			dbg "  ..sourcing $(safety $f).." && source "$f" && dbg "  ..OK"
 			if fn_exists "${cmd}_entry"; then
 				# dbg "  ..eval '${cmd}_entry' $@"
 				${cmd}_entry "$@"
@@ -91,7 +99,7 @@ _my_main_do_sth() {
 				eval $cmd "$@"
 			fi
 		else
-			err "command '$cmd' has not been defined. (CD=$CD)"
+			err "command '$cmd' has not been defined. (CD=$(safety $CD))"
 			return
 		fi
 	fi
@@ -124,7 +132,7 @@ _my_main_do_sth() {
 _bash_sh_try_source_in() {
 	local f
 	for f in "$@"; do
-		[ -f "$f" ] && shift && dbg "  ..sourcing $f" && DEBUG=0 VERBOSE=0 source "$f"
+		[ -f "$f" ] && shift && dbg "  ..sourcing $(safety $f)" && DEBUG=0 VERBOSE=0 source "$f"
 	done
 }
 
@@ -133,9 +141,9 @@ _bash_sh_try_source_child_files() {
 	# processed=0
 	if [ -d $dir ]; then
 		if test -n "$(find $dir -maxdepth 1 -name '*.sh' -print -quit)"; then
-			for f in $dir/*.sh; do dbg "  ..sourcing $f" && source $f && processed=1; done
+			for f in $dir/*.sh; do dbg "  ..sourcing $(safety $f)" && source $f && processed=1; done
 		else
-			tip "    nothing for testing $dir/*.sh, PWD: $(pwd)"
+			tip "    nothing for testing $(safety $dir)/*.sh, PWD: $(pwd)"
 		fi
 	else
 		:
@@ -151,13 +159,13 @@ _bash_sh_load_import_files() {
 			_bash_sh_try_source_child_files "$dir/ops.d/$osid"
 			_bash_sh_try_source_child_files "$dir/ops.d/$pmid"
 		else
-			dbg "[DBUG] $dir/ops.d/ folder NOT FOUND, no more script files loaded."
+			dbg "[DBUG] $(safety $dir)/ops.d/ folder NOT FOUND, no more script files loaded."
 		fi
 	done
 	if [[ $processed -eq 0 ]]; then
 		# in_debug && is_darwin && ps -a || ps -auxf
 		dbg
-		dbg "CD=$CD, SCRIPT=$SCRIPT"
+		dbg "CD=$(safety $CD), SCRIPT=$(safety $SCRIPT)"
 		dbg "[NOTE] ops.d/ folder NOT FOUND, no more script files loaded."
 	else
 		:
@@ -166,19 +174,19 @@ _bash_sh_load_import_files() {
 
 _bash_sh_load_files() {
 	local f ff dir processed=0
-	dbg "  > load_files $@ <"
+	dbg "  > load_files $(safety $@) <"
 	for dir in "$CD"; do
 		if [ -d "$dir/ops.d" ]; then
 			for f in "$@"; do
 				local s="$dir/ops.d/$f.sh"
-				dbg "  ..testing for $s ..."
+				dbg "  ..testing for $(safety $s) ..."
 				if test -n "$(find $dir/ops.d -maxdepth 1 -name $f'.sh' -print -quit)"; then
-					for ff in $dir/ops.d/$f.sh; do dbg "  ..sourcing $ff" && source $ff && processed=1; done
+					for ff in $dir/ops.d/$f.sh; do dbg "  ..sourcing $(safety $ff)" && source $ff && processed=1; done
 				else
 					:
 				fi
 				# if [ -f $s ]; then
-				# 	dbg "  ..sourcing $s" && source $s && processed=1
+				# 	dbg "  ..sourcing $(safety $s)" && source $s && processed=1
 				# fi
 			done
 		else
@@ -188,7 +196,7 @@ _bash_sh_load_files() {
 	if [[ $processed -eq 0 ]]; then
 		# in_debug && is_darwin && ps -a || ps -auxf
 		dbg
-		dbg "CD=$CD, SCRIPT=$SCRIPT"
+		dbg "CD=$(safety $CD), SCRIPT=$(safety $SCRIPT)"
 		dbg "[NOTE] ops.d/ folder NOT FOUND, no more script files loaded."
 	else
 		:
@@ -199,10 +207,10 @@ _bash_sh_load_env_files() {
 	local rel env=
 	for rel in '.' '..'; do
 		env="$CD/$rel/.env"
-		[ -f $env ] && { dbg "  ..sourcing $env" && source $env; } || :
+		[ -f $env ] && { dbg "  ..sourcing $(safety $env)" && source $env; } || :
 	done
 	for env in "$CD/ops.d/.env" "$CD/.env.local" "$CD/ops.d/.env.local" "$HOME/.config/ops.sh/env"; do
-		[ -f $env ] && { dbg "  ..sourcing $env" && source $env; } || :
+		[ -f $env ] && { dbg "  ..sourcing $(safety $env)" && source $env; } || :
 	done
 	:
 }
@@ -217,6 +225,7 @@ is_bash() { is_bash_t1 || is_bash_t2; }
 is_bash_t1() { [ -n "$BASH_VERSION" ]; }
 is_bash_t2() { [ ! -n "$BASH" ]; }
 is_zsh() { [[ -n "$ZSH_NAME" || "$SHELL" = */zsh ]]; }
+is_zsh_strict() { [[ -n "$ZSH_NAME" && "$SHELL" = */zsh ]]; }
 is_zsh_t1() { [[ "$SHELL" = */zsh ]]; }
 is_zsh_t2() { [ -n "$ZSH_NAME" ]; }
 is_fish() { [ -n "$FISH_VERSION" ]; }
@@ -612,9 +621,56 @@ rpad() {
 char_repeat() {
 	# repeat char n times: `char_repeat '-' 32`
 	local pad=$1 && (($#)) && shift
-	local n=$1 && (($#)) && shift
+	local n="$1" && (($#)) && shift
 	printf '%*s' $n "" | tr ' ' "$pad"
 }
+safety() {
+	# safety make the folder name more safety when output. It
+	# replaces $HOME to '~' to prevent home user name leaked.
+	# In additions, it refers zsh tlide folder name list and
+	# do the replacements rely on it. That means, if you have
+	# a zsh hashed folder definition /usr/local/bin -> ~ulbin,
+	# then it can also be applied to the result of
+	# $(safety $string).
+	#
+	# For example,
+	#
+	#    $ echo $(./bash.sh safety /home/$USER/Downloads)
+	#    ~/Downloads
+	#    $ echo $(./bash.sh safety $HOME/Downloads)
+	#    ~/Downloads
+	local input="${@//$HOME/~}" from to list
+	# dbg "Got input: $input" 1>&2
+	for list in $HOME/.safety.list; do
+		if [ -f $list ]; then
+			while read from to; do
+				input="$(printf "$input" | sed -E "s,$from,$to,g")"
+			done <$list
+		fi
+	done
+	if is_zsh_strict; then
+		# if running under zsh mode
+		if command -v hash >/dev/null; then
+			hash -d | while IFS=$'=' read to from; do
+				from="$(echo $from | tr -d "\042")"
+				input="$(printf "$input" | sed -E "s,$from,~$to,g")"
+			done
+		fi
+	elif command -v zsh >/dev/null; then
+		# in bash/sh mode
+		[ -f /tmp/hash.list ] || zsh -c "hash -d|sed 's/=/:/'|tr -d \"'\"|IFS=\$':' sort -k2 -r" >/tmp/hash.list
+		while IFS=$':' read to from; do
+			from="$(eval printf '%s' $from)"
+			to="$(eval printf '%s' $to)"
+			# echo "  $from -> $to" 1>&2
+			# echo "$input" | sed -E 's,'"$from"',~'"$to"',g' 1>&2
+			input="$(printf "$input" | sed -E 's,'"$from"',~'"$to"',g')"
+		done </tmp/hash.list
+	fi
+	# in="$(echo $in | sed -E -e "s,/Volumes/Vol,~vol,g")"
+	printf "$input"
+}
+safetypipe() { while read line; do printf "$(safety $line)"; done; }
 commander() {
 	local commander_self="$1" && (($#)) && shift
 	local commander_cmd="${1:-usage}" && (($#)) && shift
@@ -737,7 +793,7 @@ main_do_sth() {
 	MAIN_DEV=${MAIN_DEV:-$(default_dev)}
 	MAIN_ENTRY=${MAIN_ENTRY:-_my_main_do_sth}
 	# echo $MAIN_ENTRY - "$@"
-	in_debug && debug_info && dbg "$MAIN_ENTRY - $@ [CD: $CD, SCRIPT: $SCRIPT]"
+	in_debug && debug_info && dbg "$(safety "$MAIN_ENTRY - $@\n    [CD: $CD, SCRIPT: $SCRIPT]")"
 	if in_sourcing; then
 		$MAIN_ENTRY "$@"
 	else
@@ -760,8 +816,8 @@ DEBUG=${DEBUG:-0}
 PROVISIONING=${PROVISIONING:-0}
 # trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }
 # is_darwin && realpathx() { [[ $1 == /* ]] && echo "$1" || { DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $1)"; }; } || realpathx() { readlink -f $*; }
-in_sourcing && { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug ">> IN SOURCING (DEBUG=$DEBUG), \$0=$0, \$_=$_"; } || { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug ">> '$SCRIPT' in '$CD', \$0='$0','$1'."; }
-if_vagrant && [ "$SCRIPT" == "/tmp/vagrant-shell" ] && { [ -d $CD/ops.d ] || CD=/vagrant/bin; }
-[ -L "$SCRIPT" ] && debug linked script found && SCRIPT=$(realpathx "$SCRIPT") && CD=$(dirname "$SCRIPT")
+in_sourcing && { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug "$(safety ">> IN SOURCING (DEBUG=$DEBUG), \$0=$0, \$_=$_")"; } || { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug "$(safety ">> '$SCRIPT' in '$CD', \$0='$0','$1'.")"; }
+if_vagrant && [ "$SCRIPT" == "/tmp/vagrant-shell" ] && { [ -d "$CD/ops.d" ] || CD=/vagrant/bin; }
+[ -L "$SCRIPT" ] && debug "$(safety "linked script found")" && SCRIPT="$(realpathx "$SCRIPT")" && CD="$(dirname "$SCRIPT")"
 in_sourcing && _bash_sh_load_import_files || main_do_sth "$@"
 #### HZ Tail END ####
