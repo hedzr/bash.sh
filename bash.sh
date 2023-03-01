@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20230225
+#   Version: v20230301
 #   License: MIT
 #   Site: https://github.com/hedzr/bash.sh
 #
@@ -29,8 +29,20 @@
 # Use installer (Deprecated):
 #   $ curl -sSL https://hedzr.com/bash.sh/installer | sudo bash -s
 
-# It's safe to delete 'bump'
+# It's safe to delete 'bump'. By default it will be invoked under /bin/sh mode.
 bump() {
+	local VERSION="v$(date +%Y%m%d)"
+	local YEAR="$(date +%Y)" f
+	headline "bump version to: $VERSION ..."
+	tip "  looking up at directory '$(safety $CD)'..."
+	for f in $CD/bash*; do
+		echo "bumping for $(safety $f), YEAR = $YEAR ..."
+		sed -i '' -E -e "s/v$YEAR[0-9]+/$VERSION/g" $f
+		sed -i '' -E "s/v$((YEAR - 1))[0-9]+/$VERSION/g" $f
+	done
+}
+
+bumpold() {
 	local VERSION="v$(date +%Y%m%d)"
 	local YEAR="$(date +%Y)" f
 	echo bump version to: $VERSION
@@ -811,7 +823,7 @@ main_do_sth() {
 	# disabling this logic is still simple by defining HAS_END=1.
 	((${HAS_END:-0})) && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
 }
-BASH_SH_VERSION=v20230225
+BASH_SH_VERSION=v20230301
 DEBUG=${DEBUG:-0}
 PROVISIONING=${PROVISIONING:-0}
 # trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }

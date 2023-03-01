@@ -15,7 +15,8 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
-- v202302??
+- v20230301
+  - added `safety()` and `safetypipe` to security the message outputting
   - added `is_manjaro`
   - added `is_deb` (dpkg), `is_rpm`
   - added `is_mandriva_series`, `is_arch_series`, `is_fedora_series`, `is_suse_series`, `is_opensuse_series`
