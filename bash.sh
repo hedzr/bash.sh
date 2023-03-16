@@ -373,9 +373,7 @@ if_nix_typ() {
 	esac
 	echo "${sys}"
 }
-if_nix() {
-	[[ "$(if_nix_typ)" == "$1" ]]
-}
+if_nix() { [[ "$(if_nix_typ)" == "$1" ]]; }
 if_mac() { [[ $OSTYPE == darwin* ]]; }
 if_ubuntu() {
 	if [[ $OSTYPE == linux* ]]; then
@@ -402,7 +400,7 @@ in_vm() {
 			true
 		fi
 	else
-		dbg "without hostnamectl"
+		# dbg "without hostnamectl"
 		false
 	fi
 }
@@ -508,7 +506,7 @@ i386_amd64() {
 	echo $ar
 }
 x86_64() { uname -m; }
-if_hosttype() {
+if_hosttype() { # usage: if_hosttype x64 && echo x64 || echo x86 | BUT, it only fit for intel cpu
 	case "$HOSTTYPE" in
 	*x86_64*) sys="x64" ;;
 	*) sys="x86" ;;
@@ -685,6 +683,8 @@ safety() {
 	printf "$input"
 }
 safetypipe() { while read line; do printf "$(safety $line)"; done; }
+alias safety-pipe=safetypipe
+alias safety_pipe=safetypipe
 commander() {
 	local commander_self="$1" && (($#)) && shift
 	local commander_cmd="${1:-usage}" && (($#)) && shift
