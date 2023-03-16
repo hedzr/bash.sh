@@ -264,13 +264,13 @@ is_not_ps1() { [ ! -z "$PS1" ]; }
 # function at the top level to always return false when stdout is not
 # a tty.
 if [ -t 1 ]; then
-	is_stdin() { true; }
-	is_not_stdin() { false; }
-	is_tty() { true; }
+	alias is_stdin=true
+	alias is_not_stdin=false
+	alias is_tty=true
 else
-	is_stdin() { false; }
-	is_not_stdin() { true; }
-	is_tty() { false; }
+	alias is_stdin=false
+	alias is_not_stdin=true
+	alias is_tty=false
 fi
 cmd_exists() { command -v $1 >/dev/null; } # it detects any builtin or external commands, aliases, and any functions
 fn_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(shell function)|(a function)'; }
