@@ -351,6 +351,8 @@ homedir_s() {
 if_zero_or_empty() {
 	if [ ! -z "$1" ]; then
 		[[ "$1" -eq 0 ]]
+	else
+		false
 	fi
 }
 if_non_zero_and_empty() {
