@@ -15,6 +15,12 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20230316
+  - improved is_stdin, is_not_stdin, is_tty
+  - fixed back: `if_zero_or_empty`
+  - alias `safety-pipe` and `safety_pipe` to `safetypipe`
+  - something else
+
 - v20230301
   - added `safety()` and `safetypipe` to security the message outputting
   - added `is_manjaro`
@@ -165,7 +171,7 @@ Put these codes in your `$HOME/.zshenv`:
 {
   local dir f="/path/to/bash.sh/bash.config"
   [ -f "$f" ] && DEBUG=1 VERBOSE=0 source "$f" >>/tmp/sourced.list
-  unset cool sleeping _my_main_do_sth main_do_sth dir f DEBUG VERBOSE
+  unset cool sleeping _my_main_do_sth main_do_sth dir f DEBUG VERBOSE currentShell
 }
 ### BASH.SH/.CONFIG END ################################
 ```
@@ -173,7 +179,7 @@ Put these codes in your `$HOME/.zshenv`:
 It can be simplified to one-liner:
 
 ```bash
-. "/path/to/bash.sh/bash.config" && unset cool sleeping _my_main_do_sth main_do_sth DEBUG VERBOSE
+. "/path/to/bash.sh/bash.config" && unset cool sleeping _my_main_do_sth main_do_sth DEBUG VERBOSE currentShell
 ```
 
 ### Write functions and call them
