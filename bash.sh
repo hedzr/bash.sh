@@ -685,6 +685,36 @@ safety() {
 safetypipe() { while read line; do printf "$(safety $line)"; done; }
 alias safety-pipe=safetypipe
 alias safety_pipe=safetypipe
+datename() {
+	local i=${1:-7}
+	if [[ $OSTYPE == darwin* ]]; then
+		date -v-${i}d +%Y-%m-%d
+	else
+		date -d -${i}day +%Y-%m-%d
+	fi
+}
+for_each_days() {
+	# Sample:
+	#
+	# delete_log_file() {
+	# 	local dtname="$1"
+	# 	for PRE in .sizes db-bacup tool-updates; do
+	# 		sudo find . -type f -iname "${PRE}.$dtname"'*'".log" -print -delete | pad 3 "" " deleted."
+	# 	done
+	# }
+	#
+	# delete_elder_logs() {
+	# 	for_each_days delete_log_file 7   # delete the older logfiles more than 7 days
+	# }
+	local func="$1" && (($#)) && shift
+	local DAYS1="${1:-30}" && (($#)) && shift
+	local TILLDAYS=365
+	dbg "func: $func, days: $DAYS1"
+	# local TILLDAYS=$((DAYS1 + 365))
+	for ((i = $DAYS1; i < $TILLDAYS; i++)); do
+		eval $func "$(datename $i)" "$@"
+	done
+}
 commander() {
 	local commander_self="$1" && (($#)) && shift
 	local commander_cmd="${1:-usage}" && (($#)) && shift
