@@ -15,6 +15,9 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20230331
+  - added two functions: `datename` and `for_each_days` so that you can delete the elder logfiles with N kept.
+
 - v20230316
   - improved is_stdin, is_not_stdin, is_tty
   - fixed back: `if_zero_or_empty`
@@ -26,46 +29,6 @@ We devote ourselves to helping you to write shell script functions more easier.
   - added `is_manjaro`
   - added `is_deb` (dpkg), `is_rpm`
   - added `is_mandriva_series`, `is_arch_series`, `is_fedora_series`, `is_suse_series`, `is_opensuse_series`
-
-- v20230225
-  - improved `pmid` (pacman, zypp)
-  - added `cmd_exists` -> fixed `in_vm`
-  - improved `if_nix` with new `if_nix_typ`
-  - use `in_vagrant` as synonym of `is_vagrant`
-  - added `is_mageia`, `is_opensuse`, `is_pacman`, `is_zypp`
-  - improved `debug_info` to print more system information
-  - improved `netmask`, ...
-  - added `vercomp`
-  - added `in_array`, `not_in_array`
-
-- v20230222
-  - fixed/improved `lazy-loader`
-  - fix `in_vm` for non-linux
-  - fix `if_centos`, `in_vm`, `script_functions`, `commander`
-  - shorten or normalize some if(-if)-clauses
-  - added `status` command and `status env` subcommand, for all OSes
-  - added skel file `more.sh` so you can put your function here
-
-- v20230212
-  - auto-release at github
-
-- v20230210
-  - renamed: `_bash_sh_try_source_in`, `_bash_sh_try_source_child_files`, `_bash_sh_load_import_files`, ...
-  - added `rpad` and `repeat_char`, improved `commander`
-  - improve this doc
-
-- v20230208:
-  - improved `lazy-loader`, which fits for any zsh/bash env. The loader will check `bash.sh` installed directory for stocked lazy functions, such as `dns` -> `dns-ops`
-  - improved `installer`: now `ops` symbolic link will be created and pointed to bash.sh after installed. So, the following sample codes are relinked.
-  - added `dns` sample command to show you how to write a multi-level command hierarchy, see also [`use commander()`](#use-commander-in-your-scripts)
-
-- v20230206:
-  - improved `pad`, added `pad3`
-  - improved bash-lite.sh
-
-- v20230126:
-  - improved lazy-loader to load kebab case func and files
-  - improved `commander()`
 
 - [CHANGELOG](./CHANGELOG)
 
