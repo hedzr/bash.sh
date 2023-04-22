@@ -66,6 +66,9 @@ help() {
 		D:
 	EOF
 	err "Here Am I."
+	echo OK
+	eval in-vscode && echo "in-VSCODE" || echo "_ $?"
+	eval fn-exists in-vscode && echo "Y" || echo "N"
 }
 
 cool() { echo cool && ls -la | pad3 4 '-72' '' ' | desc here'; }
@@ -253,7 +256,7 @@ in_sourcing() {
 		[[ $(basename -- "$0") != $(basename -- "${BASH_SOURCE[0]}") ]]
 	fi
 }
-in_vscode() { [[ "$TERM_PROGRAM" == "vscode" ]]; }
+in_vscode() { [[ "$TERM_PROGRAM" == "vscode" ]]; } # or VSCODE_INJECTION=1
 in_jetbrains() { [[ "$TERMINAL_EMULATOR" == *JetBrains* ]]; }
 is_interactive_shell() { [[ $- == *i* ]]; }
 is_not_interactive_shell() { [[ $- != *i* ]]; }
@@ -683,8 +686,6 @@ safety() {
 	printf "$input"
 }
 safetypipe() { while read line; do printf "$(safety $line)"; done; }
-alias safety-pipe=safetypipe
-alias safety_pipe=safetypipe
 datename() {
 	local i=${1:-7}
 	if [[ $OSTYPE == darwin* ]]; then
@@ -735,7 +736,7 @@ commander() {
 }
 script_functions() {
 	# shellcheck disable=SC2155
-	local fncs=$(declare -F -p | cut -d " " -f 3 | grep -vE "^[_-]" | grep -vP "\\." | grep -vE "^[A-Z]") # Get function list
+	local fncs=$(declare -F -p | cut -d " " -f 3 | grep -vE "^[_-]" | grep -vE "\\." | grep -vE "^[A-Z]") # Get function list
 	if [ $# -eq 0 ]; then
 		echo "$fncs" # not quoted here to create shell "argument list" of funcs.
 	else
@@ -858,6 +859,18 @@ main_do_sth() {
 BASH_SH_VERSION=v20230331
 DEBUG=${DEBUG:-0}
 PROVISIONING=${PROVISIONING:-0}
+# Instantly aliases cannot work in many cases such as conditional
+# constructs, loops, even in statement block. So this won't work sometimes:
+#     if [ true ]; then cmd-exist ls && echo 'ls exists' || echo 'ls not-exists'; fi
+# To use the following kebab aliases, a safety way is by eval:
+#     if [ true ]; then eval cmd-exist ls && echo 'ls exists' || echo 'ls not-exists'; fi
+alias char-repeat=char_repeat
+alias cmd-exists=cmd_exists fn-aliased-exists=fn_aliased_exists fn-builtin-exists=fn_builtin_exists fn-exists=fn_exists fn-name=fn_name fn-name-dyn=fn_name_dyn
+alias for-each-days=for_each_days foreach-days=for_each_days home-dir=home_dir homedir=home_dir
+alias if-centos=if_centos if-hosttype=if_hosttype if-mac=if_mac if-nix=if_nix if-nix-typ=if_nix_typ if-non-zero-and-empty=if_non_zero_and_empty if-ubuntu=if_ubuntu if-vagrant=if_vagrant if-zero-or-empty=if_zero_or_empty
+alias in-debug=in_debug in-jetbrains=in_jetbrains in-provisioning=in_provisioning in-sourcing=in_sourcing in-vagrant=in_vagrant in-vm=in_vm in-vscode=in_vscode in-wsl=in_wsl
+alias is-apt=is_apt is-arch-series=is_arch_series is-bash=is_bash is-bash-t1='is_bash_t1' is-bash-t2='is_bash_t2' is-centos=is_centos is-darwin=is_darwin is-debian=is_debian is-debian-series=is_debian_series is-dnf=is_dnf is-fedora=is_fedora is-fedora-series=is_fedora_series is-fish=is_fish is-git-clean=is_git_clean is-git-dirty=is_git_dirty is-homebrew=is_homebrew is-interactive-shell=is_interactive_shell is-linux=is_linux is-mageia=is_mageia is-mandriva-series=is_mandriva_series is-manjaro=is_manjaro is-not-interactive-shell=is_not_interactive_shell is-not-ps1='is_not_ps1' is-opensuse=is_opensuse is-opensuse-series=is_opensuse_series is-pacman=is_pacman is-ps1='is_ps1' is-redhat=is_redhat is-redhat-series=is_redhat_series is-root=is_root is-suse-series=is_suse_series is-ubuntu=is_ubuntu is-win=is_win is-yum=is_yum is-zsh=is_zsh is-zsh-strict=is_zsh_strict is-zsh-t1='is_zsh_t1' is-zsh-t2='is_zsh_t2' is-zypp=is_zypp is-zypper=is_zypper
+alias list-all-env-variables=list_all_env_variables list-all-variables=list_all_variables safety-pipe=safetypipe safety_pipe=safetypipe strip-l=strip_l strip-r=strip_r url-exists=url_exists user-shell=user_shell
 # trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }
 # is_darwin && realpathx() { [[ $1 == /* ]] && echo "$1" || { DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $1)"; }; } || realpathx() { readlink -f $*; }
 in_sourcing && { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug "$(safety ">> IN SOURCING (DEBUG=$DEBUG), \$0=$0, \$_=$_")"; } || { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug "$(safety ">> '$SCRIPT' in '$CD', \$0='$0','$1'.")"; }
