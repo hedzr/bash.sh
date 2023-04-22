@@ -15,6 +15,9 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20230422
+  - added kebab aliases
+
 - v20230331
   - added two functions: `datename` and `for_each_days` so that you can delete the elder logfiles with N kept.
 
