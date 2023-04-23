@@ -15,6 +15,9 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20230423
+  - fixed/improved git_clone
+
 - v20230422
   - added kebab aliases
 
