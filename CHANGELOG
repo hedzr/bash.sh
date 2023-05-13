@@ -1,5 +1,8 @@
 # HISTORY
 
+- v20230513
+  - fixed `netmask` in linux
+
 - v20230508
   - fixed lshw_cpu
 

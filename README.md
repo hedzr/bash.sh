@@ -15,6 +15,9 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20230513
+  - fixed `netmask` in linux
+
 - v20230508
   - fixed lshw_cpu
 
