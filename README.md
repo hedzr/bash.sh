@@ -15,6 +15,9 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20230625
+  - added `in_vim`, `in_neovim`
+
 - v20230513
   - fixed `netmask` in linux
 
