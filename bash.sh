@@ -258,6 +258,8 @@ in_sourcing() {
 }
 in_vscode() { [[ "$TERM_PROGRAM" == "vscode" ]]; } # or VSCODE_INJECTION=1
 in_jetbrains() { [[ "$TERMINAL_EMULATOR" == *JetBrains* ]]; }
+in_vim() { [[ "$VIM" != "" ]] && [[ "$VIMRUNTIME" != "" ]]; }
+in_neovim() { [[ "$NVIM" != "" ]] || [[ "$NVIM_LOG_FILE" != "" ]] || [[ "$NVIM_LISTEN_ADDRESS" != "" ]]; }
 is_interactive_shell() { [[ $- == *i* ]]; }
 is_not_interactive_shell() { [[ $- != *i* ]]; }
 is_ps1() { [ -z "$PS1" ]; }
@@ -570,6 +572,7 @@ debug_info() {
 		       if_vagrant/in_vm: $(if_vagrant && echo Y || echo '.') / $(in_vm && echo Y || echo '.')
 		              in_vscode: $(in_vscode && echo Y || echo '.')
 		           in_jetbrains: $(in_jetbrains && echo Y || echo '.')
+		          in_vim/neovim: $(in_vim && echo Y || echo '.') / $(in_neovim && echo Y || echo '.')
 		  darwin/linux/win(wsl): $(is_darwin && echo Y || echo '.') / $(is_linux && echo Y || echo '.') / $(is_win && echo Y || echo '.')
 		   is_interactive_shell: $(is_interactive_shell && echo Y || echo '.')
 		  
