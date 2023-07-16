@@ -1,5 +1,8 @@
 # HISTORY
 
+- v20230625
+  - added `in_vim`, `in_neovim`
+
 - v20230513
   - fixed `netmask` in linux
 
