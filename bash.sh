@@ -525,18 +525,29 @@ if_hosttype() { # usage: if_hosttype x64 && echo x64 || echo x86 | BUT, it only 
 is_git_clean() { git diff-index --quiet $* HEAD -- 2>/dev/null; }
 is_git_dirty() { is_git_clean && return -1 || return 0; }
 git_clone() {
-	local Repo=${1:-hedzr/cmdr}
+	# git-clone will pull the repo into 'user.repo/', for example:
+	#   git-clone git@github.com:hedzr/cmdr.git
+	#   git-clone https://github.com/hedzr/cmdr.git
+	#   will pull hedzr/cmdr into 'hedzr.cmdr/' directory.
+	local Repo="${1:-hedzr/cmdr}"
 	local Sep='/'
-	local Prefix=${GIT_PREFIX:-https://}
+	local Prefix='${GIT_PREFIX:-https://}'
 	local Host="${GIT_HOST:-github.com}"
-	[[ $Repo =~ https://* ]] && Repo=${Repo//https:\/\//} && Prefix='git@'
-	[[ $Repo =~ github.com/* ]] && Repo=${Repo//github.com\//} && Prefix='git@'
-	[[ $Repo =~ github.com:* ]] && Repo=${Repo//github.com:/} && Prefix='git@'
+	[[ $Repo =~ https://* ]] && Repo="${Repo//https:\/\//}" && Prefix='git@'
+	[[ $Repo =~ github.com/* ]] && Repo="${Repo//github.com\//}" && Prefix='git@'
+	[[ $Repo =~ github.com:* ]] && Repo="${Repo//github.com:/}" && Prefix='git@'
+	Repo="${Repo#git@}"
+	Repo="${Repo%.git}"
+	Dir="${Repo//\//.}"
+	# Repo="${Repo#https://github.com/}"
+	# Repo="${Repo#git@github.com:}"
+	# Repo="${Repo%.git}"
 	[[ $Prefix == 'git@' ]] && Sep=':'
-	local Url=${Prefix}${Host}${Sep}${Repo}.git
+	local Url="${Prefix}${Host}${Sep}${Repo}.git"
 	# tip "Url: $Url"
-	git clone --depth=1 -q $Url && dbg "git clone $Url DONE."
+	dbg "cloning from $Url ..." && git clone --depth=1 -q "$Url" "$Dir" && dbg "git clone $Url DONE."
 }
+alias git-clone=git_clone
 #
 #
 url_exists() { curl --head --silent -S --fail --output /dev/null "$@" 1>/dev/null 2>&1; }
