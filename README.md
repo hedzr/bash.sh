@@ -15,6 +15,9 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20231022
+  - added h1, h2 for heading output
+
 - v20230908
   - fixed/improved git-clone/git_clone
 
