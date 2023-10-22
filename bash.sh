@@ -565,6 +565,8 @@ printf_blue() { printf "\e[0;34m$@\e[0m:\n"; }
 printf_purple() { printf "\e[0;35m$@\e[0m:\n"; }
 printf_cyan() { printf "\e[0;36m$@\e[0m:\n"; }
 printf_white() { printf "\e[0;37m$@\e[0m:\n"; }
+h1() { printf "\e[30;104;1m\e[2K\n\e[A%s\e[00m\n\e[2K" "$@"; } # style first header
+h2() { printf "\e[30;104m\e[1K\n\e[A%s\e[00m\n\e[2K" "$@"; }   # style second header
 debug() { in_debug && printf "\e[0;38;2;133;133;133m$@\e[0m\n" || :; }
 debug_begin() { printf "\e[0;38;2;133;133;133m"; }
 debug_end() { printf "\e[0m\n"; }
