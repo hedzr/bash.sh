@@ -19,37 +19,10 @@ We devote ourselves to helping you to write shell script functions more easier.
   - added h1, h2 for heading output
 
 - v20230908
-  - fixed/improved git-clone/git_clone
+  - fixed/improved `git-clone`/git_clone
 
 - v20230625
   - added `in_vim`, `in_neovim`
-
-- v20230513
-  - fixed `netmask` in linux
-
-- v20230508
-  - fixed lshw_cpu
-
-- v20230423
-  - fixed/improved git_clone
-
-- v20230422
-  - added kebab aliases
-
-- v20230331
-  - added two functions: `datename` and `for_each_days` so that you can delete the elder logfiles with N kept.
-
-- v20230316
-  - improved is_stdin, is_not_stdin, is_tty
-  - fixed back: `if_zero_or_empty`
-  - alias `safety-pipe` and `safety_pipe` to `safetypipe`
-  - something else
-
-- v20230301
-  - added `safety()` and `safetypipe` to security the message outputting
-  - added `is_manjaro`
-  - added `is_deb` (dpkg), `is_rpm`
-  - added `is_mandriva_series`, `is_arch_series`, `is_fedora_series`, `is_suse_series`, `is_opensuse_series`
 
 - [CHANGELOG](./CHANGELOG)
 
