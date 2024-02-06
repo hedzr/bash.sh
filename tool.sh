@@ -8,7 +8,7 @@
 # ----------------------------------------------
 
 ports() {
-	local SUDO=${SUDO:-sudo}
+	local SUDO="${SUDO:-sudo}"
 	[ "$(id -u)" = "0" ] && SUDO=
 	if [[ $# -eq 0 ]]; then
 		eval $SUDO lsof -Pni | grep -E "LISTEN|UDP"
@@ -72,6 +72,7 @@ proxy_set() {
 		local pip=$(hostname -I | awk '{print $1}')
 	fi
 	local link=${PROXY_LINK:-http://$pip:7890}
+
 	proxy_print_status() {
 		[ "$http_proxy" != "" ] && echo "http_proxy=$http_proxy"
 		[ "$HTTP_PROXY" != "" ] && echo "HTTP_PROXY=$HTTP_PROXY"
@@ -84,8 +85,8 @@ proxy_set() {
 		unset all_proxy ALL_PROXY http_proxy https_proxy HTTP_PROXY HTTPS_PROXY
 	}
 	proxy_set_on() {
-		export http_proxy=$link
-		export https_proxy=$http_proxy HTTPS_PROXY=$http_proxy HTTP_PROXY=$http_proxy all_proxy=$http_proxy ALL_PROXY=$http_proxy
+		export http_proxy="$link"
+		export https_proxy="$http_proxy" HTTPS_PROXY="$http_proxy" HTTP_PROXY="$http_proxy" all_proxy="$http_proxy" ALL_PROXY="$http_proxy"
 	}
 	proxy_set_invoke() {
 		# for better compatibilities under macOS we assumed a child shell for cleanup the envvars.
@@ -97,10 +98,10 @@ proxy_set() {
       unset all_proxy ALL_PROXY http_proxy https_proxy HTTP_PROXY HTTPS_PROXY
     }
     proxy_set_on() {
-      export http_proxy=$link
-      export https_proxy=\$http_proxy HTTPS_PROXY=\$http_proxy HTTP_PROXY=\$http_proxy all_proxy=\$http_proxy ALL_PROXY=\$http_proxy
+      export http_proxy=\"$link\"
+      export https_proxy=\"\$http_proxy\" HTTPS_PROXY=\"\$http_proxy\" HTTP_PROXY=\"\$http_proxy\" all_proxy=\"\$http_proxy\" ALL_PROXY=\"\$http_proxy\"
     }
-    trap 'proxy_set_off' EXIT ERR
+    trap proxy_set_off EXIT ERR
     proxy_set_on
     $*
     "
@@ -121,6 +122,8 @@ proxy_set() {
 		echo 'Usage: proxy_set on|off|enable|disable|allow|deny|status'
 		echo 'Or run proxy_set just like "tsock": proxy_set curl -iL https://google.com/'
 		echo 'Type "proxy_set help" for more information.'
+		echo 'Use envvar if LAN ip not detected: PROXY_LINK=http://xx.xx.xx.xx:xxxx proxy_set on'
+		echo
 		proxy_print_status
 		;;
 	*)
@@ -128,6 +131,7 @@ proxy_set() {
 		;;
 	esac
 }
+alias proxy-set=proxy_set
 
 #alias proxy_set="export http_proxy=socks5://127.0.0.1:1081; export https_proxy=$http_proxy https_proxy=$http_proxy HTTPS_PROXY=$http_proxy; echo 'HTTP Proxy on (sock5)';"
 #alias proxy_unset="unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY; echo 'HTTP Proxy off (sock5)';"
