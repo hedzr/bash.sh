@@ -15,6 +15,10 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20240206
+  - removed unused files
+  - update proxy_set in tool.sh
+
 - v20231022
   - added h1, h2 for heading output
 
