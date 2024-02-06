@@ -344,7 +344,7 @@ That's a trick!
 
 ## Samples
 
-![Sample](./_images/2018-02-22_12.30.11.png)
+![Sample](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/uPic/2018-02-22_12.30.11.png)
 
 ## Knives Document
 
