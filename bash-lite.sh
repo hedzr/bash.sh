@@ -138,6 +138,12 @@ debug_end() { printf "\e[0m\n"; }
 dbg() { ((DEBUG)) && printf ">>> \e[0;38;2;133;133;133m$@\e[0m\n" || :; }
 tip() { printf "\e[0;38;2;133;133;133m>>> $@\e[0m\n"; }
 err() { printf "\e[0;33;1;133;133;133m>>> $@\e[0m\n" 1>&2; }
+mvif() {
+	local src="$1" dstdir="$2"
+	if [ -d "$dstdir" ]; then
+		mv "$src" "$dstdir"
+	fi
+}
 #
 strip_l() { echo ${1#"$2"}; }
 strip_r() { echo ${1%"$2"}; }
