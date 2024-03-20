@@ -1,5 +1,8 @@
 # HISTORY
 
+- v20240320
+  - added `mvif` (mv if target dir exists)
+
 - v20240206
   - removed unused files
   - update proxy_set in tool.sh
