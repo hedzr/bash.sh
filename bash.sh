@@ -525,27 +525,86 @@ if_hosttype() { # usage: if_hosttype x64 && echo x64 || echo x86 | BUT, it only 
 is_git_clean() { git diff-index --quiet $* HEAD -- 2>/dev/null; }
 is_git_dirty() { is_git_clean && return -1 || return 0; }
 git_clone() {
-	# git-clone will pull the repo into 'user.repo/', for example:
-	#   git-clone git@github.com:hedzr/cmdr.git
-	#   git-clone https://github.com/hedzr/cmdr.git
-	#   will pull hedzr/cmdr into 'hedzr.cmdr/' directory.
-	local Repo="${1:-hedzr/cmdr}"
-	local Sep='/'
-	local Prefix='${GIT_PREFIX:-https://}'
-	local Host="${GIT_HOST:-github.com}"
-	[[ $Repo =~ https://* ]] && Repo="${Repo//https:\/\//}" && Prefix='git@'
-	[[ $Repo =~ github.com/* ]] && Repo="${Repo//github.com\//}" && Prefix='git@'
-	[[ $Repo =~ github.com:* ]] && Repo="${Repo//github.com:/}" && Prefix='git@'
-	Repo="${Repo#git@}"
-	Repo="${Repo%.git}"
-	Dir="${Repo//\//.}"
-	# Repo="${Repo#https://github.com/}"
-	# Repo="${Repo#git@github.com:}"
-	# Repo="${Repo%.git}"
-	[[ $Prefix == 'git@' ]] && Sep=':'
-	local Url="${Prefix}${Host}${Sep}${Repo}.git"
-	# tip "Url: $Url"
-	dbg "cloning from $Url ..." && git clone --depth=1 -q "$Url" "$Dir" && dbg "git clone $Url DONE."
+	local Deep="--depth=1" Help Https Dir arg i=1
+	while [[ $# -gt 0 ]]; do
+		case $1 in
+		-h | --help)
+			shift && Help=1
+			cat <<-EOT
+				git-clone helps cloneing git repo simply from github/gitlab/bitbucket
+
+				Usage: git-clone [-d|--deep] [-s|--https] [-o dir|--dir dir] repo
+
+				Description:
+				  git-clone will pull the repo into 'user.repo/', for example:
+					  git-clone hedzr/cmdr
+						GIT_HOST=gitlab.com git-clone hedzr/cmdr
+				    git-clone git@github.com:hedzr/cmdr.git
+				    git-clone https://github.com/hedzr/cmdr.git
+				  will pull hedzr/cmdr into 'hedzr.cmdr/' directory.
+
+				Options and Args:
+
+					'--deep' enables full fetch, default is shallow pull only
+					'--https' enables https protocal, default is ssh protocol
+					'--dir' specifies the cloned target directory, default is 'user.repo'
+
+					'repo' can be these forms:
+						hedzr/cmdr
+						https://github.com/hedzr/cmdr
+						https://github.com/hedzr/cmdr.git
+						github.com:hedzr/cmdr.git
+						git@github.com:hedzr/cmdr.git
+						gitlab.com:hedzr/cmdr
+						bitbucket.com/hedzr/cmdr
+						git.sr.ht/hedzr/cmdr
+						gitee.com/hedzr/cmdr
+						coding.net/hedzr/cmdr
+
+				EnvVars:
+				  GIT_HOSTS    extras git hosts such as your own private host
+					GIT_HOST     specify git host explicitly if you're using user/repo form.
+
+			EOT
+			;;
+		-d | --deep)
+			# strength=$OPTARG
+			shift && Deep=""
+			;;
+		-s | --https)
+			shift && Https=1
+			;;
+		-o | --dir | --output)
+			Dir="$1" && shift
+			;;
+		*)
+			case $i in
+			1)
+				local Repo="${1:-hedzr/cmdr}"
+				shift
+				;;
+			esac
+			;;
+		esac
+	done
+
+	if [[ "$Help" != 1 ]]; then
+		local Sep='/' Prefix="${GIT_PREFIX:-git@}" Host="${GIT_HOST:-github.com}" h
+		[[ "$Https" -eq 1 ]] && Prefix="https://"
+		[[ "$Repo" =~ https://* ]] && Repo="${Repo//https:\/\//}"
+		for h in github.com gitlab.com bitbucket.com git.sr.ht gitee.com coding.net $GIT_HOSTS; do
+			[[ "$Repo" =~ $h/* ]] && Host=$h && Repo="${Repo//$h\//}"
+			[[ "$Repo" =~ $h:* ]] && Host=$h && Repo="${Repo//$h:/}"
+		done
+		Repo="${Repo#git@}"
+		Repo="${Repo%.git}"
+		[[ "$Dir" == "" ]] && Dir="${Repo//\//.}"
+		[[ "$Prefix" == 'git@' ]] && Sep=':'
+		local Url="${Prefix}${Host}${Sep}${Repo}.git"
+		tip "Url: $Url | Deep?: '$Deep'"
+		tip "Result: git clone $Deep -q "$Url" "$Dir""
+		# dbg "cloning from $Url ..." && git clone $Deep -q "$Url" "$Dir" && dbg "git clone $Url DONE."
+	fi
 }
 alias git-clone=git_clone
 #
