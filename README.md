@@ -15,6 +15,10 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20240328
+  - fix `git-clone`
+  - improved `commander` and `_my_main_do_sth`
+
 - v20240327
   - added `git-clone` to `bash-lite.sh` now
   - new version of `git-clone` with widely adaptive args
