@@ -103,20 +103,29 @@ _my_main_do_sth() {
 	elif fn_exists "$cmd"; then
 		eval $cmd "$@" #&& dbg ":DONE:$cmd"
 	else
-		local f="$CD/ops.d/run/$cmd.sh"
-		# dbg "  ..finding $f"
-		if [ -f "$f" ]; then
-			dbg "  ..sourcing $(safety $f).." && source "$f" && dbg "  ..OK"
-			if fn_exists "${cmd}_entry"; then
-				# dbg "  ..eval '${cmd}_entry' $@"
-				${cmd}_entry "$@"
-			else
-				eval $cmd "$@"
-			fi
+		local xcmd="${cmd//_/-}"
+		dbg ": trying cmd: $xcmd ..."
+		if fn_exists "$xcmd"; then
+			eval $xcmd "$@" #&& dbg ":DONE:$cmd"
+		elif fn_aliased_exists "$xcmd"; then
+			eval $xcmd "$@" #&& dbg ":DONE:$cmd"
 		else
-			err "command '$cmd' has not been defined. (CD=$(safety $CD))"
-			return
+			local f="$CD/ops.d/run/$cmd.sh"
+			# dbg "  ..finding $f"
+			if [ -f "$f" ]; then
+				dbg "  ..sourcing $(safety $f).." && source "$f" && dbg "  ..OK"
+				if fn_exists "${cmd}_entry"; then
+					# dbg "  ..eval '${cmd}_entry' $@"
+					${cmd}_entry "$@"
+				else
+					eval $cmd "$@"
+				fi
+			else
+				err "command '$cmd' has not been defined. (CD=$(safety $CD))"
+				return
+			fi
 		fi
+		unset xcmd
 	fi
 
 	if in_provisioning; then
@@ -525,7 +534,7 @@ if_hosttype() { # usage: if_hosttype x64 && echo x64 || echo x86 | BUT, it only 
 is_git_clean() { git diff-index --quiet $* HEAD -- 2>/dev/null; }
 is_git_dirty() { is_git_clean && return -1 || return 0; }
 git_clone() {
-	local Deep="--depth=1" Help Https Dir arg i=1
+	local Deep="--depth=1" Help Dryrun Https Dir arg i=1
 	while [[ $# -gt 0 ]]; do
 		case $1 in
 		-h | --help)
@@ -537,39 +546,42 @@ git_clone() {
 
 				Description:
 				  git-clone will pull the repo into 'user.repo/', for example:
-					  git-clone hedzr/cmdr
-						GIT_HOST=gitlab.com git-clone hedzr/cmdr
+				    git-clone hedzr/cmdr
+				    GIT_HOST=gitlab.com git-clone hedzr/cmdr
 				    git-clone git@github.com:hedzr/cmdr.git
 				    git-clone https://github.com/hedzr/cmdr.git
 				  will pull hedzr/cmdr into 'hedzr.cmdr/' directory.
 
 				Options and Args:
 
-					'--deep' enables full fetch, default is shallow pull only
-					'--https' enables https protocal, default is ssh protocol
-					'--dir' specifies the cloned target directory, default is 'user.repo'
+				  '--deep' enables full fetch, default is shallow pull only
+				  '--https' enables https protocal, default is ssh protocol
+				  '--dir' specifies the cloned target directory, default is 'user.repo'
 
-					'repo' can be these forms:
-						hedzr/cmdr
-						https://github.com/hedzr/cmdr
-						https://github.com/hedzr/cmdr.git
-						github.com:hedzr/cmdr.git
-						git@github.com:hedzr/cmdr.git
-						gitlab.com:hedzr/cmdr
-						bitbucket.com/hedzr/cmdr
-						git.sr.ht/hedzr/cmdr
-						gitee.com/hedzr/cmdr
-						coding.net/hedzr/cmdr
+				  'repo' can be these forms:
+				    hedzr/cmdr
+				    https://github.com/hedzr/cmdr
+				    https://github.com/hedzr/cmdr.git
+				    github.com:hedzr/cmdr.git
+				    git@github.com:hedzr/cmdr.git
+				    gitlab.com:hedzr/cmdr
+				    bitbucket.com/hedzr/cmdr
+				    git.sr.ht/hedzr/cmdr
+				    gitee.com/hedzr/cmdr
+				    coding.net/hedzr/cmdr
 
 				EnvVars:
 				  GIT_HOSTS    extras git hosts such as your own private host
-					GIT_HOST     specify git host explicitly if you're using user/repo form.
+				  GIT_HOST     specify git host explicitly if you're using user/repo form.
 
 			EOT
 			;;
 		-d | --deep)
 			# strength=$OPTARG
 			shift && Deep=""
+			;;
+		-dr | --dry-run | --dryrun)
+			shift && Dryrun=1
 			;;
 		-s | --https)
 			shift && Https=1
@@ -601,9 +613,12 @@ git_clone() {
 		[[ "$Dir" == "" ]] && Dir="${Repo//\//.}"
 		[[ "$Prefix" == 'git@' ]] && Sep=':'
 		local Url="${Prefix}${Host}${Sep}${Repo}.git"
-		tip "Url: $Url | Deep?: '$Deep'"
-		tip "Result: git clone $Deep -q "$Url" "$Dir""
-		# dbg "cloning from $Url ..." && git clone $Deep -q "$Url" "$Dir" && dbg "git clone $Url DONE."
+		if [[ "$Dryrun" -ne 0 ]]; then
+			tip "Url: $Url | Deep?: '$Deep'"
+			tip "Result: git clone $Deep -q "$Url" "$Dir""
+		else
+			dbg "cloning from $Url ..." && git clone $Deep -q "$Url" "$Dir" && dbg "git clone $Url DONE."
+		fi
 	fi
 }
 alias git-clone=git_clone
@@ -812,6 +827,10 @@ commander() {
 		if fn_exists ${commander_self}_${commander_cmd}_entry; then
 			dbg "try invoking: ${commander_self}_${commander_cmd}_entry | $@"
 			eval ${commander_self}_${commander_cmd}_entry "$@"
+		elif fn_exists ${commander_self}-${commander_cmd}-entry; then
+			eval ${commander_self}-${commander_cmd}-entry "$@"
+		elif fn_exists ${commander_self}-${commander_cmd}; then
+			eval ${commander_self}-${commander_cmd} "$@"
 		else
 			dbg "try invoking: ${commander_self}_${commander_cmd} | $@"
 			eval ${commander_self}_${commander_cmd} "$@"

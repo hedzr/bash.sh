@@ -58,12 +58,23 @@ cool() { echo cool; }
 sleeping() { echo sleeping; }
 
 _my_main_do_sth() {
-	local cmd=${1:-sleeping} && { [[ $# -ge 1 ]] && shift; } || :
+	local xcmd cmd=${1:-sleeping} && { [[ $# -ge 1 ]] && shift; } || :
 	# for linux only:
 	# local cmd=${1:-sleeping} && shift || :
 
-	debug "$cmd - $@"
-	eval "$cmd $@" || :
+	# eval "$cmd $@" || :
+
+	fn_exists "$cmd" && {
+		debug "$cmd - $@"
+		eval $cmd "$@"
+	} || {
+		xcmd="lite-$cmd" && fn_exists "$xcmd" && eval $xcmd "$@" || {
+			xcmd="try-lite-$cmd" && fn_exists "$xcmd" && eval $xcmd "$@" || {
+				xcmd="build-c$cmd" && fn_exists "$xcmd" && eval $xcmd "$@"
+			}
+		}
+	}
+	unset cmd xcmd
 }
 
 ########################################################
@@ -129,7 +140,7 @@ fn_name() {
 is_git_clean() { git diff-index --quiet $* HEAD -- 2>/dev/null; }
 is_git_dirty() { is_git_clean && return -1 || return 0; }
 git_clone() {
-	local Deep="--depth=1" Help Https Dir arg i=1
+	local Deep="--depth=1" Help Dryrun Https Dir arg i=1
 	while [[ $# -gt 0 ]]; do
 		case $1 in
 		-h | --help)
@@ -141,39 +152,42 @@ git_clone() {
 
 				Description:
 				  git-clone will pull the repo into 'user.repo/', for example:
-					  git-clone hedzr/cmdr
-						GIT_HOST=gitlab.com git-clone hedzr/cmdr
+				    git-clone hedzr/cmdr
+				    GIT_HOST=gitlab.com git-clone hedzr/cmdr
 				    git-clone git@github.com:hedzr/cmdr.git
 				    git-clone https://github.com/hedzr/cmdr.git
 				  will pull hedzr/cmdr into 'hedzr.cmdr/' directory.
 
 				Options and Args:
 
-					'--deep' enables full fetch, default is shallow pull only
-					'--https' enables https protocal, default is ssh protocol
-					'--dir' specifies the cloned target directory, default is 'user.repo'
+				  '--deep' enables full fetch, default is shallow pull only
+				  '--https' enables https protocal, default is ssh protocol
+				  '--dir' specifies the cloned target directory, default is 'user.repo'
 
-					'repo' can be these forms:
-						hedzr/cmdr
-						https://github.com/hedzr/cmdr
-						https://github.com/hedzr/cmdr.git
-						github.com:hedzr/cmdr.git
-						git@github.com:hedzr/cmdr.git
-						gitlab.com:hedzr/cmdr
-						bitbucket.com/hedzr/cmdr
-						git.sr.ht/hedzr/cmdr
-						gitee.com/hedzr/cmdr
-						coding.net/hedzr/cmdr
+				  'repo' can be these forms:
+				    hedzr/cmdr
+				    https://github.com/hedzr/cmdr
+				    https://github.com/hedzr/cmdr.git
+				    github.com:hedzr/cmdr.git
+				    git@github.com:hedzr/cmdr.git
+				    gitlab.com:hedzr/cmdr
+				    bitbucket.com/hedzr/cmdr
+				    git.sr.ht/hedzr/cmdr
+				    gitee.com/hedzr/cmdr
+				    coding.net/hedzr/cmdr
 
 				EnvVars:
 				  GIT_HOSTS    extras git hosts such as your own private host
-					GIT_HOST     specify git host explicitly if you're using user/repo form.
+				  GIT_HOST     specify git host explicitly if you're using user/repo form.
 
 			EOT
 			;;
 		-d | --deep)
 			# strength=$OPTARG
 			shift && Deep=""
+			;;
+		-dr | --dry-run | --dryrun)
+			shift && Dryrun=1
 			;;
 		-s | --https)
 			shift && Https=1
@@ -205,11 +219,15 @@ git_clone() {
 		[[ "$Dir" == "" ]] && Dir="${Repo//\//.}"
 		[[ "$Prefix" == 'git@' ]] && Sep=':'
 		local Url="${Prefix}${Host}${Sep}${Repo}.git"
-		tip "Url: $Url | Deep?: '$Deep'"
-		tip "Result: git clone $Deep -q "$Url" "$Dir""
-		# dbg "cloning from $Url ..." && git clone $Deep -q "$Url" "$Dir" && dbg "git clone $Url DONE."
+		if [[ "$Dryrun" -ne 0 ]]; then
+			tip "Url: $Url | Deep?: '$Deep'"
+			tip "Result: git clone $Deep -q "$Url" "$Dir""
+		else
+			dbg "cloning from $Url ..." && git clone $Deep -q "$Url" "$Dir" && dbg "git clone $Url DONE."
+		fi
 	fi
 }
+alias git-clone=git_clone
 #
 headline() { printf "\e[0;1m$@\e[0m:\n"; }
 headline_begin() { printf "\e[0;1m"; } # for more color, see: shttps://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
@@ -268,6 +286,10 @@ commander() {
 		# if [ "$(type -t ${self}_${cmd}_entry)" == "function" ]; then
 		if $(fn_exists ${self}_${cmd}_entry); then
 			eval ${self}_${cmd}_entry "$@"
+		elif $(fn_exists ${self}-${cmd}-entry); then
+			eval ${self}-${cmd}-entry "$@"
+		elif $(fn_exists ${self}-${cmd}); then
+			eval ${self}-${cmd} "$@"
 		else
 			eval ${self}_${cmd} "$@"
 		fi
