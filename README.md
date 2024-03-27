@@ -15,6 +15,10 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20240327
+  - added `git-clone` to `bash-lite.sh` now
+  - new version of `git-clone` with widely adaptive args
+
 - v20240320
   - added `mvif` (mv if target dir exists)
 
