@@ -116,11 +116,11 @@ is_not_ps1() { [ ! -z "$PS1" ]; }
 if [ -t 1 ]; then
 	is_stdin() { true; }
 	is_not_stdin() { false; }
-	is_tty() { true; }
+	is_ttya() { true; }
 else
 	is_stdin() { false; }
 	is_not_stdin() { true; }
-	is_tty() { false; }
+	is_ttya() { false; }
 fi
 fn_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(shell function)|(a function)'; }
 fn_builtin_exists() { LC_ALL=C type $1 2>/dev/null | grep -q 'shell builtin'; }
@@ -140,7 +140,7 @@ fn_name() {
 is_git_clean() { git diff-index --quiet $* HEAD -- 2>/dev/null; }
 is_git_dirty() { is_git_clean && return -1 || return 0; }
 git_clone() {
-	local Deep="--depth=1" Help Dryrun Https Dir arg i=1
+	local Deep="--depth=1" Help Dryrun Https Dir arg i=1 Verbose=0
 	while [[ $# -gt 0 ]]; do
 		case $1 in
 		-h | --help)
@@ -193,7 +193,10 @@ git_clone() {
 			shift && Https=1
 			;;
 		-o | --dir | --output)
-			Dir="$1" && shift
+			shift && Dir="$1" && shift
+			;;
+		-v | --verbose)
+			Verbose=1 && shift
 			;;
 		*)
 			case $i in
@@ -218,12 +221,19 @@ git_clone() {
 		Repo="${Repo%.git}"
 		[[ "$Dir" == "" ]] && Dir="${Repo//\//.}"
 		[[ "$Prefix" == 'git@' ]] && Sep=':'
-		local Url="${Prefix}${Host}${Sep}${Repo}.git"
+		local Url="${Prefix}${Host}${Sep}${Repo}.git" Opts=""
+		(($Verbose)) && Opts="--verbose"
 		if [[ "$Dryrun" -ne 0 ]]; then
-			tip "Url: $Url | Deep?: '$Deep'"
-			tip "Result: git clone $Deep -q "$Url" "$Dir""
+			tip "Url: $Url | Deep?: '$Deep' | Opts: '$Opts'"
+			tip "Result: git clone $Deep -q $Opts "$Url" "$Dir""
 		else
-			dbg "cloning from $Url ..." && git clone $Deep -q "$Url" "$Dir" && dbg "git clone $Url DONE."
+			dbg "cloning from $Url ..." && git clone $Deep -q $Opts "$Url" "$Dir" && {
+				if (($Verbose)); then
+					local DEBUG=1
+				fi
+				dbg "git clone $Url DONE."
+				du -sh "$Dir"
+			}
 		fi
 	fi
 }
