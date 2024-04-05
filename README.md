@@ -15,6 +15,9 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20240406
+  - fix `git-clone`: -o cannot work; also add -v in it
+
 - v20240328
   - fix `git-clone`
   - improved `commander` and `_my_main_do_sth`

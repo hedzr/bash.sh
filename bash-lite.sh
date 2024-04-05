@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20240328
+#   Version: v20240406
 #   License: MIT
 #   Site: https://github/hedzr/bash.sh
 #
@@ -366,7 +366,7 @@ main_do_sth() {
 	fi
 	${HAS_END:-$(false)} && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
 }
-BASH_SH_VERSION=v20240328
+BASH_SH_VERSION=v20240406
 DEBUG=${DEBUG:-0}
 # trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }
 # is_darwin && realpathx() { [[ $1 == /* ]] && echo "$1" || { DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $1)"; }; } || realpathx() { readlink -f $*; }
