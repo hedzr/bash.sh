@@ -15,6 +15,10 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20240407
+  - fix `git-clone`: make output clean in quiet mode
+  - add alias `git-clone-deep`
+
 - v20240406
   - fix `git-clone`: -o cannot work; also add -v in it
 
