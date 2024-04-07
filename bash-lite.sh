@@ -228,16 +228,15 @@ git_clone() {
 			tip "Result: git clone $Deep -q $Opts "$Url" "$Dir""
 		else
 			dbg "cloning from $Url ..." && git clone $Deep -q $Opts "$Url" "$Dir" && {
-				if (($Verbose)); then
-					local DEBUG=1
-				fi
+				(($Verbose)) && local DEBUG=1
 				dbg "git clone $Url DONE."
-				du -sh "$Dir"
+				(($Verbose)) && du -sh "$Dir" || :
 			}
 		fi
 	fi
 }
 alias git-clone=git_clone
+alias git-clone-deep='git_clone -d'
 #
 headline() { printf "\e[0;1m$@\e[0m:\n"; }
 headline_begin() { printf "\e[0;1m"; } # for more color, see: shttps://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
