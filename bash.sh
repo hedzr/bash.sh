@@ -615,6 +615,7 @@ git_clone() {
 		Repo="${Repo%\?*}"
 		Repo="${Repo#git@}"
 		Repo="${Repo%.git}"
+		Repo="${Repo%/blob/*}"
 		[[ "$Dir" == "" ]] && Dir="${Repo//\//.}"
 		[[ "$Prefix" == 'git@' ]] && Sep=':'
 		local Url="${Prefix}${Host}${Sep}${Repo}.git" Opts=""
@@ -633,6 +634,7 @@ git_clone() {
 }
 alias git-clone=git_clone
 alias git-clone-deep='git_clone -d'
+alias git-clone-deep-v='git_clone -d -v'
 #
 #
 url_exists() { curl --head --silent -S --fail --output /dev/null "$@" 1>/dev/null 2>&1; }

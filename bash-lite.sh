@@ -221,6 +221,7 @@ git_clone() {
 		Repo="${Repo%\?*}"
 		Repo="${Repo#git@}"
 		Repo="${Repo%.git}"
+		Repo="${Repo%/blob/*}"
 		[[ "$Dir" == "" ]] && Dir="${Repo//\//.}"
 		[[ "$Prefix" == 'git@' ]] && Sep=':'
 		local Url="${Prefix}${Host}${Sep}${Repo}.git" Opts=""
@@ -239,6 +240,7 @@ git_clone() {
 }
 alias git-clone=git_clone
 alias git-clone-deep='git_clone -d'
+alias git-clone-deep-v='git_clone -d -v'
 #
 headline() { printf "\e[0;1m$@\e[0m:\n"; }
 headline_begin() { printf "\e[0;1m"; } # for more color, see: shttps://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
