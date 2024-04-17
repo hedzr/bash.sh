@@ -15,6 +15,9 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20240418
+  - improve `git-clone`: strip `/blob/...`
+
 - v20240408
   - improve `git-clone`: remove query and hash if exists
 
