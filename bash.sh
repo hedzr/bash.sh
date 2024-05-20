@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20240418
+#   Version: v20240520
 #   License: MIT
 #   Site: https://github.com/hedzr/bash.sh
 #
@@ -974,7 +974,7 @@ main_do_sth() {
 	# disabling this logic is still simple by defining HAS_END=1.
 	((${HAS_END:-0})) && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
 }
-BASH_SH_VERSION=v20240418
+BASH_SH_VERSION=v20240520
 DEBUG=${DEBUG:-0}
 PROVISIONING=${PROVISIONING:-0}
 # Instantly aliases cannot work in many cases such as conditional

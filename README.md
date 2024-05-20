@@ -15,33 +15,14 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20240520
+  - add `is_darwin_sillicon`
+
 - v20240418
   - improve `git-clone`: strip `/blob/...`
 
 - v20240408
   - improve `git-clone`: remove query and hash if exists
-
-- v20240407
-  - fix `git-clone`: make output clean in quiet mode
-  - add alias `git-clone-deep`
-
-- v20240406
-  - fix `git-clone`: -o cannot work; also add -v in it
-
-- v20240328
-  - fix `git-clone`
-  - improved `commander` and `_my_main_do_sth`
-
-- v20240327
-  - added `git-clone` to `bash-lite.sh` now
-  - new version of `git-clone` with widely adaptive args
-
-- v20240320
-  - added `mvif` (mv if target dir exists)
-
-- v20240206
-  - removed unused files
-  - update proxy_set in tool.sh
 
 - [CHANGELOG](./CHANGELOG)
 
