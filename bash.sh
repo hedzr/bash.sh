@@ -254,6 +254,7 @@ is_zsh_t1() { [[ "$SHELL" = */zsh ]]; }
 is_zsh_t2() { [ -n "$ZSH_NAME" ]; }
 is_fish() { [ -n "$FISH_VERSION" ]; }
 is_darwin() { [[ $OSTYPE == darwin* ]]; }
+is_darwin_sillicon() { is_darwin && [[ $(uname_mach) == arm64 ]]; }
 is_linux() { [[ $OSTYPE == linux* ]]; }
 is_win() { in_wsl; }
 in_wsl() { [[ "$(uname -r)" == *windows_standard* ]]; }
@@ -679,7 +680,7 @@ debug_info() {
 		              in_vscode: $(in_vscode && echo Y || echo '.')
 		           in_jetbrains: $(in_jetbrains && echo Y || echo '.')
 		          in_vim/neovim: $(in_vim && echo Y || echo '.') / $(in_neovim && echo Y || echo '.')
-		  darwin/linux/win(wsl): $(is_darwin && echo Y || echo '.') / $(is_linux && echo Y || echo '.') / $(is_win && echo Y || echo '.')
+		  darwin/linux/win(wsl): $(is_darwin && echo Y || echo '.')$(is_darwin_sillicon && echo ' [Sillicon] ' || echo ' ')/ $(is_linux && echo Y || echo '.') / $(is_win && echo Y || echo '.')
 		   is_interactive_shell: $(is_interactive_shell && echo Y || echo '.')
 		  
 		NOTE: bash.sh can only work in bash/zsh mode, even if running it in fish shell.
