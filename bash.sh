@@ -477,6 +477,8 @@ is_ubuntu() { [[ "$(osid)" == ubuntu ]]; }
 is_mageia() { [[ "$(osid)" == mageia ]]; }
 is_manjaro() { [[ "$(osid)" == manjaro ]]; }
 is_opensuse() { [[ "$(osid)" == opensuse* ]]; }
+is_archlinux() { [[ "$(osid)" == arch* ]]; }
+is_archlinux_arm() { [[ "$(osid)" == archarm* ]]; }
 # is_debian_series() { [[ "$(osid)" == debian || "$(osid)" == ubuntu ]]; }
 # is_redhat_series() { [[ "$(osid)" == redhat || "$(osid)" == centos || "$(osid)" == fedora ]]; }
 is_yum() { which yum 1>/dev/null 2>&1; }
