@@ -15,6 +15,10 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20240704
+  - added lanipall, improved lanip,gw,debug_info,...
+  - added is_archlinux(_arm)
+
 - v20240520
   - add `is_darwin_sillicon`
 

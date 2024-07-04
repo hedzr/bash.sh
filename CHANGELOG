@@ -1,5 +1,9 @@
 # HISTORY
 
+- v20240704
+  - added lanipall, improved lanip,gw,debug_info,...
+  - added is_archlinux(_arm)
+
 - v20240520
   - add `is_darwin_sillicon`
 
