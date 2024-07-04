@@ -498,12 +498,12 @@ is_opensuse_series() { [[ "$(osidlike)" == *opensuse* ]]; }
 #
 #
 #
-lsb_release_cs() { lsb_release -cs; } # focal, ... # = oscodename
-uname_kernel() { uname -s; }          # Linux
-uname_cpu() { uname -p; }             # processor: x86_64
-uname_mach() { uname -m; }            # machine:   x86_64, ...
-uname_rev() { uname -r; }             # kernel-release: 5.8.15-301.fc33.x86_64
-uname_ver() { uname -v; }             # kernel-version:
+lsb_release_cs() { which lsb_release 1>/dev/null 2>&1 && lsb_release -cs; } # focal, ... # = oscodename
+uname_kernel() { uname -s; }                                                # Linux
+uname_cpu() { uname -p; }                                                   # processor: x86_64
+uname_mach() { uname -m; }                                                  # machine:   x86_64, ...
+uname_rev() { uname -r; }                                                   # kernel-release: 5.8.15-301.fc33.x86_64
+uname_ver() { uname -v; }                                                   # kernel-version:
 lscpu_call() { lscpu $*; }
 lshw_cpu() { $SUDO lshw -c cpu; }
 i386_amd64() {
@@ -686,7 +686,7 @@ debug_info() {
 		NOTE: bash.sh can only work in bash/zsh mode, even if running it in fish shell.
 
 		  IP(s):
-		$(lanip | pad 9)
+		$(lanipall | pad 9)
 		  Gateway / Mask: $(gw) / $(netmask)
 
 		  OS tests: pmid='$(pmid)' osid='$(osid)' osidlike='$(osidlike)'
@@ -911,19 +911,32 @@ if is_darwin; then
 	}
 	default_dev() { route get default | awk '/interface:/{print $2}'; }
 	gw() { route get default | awk '/gateway:/{print $2}'; }
-	lanip() { ifconfig | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}'; }
-	lanip6() { ifconfig | grep 'inet6 ' | grep -FvE '::1|%lo|fe80::' | awk '{print $2}'; }
+	lanip() { ifconfig | grep 'inet ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
+	lanip6() { ifconfig | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
+	lanipall() { ifconfig | grep -P 'inet6? ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
 	netmask_hex() { ifconfig $(default_dev) | awk '/netmask /{print $4}'; }
 	netmask() { hex2mask $(netmask_hex); }
 else
-	ipcmd="$(which ip 2>/dev/null || echo 'sudo ip')"
+	ipcmd="$(which ip 1>/dev/null 2>&1 && echo 'sudo ip' || echo ifconfig)"
 	realpathx() { readlink -f "$@"; }
 	default_dev() { $ipcmd route show default | grep -oE 'dev \w+' | awk '{print $2}'; }
-	gw() { $ipcmd route show default | awk '{print $3}'; }
-	lanip() { $ipcmd a | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}'; }
-	lanip6() { $ipcmd a | grep 'inet6 ' | grep -FvE '::1|%lo|fe80::' | awk '{print $2}'; }
+	if is_suse_series; then
+		gw() { which netstat 1>/dev/null 2>&1 && netstat -r -n | grep -P '^0.0.0.0' | awk '{print $2}' || {
+			local xx=$($ipcmd route show | awk '{print $1}')
+			if [[ "$xx" = */* ]]; then
+				cut -d'/' -f1 <<<"$xx" | sed 's/.0$/.1/'
+			else
+				echo $xx
+			fi
+		}; }
+	else
+		gw() { $ipcmd route show default | awk '{print $3}'; }
+	fi
+	lanip() { $ipcmd a | grep -P 'inet ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
+	lanip6() { $ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
+	lanipall() { $ipcmd a | grep -P 'inet6? ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
 	netmask() {
-		which ifconfig >/dev/null 2>&1 && { ifconfig $(default_dev) | awk '/netmask /{print $4}'; } || {
+		which ifconfig 1>/dev/null 2>&1 && { ifconfig $(default_dev) | awk '/netmask /{print $4}'; } || {
 			tomask() {
 				while IFS='/' read IP S; do
 					M=$((0xffffffff ^ ((1 << (32 - S)) - 1)))
