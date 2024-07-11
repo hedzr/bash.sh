@@ -975,18 +975,16 @@ main_do_sth() {
 	# set -o pipefail
 	MAIN_DEV=${MAIN_DEV:-$(default_dev)}
 	MAIN_ENTRY=${MAIN_ENTRY:-_my_main_do_sth}
-	local res_
-	# echo $MAIN_ENTRY - "$@"
 	in_debug && debug_info && dbg "$(safety "$MAIN_ENTRY - $@\n    [CD: $CD, SCRIPT: $SCRIPT]")"
 	if in_sourcing; then
-		dbg "[exec] in-sourcing mode"
 		$MAIN_ENTRY "$@"
-		res_=$?
+		return $?
 	else
+		local result_code
 		trap 'previous_command=$this_command; this_command=$BASH_COMMAND' DEBUG
-		trap '[ $? -ne 0 ] && echo FAILED COMMAND: "$previous_command" with exit code $?' EXIT
+		is_darwin || trap '[[ $? -ne 0 ]] && echo FAILED COMMAND: "$previous_command" with exit code $?' EXIT
 		$MAIN_ENTRY "$@"
-		res_=$?
+		result_code=$?
 		trap - EXIT
 	fi
 	# Why use `{ [ $# -eq 0 ] && :; }`?
@@ -996,7 +994,7 @@ main_do_sth() {
 	# You might always change this logic or comment the following line, no obsezzing on it.
 	# Or, if your provisioning script with bash.sh has not any entranance arguments,
 	# disabling this logic is still simple by defining HAS_END=1.
-	((${HAS_END:-0})) && { debug_begin && echo -n 'Success!' && debug_end; } || return $res_ # { [ $# -eq 0 ] && :; }
+	((${HAS_END:-0})) && { debug_begin && echo -n 'Success!' && debug_end; } || return $result_code # { [ $# -eq 0 ] && :; }
 }
 BASH_SH_VERSION=v20240704
 DEBUG=${DEBUG:-0}
