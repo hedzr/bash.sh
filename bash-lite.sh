@@ -356,20 +356,19 @@ main_do_sth() {
 	# set -o pipefail
 	MAIN_DEV=${MAIN_DEV:-$(default_dev)}
 	MAIN_ENTRY=${MAIN_ENTRY:-_my_main_do_sth}
-	# echo $MAIN_ENTRY - "$@"
-	if in_debug; then
-		debug_info && dbg "$MAIN_ENTRY - $@ [CD: $CD, SCRIPT: $SCRIPT]"
-	fi
-	#
+	local res_
+	in_debug && debug_info && dbg "$(safety "$MAIN_ENTRY - $@\n    [CD: $CD, SCRIPT: $SCRIPT]")"
 	if in_sourcing; then
 		$MAIN_ENTRY "$@"
+		res_=$?
 	else
 		trap 'previous_command=$this_command; this_command=$BASH_COMMAND' DEBUG
 		trap '[ $? -ne 0 ] && echo FAILED COMMAND: "$previous_command" with exit code $?' EXIT
 		$MAIN_ENTRY "$@"
+		res_=$?
 		trap - EXIT
 	fi
-	${HAS_END:-$(false)} && { debug_begin && echo -n 'Success!' && debug_end; } || { [ $# -eq 0 ] && :; }
+	((${HAS_END:-0})) && { debug_begin && echo -n 'Success!' && debug_end; } || return $res_ # { [ $# -eq 0 ] && :; }
 }
 BASH_SH_VERSION=v20240704
 DEBUG=${DEBUG:-0}
