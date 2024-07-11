@@ -23,6 +23,11 @@ if is_zsh; then
 	echo
 
 	local dir dir_saved f
+
+	dir="$HOME/Library/Application Support/Coursier/bin"
+	try_append_path "$dir"
+	# ls -laG "$dir"
+
 	# $HOME/.rvm/bin $HOME/.r2env/bin
 	for dir in /opt/local/bin /opt/bin $HOME/bin $HOME/.local/bin $HOME/go/bin $HOME/hack/bin; do
 		if [ -d $dir ]; then
