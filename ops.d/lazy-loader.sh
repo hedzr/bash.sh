@@ -30,16 +30,18 @@ function command_not_found_handler() {
 	# try loading the lazied version of a command from these standard locations
 	for dir in $HOME/.local/bin $HOME/bin /opt/bin /opt/local/bin $HOME/hack/bin $HOME/.r2env/bin; do
 		if ! (($command_not_found_handler_processed)); then
-			local dx="$dir/.zsh/lazy"
-			if [ -d $dx ]; then
-				dbg "lazy-loader [1st]: dir: $dx, cmd: $command_not_found_handler_cmd, args: $command_not_found_handler_arg"
-				_bash_sh_lazy_try_source_in "$dx"
-			fi
+			local dx
+			for dx in "$dir/.zsh/lazy" "$dir/ops.d/lazy"; do
+				if [ -d $dx ]; then
+					dbg "lazy-loader [1st]: dir: $dx, cmd: $command_not_found_handler_cmd, args: $command_not_found_handler_arg"
+					_bash_sh_lazy_try_source_in "$dx"
+				fi
+			done
 		fi
 	done
 
-	dbg "CD: $CD"
 	if ! (($command_not_found_handler_processed)); then
+		dbg "CD/1: $CD"
 		# and if not found, loading it from bash.sh/ops.d/.../lazy/ folders
 		for dir in "$CD/ops.d" "$CD/ops.d/$osid" "$CD/opd.d/$pmid"; do
 			if ! (($command_not_found_handler_processed)); then
