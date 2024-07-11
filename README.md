@@ -15,18 +15,16 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
-- v20240704
-  - added lanipall, improved lanip,gw,debug_info,...
-  - added is_archlinux(_arm)
-
-- v20240520
-  - add `is_darwin_sillicon`
-
-- v20240418
-  - improve `git-clone`: strip `/blob/...`
-
-- v20240408
-  - improve `git-clone`: remove query and hash if exists
+- v20240711
+  - drawin-only: normal path appending
+  - fix lazy_loader
+  - improved commander()
+  - added is_kalilinux()
+  - fix in_vm()
+  - fix lanip/lanipall
+  - fix try_append_path ...
+  - improved main_do_sth/_my_main_do_sth to return inner functions' result directly
+  - improve prilogue and epilogue tag in comment
 
 - [CHANGELOG](./CHANGELOG)
 

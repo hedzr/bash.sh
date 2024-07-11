@@ -1,5 +1,16 @@
 # HISTORY
 
+- v20240711
+  - drawin-only: normal path appending
+  - fix lazy_loader
+  - improved commander()
+  - added is_kalilinux()
+  - fix in_vm()
+  - fix lanip/lanipall
+  - fix try_append_path ...
+  - improved main_do_sth/_my_main_do_sth to return inner functions' result directly
+  - improve prilogue and epilogue tag in comment
+
 - v20240704
   - added lanipall, improved lanip,gw,debug_info,...
   - added is_archlinux(_arm)
@@ -133,9 +144,9 @@
 - v20230108:
   - add comment for HAS_END testing at ending of the whole provisioning script:
     > Why use `{ [ $# -eq 0 ] && :; }`?
-    >   While bash.sh/provision.sh/ops was been invoking with command-line args,
-    >   we would assume that's normal status if `trap` caluse doesn't catch any errors.
-    >   So, a failure test on HAS_END shouldn't take bad effect onto the whole provisioning script exit status.
+    > While bash.sh/provision.sh/ops was been invoking with command-line args,
+    > we would assume that's normal status if `trap` caluse doesn't catch any errors.
+    > So, a failure test on HAS_END shouldn't take bad effect onto the whole provisioning script exit status.
     > You might always change this logic or comment the following line, no obsezzing on it.
     > Or, if your provisioning script with bash.sh has not any entranance arguments,
     > disabling this logic is still simple by defining HAS_END=1.
