@@ -50,6 +50,8 @@ if is_zsh; then
 					dir="$dir_saved"
 				fi
 			fi
+		else
+			:
 		fi
 	done
 	# try_append_path $VULS_HOME/bin $PY_USER_BIN $FLUTTER_HOME/bin
