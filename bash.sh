@@ -409,7 +409,7 @@ if_centos() {
 in_vm() {
 	if cmd_exists hostnamectl; then
 		# dbg "checking hostnamectl"
-		if hostnamectl | grep -E 'chassis: ' | grep -q ' vm'; then
+		if hostnamectl | grep -iE 'chassis: ' | grep -q ' vm'; then
 			true
 		elif hostnamectl | grep -qE 'Virtualization: '; then
 			true
