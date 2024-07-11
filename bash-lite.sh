@@ -79,6 +79,7 @@ _my_main_do_sth() {
 
 ########################################################
 
+#### HZ Tail BEGIN #### v20240704 ####
 in_debug() { (($DEBUG)); }
 in_provisioning() { (($PROVISIONING)); } ## return exit status as true if $PROVISIONING is not equal to 0
 is_root() { [ "$(id -u)" = "0" ]; }
@@ -378,4 +379,4 @@ in_sourcing && { CD="${CD}" && debug ">> IN SOURCING, \$0=$0, \$_=$_"; } || { SC
 if_vagrant && [ "$SCRIPT" == "/tmp/vagrant-shell" ] && { [ -d $CD/ops.d ] || CD=/vagrant/bin; }
 [ -L "$SCRIPT" ] && debug linked script found && SCRIPT=$(realpathx "$SCRIPT") && CD=$(dirname "$SCRIPT")
 in_sourcing || main_do_sth "$@"
-#### HZ Tail END ####
+#### HZ Tail END #### v20240704 ####
