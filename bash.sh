@@ -85,12 +85,12 @@ _my_main_do_sth() {
 
 	local DBG_SAVE="$DEBUG"
 
-	dbg ": loading imports"
+	dbg "[importing files]: loading ..."
 	_bash_sh_load_import_files
-	dbg ": shell.d files imports"
+	dbg "[importing files]: shell.d/ops.d files"
 	# _bash_sh_load_files '*'
 	_bash_sh_load_env_files
-	dbg ": env imports"
+	dbg "[importing files]: .env done"
 
 	# in_provisioning ||
 	[ "$cmd" = "first-install" ] || DEBUG="$DBG_SAVE" # && echo "DEBUG: $DEBUG"
@@ -110,22 +110,30 @@ _my_main_do_sth() {
 		elif fn_aliased_exists "$xcmd"; then
 			eval $xcmd "$@" #&& dbg ":DONE:$cmd"
 		else
-			local f="$CD/ops.d/run/$cmd.sh"
-			# dbg "  ..finding $f"
-			if [ -f "$f" ]; then
-				dbg "  ..sourcing $(safety $f).." && source "$f" && dbg "  ..OK"
-				if fn_exists "${cmd}_entry"; then
-					# dbg "  ..eval '${cmd}_entry' $@"
-					${cmd}_entry "$@"
-				else
-					eval $cmd "$@"
-				fi
+			local xcmd="${cmd//-/_}"
+			dbg ": trying cmd: $xcmd ..."
+			if fn_exists "$xcmd"; then
+				eval $xcmd "$@" #&& dbg ":DONE:$cmd"
+			elif fn_aliased_exists "$xcmd"; then
+				eval $xcmd "$@" #&& dbg ":DONE:$cmd"
 			else
-				err "command '$cmd' has not been defined. (CD=$(safety $CD))"
-				return
+				local f="$CD/ops.d/run/$cmd.sh"
+				# dbg "  ..finding $f"
+				if [ -f "$f" ]; then
+					dbg "  ..sourcing $(safety $f).." && source "$f" && dbg "  ..OK"
+					if fn_exists "${cmd}_entry"; then
+						# dbg "  ..eval '${cmd}_entry' $@"
+						${cmd}_entry "$@"
+					else
+						eval $cmd "$@"
+					fi
+				else
+					err "command '$cmd' has not been defined. (CD=$(safety $CD))"
+					return
+				fi
 			fi
 		fi
-		unset xcmd
+		# unset xcmd
 
 		if in_provisioning; then
 			if [ -f "$CD/after.sh" ]; then
