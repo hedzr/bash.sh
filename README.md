@@ -15,6 +15,11 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20240722
+  - comment unused lines
+  - improved gw/lanip/... in suse series and all linux distros
+  - improved _my_main_do_sth
+
 - v20240711
   - drawin-only: normal path appending
   - fix lazy_loader
