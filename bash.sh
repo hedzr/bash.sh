@@ -35,7 +35,7 @@ bump() {
 	local YEAR="$(date +%Y)" f
 	headline "bump version to: $VERSION ..."
 	tip "  looking up at directory '$(safety $CD)'..."
-	for f in $CD/bash*; do
+	for f in $CD/bash* $CD/simple*; do
 		echo "bumping for $(safety $f), YEAR = $YEAR ..."
 		sed -i '' -E -e "s/v$YEAR[0-9]+/$VERSION/g" $f
 		sed -i '' -E "s/v$((YEAR - 1))[0-9]+/$VERSION/g" $f
@@ -1024,5 +1024,8 @@ alias list-all-env-variables=list_all_env_variables list-all-variables=list_all_
 in_sourcing && { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug "$(safety ">> IN SOURCING (DEBUG=$DEBUG), \$0=$0, \$_=$_")"; } || { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug "$(safety ">> '$SCRIPT' in '$CD', \$0='$0','$1'.")"; }
 if_vagrant && [ "$SCRIPT" == "/tmp/vagrant-shell" ] && { [ -d "$CD/ops.d" ] || CD=/vagrant/bin; }
 [ -L "$SCRIPT" ] && debug "$(safety "linked script found")" && SCRIPT="$(realpathx "$SCRIPT")" && CD="$(dirname "$SCRIPT")"
+# The better consice way to get baseDir, ie. $CD, is:
+#       CD=$(cd `dirname "$0"`;pwd)
+# It will open a sub-shell to print the folder name of the running shell-script.
 in_sourcing && _bash_sh_load_import_files || main_do_sth "$@"
 #### HZ Tail END #### v20240722 ####

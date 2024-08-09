@@ -1,5 +1,8 @@
 # HISTORY
 
+- v20240809
+  - added `simple-entry.sh`: for the guys that are looking for a dead lite entry.
+
 - v20240722
   - comment unused lines
   - improved gw/lanip/... in suse series and all linux distros
