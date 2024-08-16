@@ -15,6 +15,9 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20240816
+  - fix `_my_main_do_sth` to how to find a cmd with its name variants
+
 - v20240809
   - added `simple-entry.sh`: for the guys that are looking for a dead lite entry.
 
