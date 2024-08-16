@@ -98,66 +98,64 @@ _my_main_do_sth() {
 
 	# in_debug && LC_ALL=C type $cmd || echo "$cmd not exists"
 	dbg ": invoking cmd: $cmd"
-	if fn_exists "boot_$cmd"; then
-		eval boot_$cmd "$@" #&& dbg ":DONE:boot_$cmd"
-	elif fn_exists "$cmd"; then
-		eval $cmd "$@" #&& dbg ":DONE:$cmd"
+	local xcmd="${cmd//-/_}"
+	dbg ": trying cmd: $xcmd ..."
+	if fn_exists "$xcmd"; then
+		eval $xcmd "$@" #&& dbg ":DONE:$cmd"
+	elif fn_exists "boot_$xcmd"; then
+		eval boot_$xcmd "$@" #&& dbg ":DONE:$cmd"
+	elif fn_aliased_exists "$xcmd"; then
+		eval $xcmd "$@" #&& dbg ":DONE:$cmd"
 	else
-		local xcmd="${cmd//_/-}"
+		xcmd="${cmd//_/-}"
 		dbg ": trying cmd: $xcmd ..."
 		if fn_exists "$xcmd"; then
 			eval $xcmd "$@" #&& dbg ":DONE:$cmd"
+		elif fn_exists "boot-$xcmd"; then
+			eval boot-$xcmd "$@" #&& dbg ":DONE:$cmd"
 		elif fn_aliased_exists "$xcmd"; then
 			eval $xcmd "$@" #&& dbg ":DONE:$cmd"
 		else
-			local xcmd="${cmd//-/_}"
-			dbg ": trying cmd: $xcmd ..."
-			if fn_exists "$xcmd"; then
-				eval $xcmd "$@" #&& dbg ":DONE:$cmd"
-			elif fn_aliased_exists "$xcmd"; then
-				eval $xcmd "$@" #&& dbg ":DONE:$cmd"
+			local f="$CD/ops.d/run/$cmd.sh"
+			# dbg "  ..finding $f"
+			if [ -f "$f" ]; then
+				dbg "  ..sourcing $(safety $f).." && source "$f" && dbg "  ..OK"
+				if fn_exists "${cmd}_entry"; then
+					# dbg "  ..eval '${cmd}_entry' $@"
+					${cmd}_entry "$@"
+				else
+					eval $cmd "$@"
+				fi
 			else
-				local f="$CD/ops.d/run/$cmd.sh"
-				# dbg "  ..finding $f"
-				if [ -f "$f" ]; then
-					dbg "  ..sourcing $(safety $f).." && source "$f" && dbg "  ..OK"
-					if fn_exists "${cmd}_entry"; then
-						# dbg "  ..eval '${cmd}_entry' $@"
-						${cmd}_entry "$@"
-					else
-						eval $cmd "$@"
-					fi
-				else
-					err "command '$cmd' has not been defined. (CD=$(safety $CD))"
-					return
-				fi
+				err "command '$cmd' has not been defined. (CD=$(safety $CD))"
+				return
 			fi
 		fi
-		# unset xcmd
+	fi
+	# unset xcmd
 
-		if in_provisioning; then
-			if [ -f "$CD/after.sh" ]; then
-				headline "Sourcing and Running after.sh ..."
-				source "$CD/after.sh"
-				if fn_exists "after_provision"; then
-					eval "after_provision" "$@"
-				else
-					:
-				fi
+	if in_provisioning; then
+		if [ -f "$CD/after.sh" ]; then
+			headline "Sourcing and Running after.sh ..."
+			source "$CD/after.sh"
+			if fn_exists "after_provision"; then
+				eval "after_provision" "$@"
+			else
+				:
 			fi
-			if [ -f "$CD/user-customizations.sh" ]; then
-				headline "Sourcing and Running user-customizations.sh ..."
-				source "$CD/user-customizations.sh"
-				if fn_exists "user_custom"; then
-					eval "user_custom" "$@"
-				else
-					:
-				fi
-			fi
-			dbg ":DONE:END:$(fn_name_dyn):$?"
-		else
-			HAS_END=0
 		fi
+		if [ -f "$CD/user-customizations.sh" ]; then
+			headline "Sourcing and Running user-customizations.sh ..."
+			source "$CD/user-customizations.sh"
+			if fn_exists "user_custom"; then
+				eval "user_custom" "$@"
+			else
+				:
+			fi
+		fi
+		dbg ":DONE:END:$(fn_name_dyn):$?"
+	else
+		HAS_END=0
 	fi
 }
 
