@@ -15,6 +15,11 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20240817
+  - added `is_bash_strict()` to test if it's in real bash rather than zsh
+  - fixed `subnet4()`, and its relevants
+  - fixed `gw()` under opensuse (complex installs)
+
 - v20240816
   - fix `_my_main_do_sth` to how to find a cmd with its name variants
 
