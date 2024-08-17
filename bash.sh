@@ -878,6 +878,59 @@ script_functions() {
 }
 list_all_env_variables() { declare -xp; }
 list_all_variables() { declare -p; }
+hex2ip4() { local II="$1" && echo "$(((II >> 24) & 0xff)).$(((II >> 16) & 0xff)).$(((II >> 8) & 0xff)).$((II & 0xff))"; }
+ip_hex() {
+	tox() {
+		local IP S A II
+		while IFS='/' read IP S; do
+			is_bash_strict && {
+				IFS='.' read -ra A <<<"$IP"
+				II=$(printf '0x%02X%02X%02X%02X' ${A[0]} ${A[1]} ${A[2]} ${A[3]})
+				echo $II
+			} || bash <<-EOF
+				IFS='.' read -ra A <<<"$IP"
+				II=\$(printf '0x%02X%02X%02X%02X' \${A[0]} \${A[1]} \${A[2]} \${A[3]})
+				echo \$II
+			EOF
+		done
+	}
+	lanip | tox
+}
+netmask_hex() {
+	tox() {
+		local IP S M
+		while IFS='/' read IP S; do
+			M=$((0xffffffff ^ ((1 << (32 - S)) - 1)))
+			printf '0x%08x' $M
+		done
+	}
+	lanip | tox
+}
+subnet_hex() {
+	tox1() {
+		# local IP S M A I II
+		while IFS='/' read IP S; do
+			is_bash_strict && {
+				# tip "ip: $IP, S: $S"
+				M=$((0xffffffff ^ ((1 << (32 - S)) - 1)))
+				IFS=. read -ra A <<<"$IP"
+				# tip "A: ${A[@]}, M: $(printf '0x%08x' $M)"
+				I=$(printf '0x%02X%02X%02X%02X' ${A[0]} ${A[1]} ${A[2]} ${A[3]})
+				II=$((M & I))
+				printf '0x%08x' $II
+			} || bash <<-EOF
+				M=\$((0xffffffff ^ ((1 << (32 - $S)) - 1)))
+				IFS=. read -ra A <<<"$IP"
+				# tip "A: ${A[@]}, M: $(printf '0x%08x' $M)"
+				I=\$(printf '0x%02X%02X%02X%02X' \${A[0]} \${A[1]} \${A[2]} \${A[3]})
+				II=\$((M & I))
+				printf '0x%08x' \$II
+			EOF
+		done
+	}
+	# tip "lanip: '$(lanip)'"
+	lanip | tox1
+}
 if is_darwin; then
 	readlinkx() {
 		local p="$@"
@@ -929,38 +982,32 @@ if is_darwin; then
 	lanip6() { ifconfig | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
 	lanipall() { ifconfig | grep -P 'inet6? ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
 	netmask_hex() { ifconfig $(default_dev) | awk '/netmask /{print $4}'; }
-	netmask() { hex2mask $(netmask_hex); }
 else
 	ipcmd="$(which ip 1>/dev/null 2>&1 && echo 'sudo ip' || echo ifconfig)"
 	realpathx() { readlink -f "$@"; }
 	default_dev() { eval $ipcmd route show default | grep -oE 'dev \w+' | awk '{print $2}'; }
 	if is_suse_series; then
 		gw() { which netstat 1>/dev/null 2>&1 && netstat -r -n | grep -P '^0.0.0.0' | awk '{print $2}' || {
-			local xx=$(eval $ipcmd route show | awk '{print $1}')
-			if [[ "$xx" = */* ]]; then
-				cut -d'/' -f1 <<<"$xx" | sed 's/.0$/.1/'
+			if eval "$ipcmd route show" | grep -qP '^default'; then
+				eval "$ipcmd route show default" | awk '{print $3}'
 			else
-				echo $xx
+				local xx=$(eval "$ipcmd route show" | awk '{print $1}')
+				if [[ "$xx" = */* ]]; then
+					cut -d'/' -f1 <<<"$xx" | sed 's/.0$/.1/'
+				else
+					echo $xx
+				fi
 			fi
 		}; }
 	else
-		gw() { eval $ipcmd route show default | awk '{print $3}'; }
+		gw() { eval "$ipcmd route show default" | awk '{print $3}'; }
 	fi
 	lanip() { eval $ipcmd a | grep -E 'inet ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
 	lanip6() { eval $ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
 	lanipall() { eval $ipcmd a | grep -E 'inet6? ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
-	netmask() {
-		which ifconfig 1>/dev/null 2>&1 && { ifconfig $(default_dev) | awk '/netmask /{print $4}'; } || {
-			tomask() {
-				while IFS='/' read IP S; do
-					M=$((0xffffffff ^ ((1 << (32 - S)) - 1)))
-					echo "$(((M >> 24) & 0xff)).$(((M >> 16) & 0xff)).$(((M >> 8) & 0xff)).$((M & 0xff))"
-				done
-			}
-			eval $ipcmd a | grep 'inet ' | grep -Fv 127.0.0.1 | awk '{print $2}' | tomask
-		}
-	}
 fi
+subnet4() { hex2ip4 $(subnet_hex); }
+netmask() { hex2ip4 $(netmask_hex); }
 # alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
 # alias ip-wan=wanip
 wanip() { host myip.opendns.com 208.67.220.222 | tail -1 | awk '{print $4}'; }
