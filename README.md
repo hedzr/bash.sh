@@ -2,8 +2,9 @@
 
 `bash.sh` is a starter template for shell developing.
 
-File `bash.config` can be applied and sourced into your zshell environment directly. See [Import bash.config into your zsh env](#3-import-bashconfig-into-your-zsh-env).
-Why? Because we will have a clean zsh initializing environment and many tools can be lazy-loaded now.
+![image-20240817103856118](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/upgit/2024/08/20240819_1724026017.png)
+
+File `bash.config` can be applied and sourced into your zshell environment directly. See [Import bash.config into your zsh env](#3-import-bashconfig-into-your-zsh-env). This will allow loading any tools lazily and automatically from `$HOME/.local/bin/ops.d/{lazy,apt,yum,zypper,ubuntu,opensuse-leap,...}`.
 
 ## Features
 
@@ -15,33 +16,17 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20240819
+  - added join_lines
+  - improved debug_info
 - v20240817
   - added `is_bash_strict()` to test if it's in real bash rather than zsh
   - fixed `subnet4()`, and its relevants
   - fixed `gw()` under opensuse (complex installs)
-
 - v20240816
   - fix `_my_main_do_sth` to how to find a cmd with its name variants
-
 - v20240809
   - added `simple-entry.sh`: for the guys that are looking for a dead lite entry.
-
-- v20240722
-  - comment unused lines
-  - improved gw/lanip/... in suse series and all linux distros
-  - improved _my_main_do_sth
-
-- v20240711
-  - drawin-only: normal path appending
-  - fix lazy_loader
-  - improved commander()
-  - added is_kalilinux()
-  - fix in_vm()
-  - fix lanip/lanipall
-  - fix try_append_path ...
-  - improved main_do_sth/_my_main_do_sth to return inner functions' result directly
-  - improve prilogue and epilogue tag in comment
-
 - [CHANGELOG](./CHANGELOG)
 
 ## Usages
@@ -116,6 +101,7 @@ machanism is available too. Just put your .sh tool
 into this folder:
 
 1. `$HOME/.local/bin/.zsh/lazy/`
+1. `$HOME/.local/bin/ops.d/lazy/*.sh`
 
 It will be loaded and invoked on-demand.
 
