@@ -682,7 +682,7 @@ debug_info() {
 	cat <<-EOF
 		               in_debug: $(in_debug && echo Y || echo '.')
 		                is_root: $(is_root && echo Y || echo '.')
-		                is_bash: $(is_bash && echo Y || echo '.')       # SHELL = $SHELL, BASH_VERSION = $BASH_VERSION
+		                is_bash: $(is_bash && echo Y || echo '.')       # STRICTED = $(is_bash_strict && echo Y || echo N), SHELL = $SHELL, BASH_VERSION = $BASH_VERSION
 		       is_zsh/is_zsh_t1: $(is_zsh && echo Y || echo '.') / $(is_zsh_t1 && echo Y || echo '.')   # $(is_zsh && echo "ZSH_EVAL_CONTEXT = $ZSH_EVAL_CONTEXT, ZSH_NAME/VERSION = $ZSH_NAME v$ZSH_VERSION" || :)
 		                is_fish: $(is_fish && echo Y || echo '.')       # FISH_VERSION = $FISH_VERSION
 		            in_sourcing: $(in_sourcing && echo Y || echo '.')
@@ -695,13 +695,17 @@ debug_info() {
 		  
 		NOTE: bash.sh can only work in bash/zsh mode, even if running it in fish shell.
 
-		  IP(s):
+		  IP(s): 4 -> $(lanip | join_lines), 6 -> $(lanip6 | join_lines)
 		$(lanipall | pad 9)
 		  Gateway / Mask: $(gw) / $(netmask)
+		   Subnet Prefix: $(subnet4)
+	EOF
+	fn_exists pmid && cat <<-EOF
 
 		  OS tests: pmid='$(pmid)' osid='$(osid)' osidlike='$(osidlike)'
 		            oscodename='$(oscodename)' versionid='$(versionid)' variantid='$(variantid)'
 		            if_nix_typ='$(if_nix_typ)' (\$OSTYPE='$OSTYPE')
+		            is_suse_series='$(is_suse_series && echo Y || echo .)'
 	EOF
 	is_linux && cat <<-EOF
 
@@ -717,6 +721,14 @@ debug_info() {
 	EOF
 	debug_end
 	:
+}
+join_lines() {
+	local delim="${1:-,}" ix=0
+	while read line; do
+		(($ix)) && printf '%s' "$delim"
+		let ix++
+		printf '%s' "$line"
+	done
 }
 strip_l() { echo ${1#"$2"}; }
 strip_r() { echo ${1%"$2"}; }
