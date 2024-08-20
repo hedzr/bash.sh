@@ -16,6 +16,9 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
+- v20240821
+  - improved lazy-loader to find the possible pm solves
+  - improved lazied-functions
 - v20240819
   - added join_lines
   - improved debug_info
