@@ -1,3 +1,5 @@
+# in a fresh shell env, trying 'status' command will trigger lazy-loader.sh.
+# See the lazied-functions.sh and lazy-loader.sh for more details.
 status_lazy() {
 	status_entry() { dbg "fn_name: $(fn_name), arg: $@" && commander $(strip_r $(fn_name) _entry) "$@"; }
 	status_usage() {
@@ -39,4 +41,4 @@ check_env() {
 		        qcloud: $(if_qcloud && echo Y)
 	EOC
 }
-alias check-env='check_env'
+alias check-env='check_env' ii='check_end'

@@ -3,3 +3,4 @@
 #
 # e.g.: status docker, status apache, ...
 status() { status_lazy "$@"; }
+dns() { dns_lazy "$@"; }

@@ -1,4 +1,6 @@
-dns_ops() {
+# in a fresh shell env, trying 'dns' command will trigger lazy-loader.sh.
+# See the lazied-functions.sh and lazy-loader.sh for more details.
+dns_lazy() {
 	local DNS_SERVER_KEY="${DNS_SERVER_KEY:-foreman:cWzWNjwEunNvojvvk/W86A==}" # a sample key here, you should replace it with your own.
 
 	dns_entry() { commander $(strip_r $(fn_name) _entry) "$@"; }
