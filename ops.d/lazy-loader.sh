@@ -10,12 +10,17 @@ function command_not_found_handler() {
 		if [ -d $dx ]; then
 			f="$dx/$command_not_found_handler_cmd.sh"
 			if not_in_array $f $lazy_loaded; then
+				dbg "    try loading $f ..."
 				if [ -f "$f" ]; then
 					source $f && dbg "  yes: $f" && command_not_found_handler_processed=1
+				elif [ -f "${f}-lazy.sh" ]; then
+					source "${f}-lazy.sh" && dbg "  yes: $f" && command_not_found_handler_processed=1
 				else
 					f1="${f//_/-}"
 					if [ -f "$f1" ]; then
 						source $f1 && dbg "  yes: $f ($f1 loaded)" && command_not_found_handler_processed=1
+					elif [ -f "${f1}-lazy.sh" ]; then
+						source "${f1}-lazy.sh" && dbg "  yes: $f (${f1}-lazy.sh loaded)" && command_not_found_handler_processed=1
 					fi
 				fi
 				if (($command_not_found_handler_processed)); then
@@ -26,11 +31,10 @@ function command_not_found_handler() {
 		fi
 	}
 
-	local dir osid="$(osid)" pmid="$(pmid)"
+	local dir dx osid="$(osid)" pmid="$(pmid)"
 	# try loading the lazied version of a command from these standard locations
 	for dir in $HOME/.local/bin $HOME/bin /opt/bin /opt/local/bin $HOME/hack/bin $HOME/.r2env/bin; do
 		if ! (($command_not_found_handler_processed)); then
-			local dx
 			for dx in "$dir/.zsh/lazy" "$dir/ops.d/lazy"; do
 				if [ -d $dx ]; then
 					dbg "lazy-loader [1st]: dir: $dx, cmd: $command_not_found_handler_cmd, args: $command_not_found_handler_arg"
@@ -58,6 +62,15 @@ function command_not_found_handler() {
 		return 0
 	else
 		err "COMMAND NOT FOUND: You tried to run '$command_not_found_handler_cmd' with args '$command_not_found_handler_arg'"
+		if [ -x /usr/bin/python3 ]; then
+			if [ -x /usr/bin/command-not-found ]; then
+				/usr/bin/command-not-found "${command_not_found_handler_cmd}" $(pmid) || :
+				return 128
+			elif [ -x /usr/lib/command-not-found ]; then
+				/usr/lib/command-not-found -- "${command_not_found_handler_cmd}" || :
+				return 129
+			fi
+		fi
 		return 127
 	fi
 }
