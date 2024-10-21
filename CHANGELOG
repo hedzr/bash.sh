@@ -1,5 +1,9 @@
 # HISTORY
 
+- v20241021
+  - improved is_git_dirty
+  - added if_systemd, if_sysv (init), if_upstart
+
 - v20240821
   - improved lazy-loader to find the possible pm solves
   - improved lazied-functions

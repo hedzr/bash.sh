@@ -16,20 +16,9 @@ We devote ourselves to helping you to write shell script functions more easier.
 
 ## History
 
-- v20240821
-  - improved lazy-loader to find the possible pm solves
-  - improved lazied-functions
-- v20240819
-  - added join_lines
-  - improved debug_info
-- v20240817
-  - added `is_bash_strict()` to test if it's in real bash rather than zsh
-  - fixed `subnet4()`, and its relevants
-  - fixed `gw()` under opensuse (complex installs)
-- v20240816
-  - fix `_my_main_do_sth` to how to find a cmd with its name variants
-- v20240809
-  - added `simple-entry.sh`: for the guys that are looking for a dead lite entry.
+- v20241021
+  - improved is_git_dirty
+  - added if_systemd, if_sysv (init), if_upstart
 - [CHANGELOG](./CHANGELOG)
 
 ## Usages
