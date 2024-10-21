@@ -58,6 +58,8 @@ function command_not_found_handler() {
 		done
 	fi
 
+	# todo: ~/.oh-my-zsh/plugins/command-not-found/command-not-found.plugin.zsh
+
 	if (($command_not_found_handler_processed)); then
 		return 0
 	else

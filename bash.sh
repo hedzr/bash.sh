@@ -426,6 +426,9 @@ in_vm() {
 		false
 	fi
 }
+if_upstart() { [[ $(/sbin/init --version) =~ upstart ]]; }
+if_systemd() { [[ $(systemctl) =~ -\.mount ]]; }
+if_sysv() { [[ -f /etc/init.d/cron && ! -L /etc/init.d/cron ]]; }
 #
 #
 #
@@ -542,8 +545,14 @@ if_hosttype() { # usage: if_hosttype x64 && echo x64 || echo x86 | BUT, it only 
 #
 #
 # is_git_clean() { git diff-index --quiet --cached HEAD -- 2>/dev/null; }
-is_git_clean() { git diff-index --quiet $* HEAD -- 2>/dev/null; }
-is_git_dirty() { is_git_clean && return -1 || return 0; }
+is_git_clean() { git diff-index --quiet "$@" HEAD -- 2>/dev/null; }
+is_git_dirty() {
+	if is_git_clean "$@"; then
+		false
+	else
+		true
+	fi
+}
 git_clone() {
 	local Deep="--depth=1" Help Dryrun Https Dir arg i=1 Verbose=0
 	while [[ $# -gt 0 ]]; do
