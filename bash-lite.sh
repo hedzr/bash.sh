@@ -232,8 +232,14 @@ in_vm() {
 }
 #
 #
-is_git_clean() { git diff-index --quiet $* HEAD -- 2>/dev/null; }
-is_git_dirty() { is_git_clean && return -1 || return 0; }
+is_git_clean() { git diff-index --quiet "$@" HEAD -- 2>/dev/null; }
+is_git_dirty() {
+	if is_git_clean "$@"; then
+		false
+	else
+		true
+	fi
+}
 git_clone() {
 	local Deep="--depth=1" Help Dryrun Https Dir arg i=1 Verbose=0
 	while [[ $# -gt 0 ]]; do
