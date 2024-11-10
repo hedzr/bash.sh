@@ -143,6 +143,13 @@ proxy_set() {
 	fi
 	local link=${PROXY_LINK:-http://$pip:7890}
 
+	clash_proxy_set() {
+		sudo networksetup -setwebproxy "Wi-Fi" 127.0.0.1 7890
+		sudo networksetup -setsecurewebproxy "Wi-Fi" 127.0.0.1 7890
+		sudo networksetup -setsocksfirewallproxy "Wi-Fi" 127.0.0.1 7890
+		sudo networksetup -setproxybypassdomains "Wi-Fi" '192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,100.64.0.0/10,127.0.0.1,127.0.1.1,localhost,*.local,169.254.0.0/16,224.0.0.0/4,240.0.0.0/4,<local>,hz-pc,laoye-mac,loaye16,laoye16,*.test,*.cn.*.crashlytics.com,22os.com,jycode.com,anos.biz,swt.im,yekeke.com,163.com,sina.com.cn,bing.com,sohu.com,*.22os.com,*.jycode.com,*.anos.biz,*.swt.im,*.yekeke.com,*.163.com,*.sina.com.cn,*.bing.com,*.sohu.com,*.zxcs.cme,*.microsoft.com,timestamp.apple.com,sequoia.apple.com,seed-sequoia.siri.apple.com,*.ntp.org,timestamp.windows.com'
+	}
+
 	proxy_print_status() {
 		[ "$http_proxy" != "" ] && echo "http_proxy=$http_proxy"
 		[ "$HTTP_PROXY" != "" ] && echo "HTTP_PROXY=$HTTP_PROXY"
@@ -188,11 +195,17 @@ proxy_set() {
 	status | st)
 		proxy_print_status
 		;;
+	clash)
+		is_darwin && clash_proxy_set || :
+		;;
 	usage | help | info)
 		echo 'Usage: proxy_set on|off|enable|disable|allow|deny|status'
 		echo 'Or run proxy_set just like "tsock": proxy_set curl -iL https://google.com/'
 		echo 'Type "proxy_set help" for more information.'
 		echo 'Use envvar if LAN ip not detected: PROXY_LINK=http://xx.xx.xx.xx:xxxx proxy_set on'
+		echo
+		echo 'For clash verge rev mac, here is a patch to enable it at system proxy settings:'
+		echo '  proxy_set clash'
 		echo
 		proxy_print_status
 		;;
