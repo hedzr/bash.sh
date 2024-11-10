@@ -263,6 +263,7 @@ is_fish() { [ -n "$FISH_VERSION" ]; }
 is_darwin() { [[ $OSTYPE == darwin* ]]; }
 is_darwin_sillicon() { is_darwin && [[ $(uname_mach) == arm64 ]]; }
 is_linux() { [[ $OSTYPE == linux* ]]; }
+is_freebsd() { [[ $OSTYPE == freebsd* ]]; }
 is_win() { in_wsl; }
 in_wsl() { [[ "$(uname -r)" == *windows_standard* ]]; }
 in_sourcing() {
