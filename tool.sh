@@ -7,21 +7,91 @@
 
 # ----------------------------------------------
 
+# ports() {
+# 	local SUDO="${SUDO:-sudo}"
+# 	[ "$(id -u)" = "0" ] && SUDO=
+# 	if [[ $# -eq 0 ]]; then
+# 		eval $SUDO lsof -Pni | grep -E "LISTEN|UDP"
+# 	else
+# 		local p='' i
+# 		for i in "$@"; do
+# 			if [[ "$i" -eq "$i" ]]; then
+# 				p="$p -i :$i"
+# 			else
+# 				p="$p -i $i"
+# 			fi
+# 		done
+# 		eval $SUDO lsof -Pn $p
+# 	fi
+# }
+#function ports () { open-ports $*; }
 ports() {
-	local SUDO="${SUDO:-sudo}"
-	[ "$(id -u)" = "0" ] && SUDO=
-	if [[ $# -eq 0 ]]; then
-		eval $SUDO lsof -Pni | grep -E "LISTEN|UDP"
+	local SUDO="${SUDO:-sudo}" && [ "$(id -u)" = "0" ] && SUDO=
+	if [ $# -eq 0 ]; then
+		if which lsof >/dev/null; then
+			eval $SUDO lsof -Pni | grep -E "LISTEN|UDP"
+		elif which sockstat >/dev/null; then
+			sockstat -l -64
+		elif which netstat >/dev/null; then
+			eval $SUDO netstat -tulpn | grep LISTEN
+			# eval netstat -aLnW | grep -E "${p#|}" # for freebsd
+		elif which ss >/dev/null; then
+			# sudo ss -tulpn | grep LISTEN
+			# sudo ss -tulw | grep LISTEN
+			# ss -4 state listen
+			# https://www.cyberciti.biz/tips/linux-investigate-sockets-network-connections.html
+			eval $SUDO ss -tulwn | grep LISTEN
+		else
+			:
+			# sudo nmap -sTU -O IP-address-Here
+		fi
 	else
-		local p='' i
-		for i in "$@"; do
-			if [[ "$i" -eq "$i" ]]; then
-				p="$p -i :$i"
-			else
-				p="$p -i $i"
-			fi
-		done
-		eval $SUDO lsof -Pn $p
+		if which lsof >/dev/null; then
+			local p='' i
+			for i in "$@"; do
+				if [[ "$i" -eq "$i" ]]; then
+					p="$p -i :$i"
+				else
+					p="$p -i $i"
+				fi
+			done
+			# debug echo "lsof -Pn $p"
+			eval $SUDO lsof -Pn $p | grep -E "LISTEN|UDP"
+		elif which sockstat >/dev/null; then
+			local p='' i
+			for i in "$@"; do
+				if [[ "$i" -eq "$i" ]]; then
+					p="$p,$i"
+				else
+					p="$p,$i"
+				fi
+			done
+			sockstat -l -64 -p "${p#,}"
+		elif which netstat >/dev/null; then
+			local p='' i
+			for i in "$@"; do
+				if [[ "$i" -eq "$i" ]]; then
+					p="$p|$i"
+				else
+					p="$p|$i"
+				fi
+			done
+			eval $SUDO netstat -tulpn | grep LISTEN | grep -E "${p#|}"
+			# eval netstat -aLnW | grep -E "${p#|}" # for freebsd
+		elif which ss >/dev/null; then
+			local p='' i
+			for i in "$@"; do
+				if [[ "$i" -eq "$i" ]]; then
+					p="$p|:$i"
+				else
+					p="$p|:$i"
+				fi
+			done
+			eval $SUDO ss -tulwn | grep LISTEN | grep -E "${p#|}"
+		else
+			:
+			# sudo nmap -sTU -O IP-address-Here
+		fi
 	fi
 }
 #function ports () { open-ports $*; }
