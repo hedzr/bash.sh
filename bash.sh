@@ -500,6 +500,7 @@ is_pacman() { which pacman 1>/dev/null 2>&1; }
 is_zypp() { which zypper 1>/dev/null 2>&1; }
 is_zypper() { which zypper 1>/dev/null 2>&1; }
 is_homebrew() { which brew 1>/dev/null 2>&1; }
+is_pkg() { which pkg 1>/dev/null 2>&1; }
 # is_redhat_series() { is_yum || is_dnf; }
 # is_debian_series() { is_apt; }
 is_redhat_series() { [[ "$(osidlike)" == redhat ]]; }
@@ -509,6 +510,7 @@ is_arch_series() { [[ "$(osidlike)" == arch ]]; }
 is_fedora_series() { [[ "$(osidlike)" == *fedora* ]]; }
 is_suse_series() { [[ "$(osidlike)" == suse* ]]; }
 is_opensuse_series() { [[ "$(osidlike)" == *opensuse* ]]; }
+is_bsd_series() { [[ "$(osid)" == *bsd* ]]; }
 #
 #
 #
@@ -910,7 +912,7 @@ ip_hex() {
 		local IP S A II
 		while IFS='/' read IP S; do
 			is_bash_strict && {
-				tip "ip: $IP, S: $S"
+				# tip "ip: $IP, S: $S"
 				II=$(awk -F. '{printf "0x%02x%02x%02x%02x",$1,$2,$3,$4}' <<<"$IP")
 				echo $II
 			} || bash <<-EOF
