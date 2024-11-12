@@ -1,5 +1,13 @@
 # HISTORY
 
+- v20241112
+  - added `is_pkg` & `is_bsd_series`
+  - fix `subnet4`/`subnet_hex`/`ip_hex`, fix `gw`/`default_dev` in mac
+  - preparing to remove `for_each_days`
+  - added `is_freebsd`
+  - update `proxy_set`
+  - update `ports`
+
 - v20241021
   - improved is_git_dirty
   - added if_systemd, if_sysv (init), if_upstart
