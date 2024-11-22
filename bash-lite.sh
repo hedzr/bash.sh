@@ -340,6 +340,7 @@ git_clone() {
 	fi
 }
 alias git-clone=git_clone
+alias git-clone-v='git_clone -v'
 alias git-clone-deep='git_clone -d'
 alias git-clone-deep-v='git_clone -d -v'
 #
