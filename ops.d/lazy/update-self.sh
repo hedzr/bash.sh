@@ -1,18 +1,5 @@
 #!/bin/bash
 
-# Install:
-#   $ curl -sSL https://hedzr.com/bash.sh/installer | sudo bash -si
-#   $ curl -sSL https://hedzr.com/bash.sh/installer | sudo bash -s
-#
-#
-#
-#
-#
-#
-#
-#set -e
-#set -x
-
 function self_download() {
 	if [ -z $# ]; then
 		false
