@@ -62,19 +62,20 @@ DEBUG=1 ./installsamba
 
 #### 2. Global
 
-##### Use OLD `installer`: [~~**DEPRECATED**~~]
+##### Use `installer`
 
 ```bash
-curl -sSL https://hedzr.com/bash/bash.sh/installer | sudo bash -s
+curl -sSL https://github.com/hedzr/bash.sh/blob/master/installer | sudo bash -s
 ```
 
-> The old <https://hedzr.com/bash.sh/installer> has been obseleted.
-
-~~`installer` will copy `bash.config` to `/usr/local/bin`~~.
+> `installer` will copy `bash.config` to `~/.local/bin/bash.sh`.
+>
+> `installer` make a symbolic link `ops` to `bash.config`, you can run the builtin functions with it:
+> try `ops debug-info` to ensure it works.
 
 ##### Manually
 
-Copy `bash.config` to `/usr/local/bin/` or anywhere, and `source` it from your script file:
+Copy `bash.config` to `/usr/local/bin/` or anywhere you prefer, and `source` it from your script file.
 
 Some examples [here](./examples/).
 
@@ -117,12 +118,12 @@ It will be loaded and invoked on-demand.
 
 ##### How?
 
-Put these codes in your `$HOME/.zshenv`:
+Put these codes in your `$HOME/.zshenv`(or `$HOME/.bashrc`):
 
 ```bash
 ### BASH.SH/.CONFIG ####################################
 {
-  local dir f="/path/to/bash.sh/bash.config"
+  f="/path/to/bash.sh/bash.config"
   [ -f "$f" ] && DEBUG=1 VERBOSE=0 source "$f" >>/tmp/sourced.list
   unset cool sleeping _my_main_do_sth main_do_sth dir f DEBUG VERBOSE currentShell
 }
