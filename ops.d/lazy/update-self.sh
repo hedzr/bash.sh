@@ -16,7 +16,7 @@ function self_download() {
 			cdir="."
 			cname=$context
 		fi
-		printf "#### Downloading %60s   todir: %s\n" "$context..." "$INSTALL_TARGET/$cdir"
+		printf "#### Downloading %48s   todir: %s\n" "$context..." "$INSTALL_TARGET/$cdir"
 		[ ! -d "$INSTALL_TARGET/$cdir" ] && mkdir -p "$INSTALL_TARGET/$cdir"
 		#curl -sSL https://ops.hedzr.net/bash.sh/get/$context -o $INSTALL_TARGET/$cdir/$cname
 		wget $Q -c --show-progress $URL_BASE/$context -O "$INSTALL_TARGET/$cdir/$cname"
@@ -94,24 +94,24 @@ install_myself() {
 	# install now:
 	#
 	echo "Install....$0 $@"
-	OPS_NAME="${OPS_NAME:-bash.sh}"
-	URL_BASE="${OPS_URL_BASE:-https://github.com/hedzr/$OPS_NAME/raw/refs/heads/master}"
-	INSTALL_PREFIX="${INSTALL_TARGET:-$HOME/.local/bin}"
-	INSTALL_TARGET="$INSTALL_PREFIX/bash.sh"
-	N=""
-	VERBOSE="${VERBOSE:-0}"
-	Q="-q" # for wget
+	local OPS_NAME="${OPS_NAME:-bash.sh}"
+	local URL_BASE="${OPS_URL_BASE:-https://github.com/hedzr/$OPS_NAME/raw/refs/heads/master}"
+	local INSTALL_PREFIX="${INSTALL_TARGET:-$HOME/.local/bin}"
+	local INSTALL_TARGET="$INSTALL_PREFIX/bash.sh"
+	local N=""
+	local VERBOSE="${VERBOSE:-0}"
+	local Q="-q" # for wget
 	((VERBOSE)) && Q=""
-	SHORT="${SHORT:-0}" # just download main file
+	local SHORT="${SHORT:-0}" # just download main file
 
 	self_download "bash.config" && {
 		try_append_path "$INSTALL_PREFIX"
 		chmod +x "$INSTALL_TARGET/bash.config"
-		ln -sf "$INSTALL_TARGET/bash.config" "$INSTALL_PREFIX/ops" && chmod +x ops
+		ln -sf "$INSTALL_TARGET/bash.config" "$INSTALL_PREFIX/ops" && chmod +x "$INSTALL_PREFIX/ops"
 
 		download_others "$INSTALL_TARGET"
 
-		f=
+		local f=
 		case $SHELL in
 		*zsh)
 			f="$HOME/.zshenv"
@@ -132,13 +132,7 @@ install_myself() {
 
 		EOF
 		unset f
-	}
-}
-alias update-self=install_myself
-alias upgrade-self=install_myself
-
-#############
-install_myself && cat <<EOF
+	} && cat <<EOF
 
 ====================================================================
 '$OPS_NAME' was installed as '$N'.
@@ -146,3 +140,9 @@ install_myself && cat <<EOF
 All folks, Enjoy it!
 
 EOF
+}
+alias update-self=install_myself
+alias upgrade-self=install_myself
+
+#############
+install_myself
