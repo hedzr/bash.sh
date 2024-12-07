@@ -1,14 +1,7 @@
 #!/bin/bash
 
 # Install:
-#   $ curl -sSL https://hedzr.com/bash.sh/installer | sudo bash -si
-#   $ curl -sSL https://hedzr.com/bash.sh/installer | sudo bash -s
-#
-#
-#
-#
-#
-#
+#   $ curl -sSL https://github.com/hedzr/bash.sh/raw/refs/heads/master/installer | bash -s
 #
 #set -e
 #set -x
