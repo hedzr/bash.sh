@@ -1,5 +1,8 @@
 # HISTORY
 
+- v20241208
+  - fix installer
+
 - v20241207
   - fix `fn_aliased_exists`
   - add more lazyfunc search paths

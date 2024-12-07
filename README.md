@@ -70,7 +70,7 @@ curl -sSL https://github.com/hedzr/bash.sh/raw/refs/heads/master/installer | bas
 
 > `installer` will copy `bash.config` to `~/.local/bin/bash.sh`.
 >
-> `installer` make a symbolic link `ops` to `bash.config`, you can run the builtin functions with it:
+> `installer` makes a symbolic link `ops` to `bash.config`, you can run the builtin functions with it:
 > try `ops debug-info` to ensure it works.
 
 ##### Manually
