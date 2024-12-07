@@ -120,7 +120,7 @@ install_myself() {
 	self_download "bash.config" && {
 		try_append_path "$INSTALL_PREFIX"
 		chmod +x "$INSTALL_TARGET/bash.config"
-		ln -sf "$INSTALL_TARGET/bash.config" "$INSTALL_PREFIX/ops" && chmod +x ops
+		ln -sf "$INSTALL_TARGET/bash.config" "$INSTALL_PREFIX/ops" && chmod +x "$INSTALL_PREFIX/ops"
 
 		download_others "$INSTALL_TARGET"
 
