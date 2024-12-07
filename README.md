@@ -65,7 +65,7 @@ DEBUG=1 ./installsamba
 ##### Use `installer`
 
 ```bash
-curl -sSL https://github.com/hedzr/bash.sh/blob/master/installer | sudo bash -s
+curl -sSL https://github.com/hedzr/bash.sh/raw/refs/heads/master/installer | sudo bash -s
 ```
 
 > `installer` will copy `bash.config` to `~/.local/bin/bash.sh`.
