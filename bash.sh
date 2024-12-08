@@ -298,10 +298,10 @@ fi
 cmd_exists() { command -v $1 >/dev/null; } # it detects any builtin or external commands, aliases, and any functions
 fn_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(shell function)|(a function)'; }
 fn_builtin_exists() { LC_ALL=C type $1 2>/dev/null | grep -q 'shell builtin'; }
-if is_bash_strict; then
-	fn_aliased_exists() { LC_ALL=C alias $1 1>/dev/null 2>&1; }
-else
+if is_zsh_strict; then
 	fn_aliased_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(alias for)|(aliased to)'; }
+else
+	fn_aliased_exists() { LC_ALL=C alias $1 1>/dev/null 2>&1; }
 fi
 fn_name() {
 	is_zsh && local fn_="${funcstack[2]}"
