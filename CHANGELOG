@@ -1,5 +1,9 @@
 # HISTORY
 
+- v20241209
+  - fix `fn_aliased_exists`
+  - fix `$SCRIPT` in soucing itself
+
 - v20241208
   - fix installer
 
