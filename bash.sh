@@ -1114,7 +1114,9 @@ alias is-apt=is_apt is-arch-series=is_arch_series is-bash=is_bash is-bash-t1='is
 alias list-all-env-variables=list_all_env_variables list-all-variables=list_all_variables safety-pipe=safetypipe safety_pipe=safetypipe strip-l=strip_l strip-r=strip_r url-exists=url_exists user-shell=user_shell
 # trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }
 # is_darwin && realpathx() { [[ $1 == /* ]] && echo "$1" || { DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $1)"; }; } || realpathx() { readlink -f $*; }
-in_sourcing && { SCRIPT=$(realpathx "$BASH_SOURCE") && CD=$(dirname "$SCRIPT") && debug "$(safety ">> IN SOURCING (DEBUG=$DEBUG), \$0=$0, \$_=$_")"; } || { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug "$(safety ">> '$SCRIPT' in '$CD', \$0='$0','$1'.")"; }
+in_sourcing && {
+	SCRIPT=$(realpathx $(is_zsh_strict && echo "$0" || echo "$BASH_SOURCE")) && CD=$(dirname "$SCRIPT") && debug "$(safety ">> IN SOURCING (DEBUG=$DEBUG), \$0=$0, \$_=$_")"
+} || { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug "$(safety ">> '$SCRIPT' in '$CD', \$0='$0','$1'.")"; }
 if_vagrant && [ "$SCRIPT" == "/tmp/vagrant-shell" ] && { [ -d "$CD/ops.d" ] || CD=/vagrant/bin; }
 [ -L "$SCRIPT" ] && debug "$(safety "linked script found")" && SCRIPT="$(realpathx "$SCRIPT")" && CD="$(dirname "$SCRIPT")"
 # The better consice way to get baseDir, ie. $CD, is:
