@@ -624,7 +624,7 @@ if is_darwin; then
 	default_dev() { route get default | awk '/interface:/{print $2}'; }
 	gw() { route get default | awk '/gateway:/{print $2}'; }
 	lanip() { ifconfig | grep 'inet ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
-	lanip6() { ifconfig | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
+	lanip6_flat() { ifconfig | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
 	lanipall() { ifconfig | grep -P 'inet6? ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
 	netmask_hex() { ifconfig $(default_dev) | awk '/netmask /{print $4}'; }
 else
@@ -648,15 +648,46 @@ else
 		gw() { eval "$ipcmd route show default" | awk '{print $3}'; }
 	fi
 	lanip() { eval $ipcmd a | grep -E 'inet ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
-	lanip6() { eval $ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
+	lanip6_flat() { eval $ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
 	lanipall() { eval $ipcmd a | grep -E 'inet6? ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
 fi
 subnet4() { hex2ip4 $(subnet_hex); }
 netmask() { hex2ip4 $(netmask_hex); }
 # alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
 # alias ip-wan=wanip
+lanip6() {
+	if is_darwin; then
+		local ipinf=$(ifconfig | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
+	else
+		local ipinf=$(eval $ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
+	fi
+	ipinf=$(grep -v ' deprecated ' <<<"$ipinf")
+	local dyn=$(grep ' dynamic' <<<"$ipinf" | awk '{print $2}')
+	local secured=$(grep ' secured' <<<"$ipinf" | awk '{print $2}')
+	local pub=$(grep ' temporary' <<<"$ipinf" | awk '{print $2}')
+	cat <<-EOT
+		IPv6(s) for this machine (locally):
+		                 dyn: ${dyn}
+		             secured: ${secured}
+		    public(*wan-ip*): ${pub}
+
+	EOT
+}
 wanip() { host myip.opendns.com 208.67.220.222 | tail -1 | awk '{print $4}'; }
-wanip6() { host -t AAAA myip.opendns.com resolver1.ipv6-sandbox.opendns.com | grep -oE "^myip\.opendns\.com.*" | awk '{print $5}'; }
+wanip6() {
+	if is_darwin; then
+		local ipinf=$(ifconfig | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
+	else
+		local ipinf=$(eval $ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
+	fi
+	ipinf=$(grep -v ' deprecated ' <<<"$ipinf")
+	local pub=$(grep ' temporary' <<<"$ipinf" | awk '{print $2}')
+	if [ "$pub" == "" ]; then
+		host -t AAAA myip.opendns.com resolver1.ipv6-sandbox.opendns.com | grep -oE "^myip\.opendns\.com.*" | awk '{print $5}'
+	else
+		echo "$pub"
+	fi
+}
 # use a tool script 'externalip' is better choice.
 # try more sources for yourself:
 #  http://ipecho.net/plain
