@@ -1,5 +1,8 @@
 # HISTORY
 
+- v20250531
+  - improved `lanip6` & `wanip6`
+
 - v20241209
   - fix `fn_aliased_exists`
   - fix `$SCRIPT` in soucing itself

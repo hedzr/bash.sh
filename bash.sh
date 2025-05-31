@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20241209
+#   Version: v20250531
 #   License: MIT
 #   Site: https://github.com/hedzr/bash.sh
 #
@@ -247,7 +247,7 @@ _bash_sh_load_env_files() {
 
 ########################################################
 
-#### HZ Tail BEGIN #### v20241209 ####
+#### HZ Tail BEGIN #### v20250531 ####
 in_debug() { (($DEBUG)); }
 in_provisioning() { (($PROVISIONING)); } ## return exit status as true if $PROVISIONING is not equal to 0
 is_root() { [ "$(id -u)" = "0" ]; }
@@ -1128,7 +1128,7 @@ main_do_sth() {
 	# disabling this logic is still simple by defining HAS_END=1.
 	((${HAS_END:-0})) && { debug_begin && echo -n 'Success!' && debug_end; } || return $result_code # { [ $# -eq 0 ] && :; }
 }
-BASH_SH_VERSION=v20241209
+BASH_SH_VERSION=v20250531
 DEBUG=${DEBUG:-0}
 PROVISIONING=${PROVISIONING:-0}
 # Instantly aliases cannot work in many cases such as conditional
@@ -1154,4 +1154,4 @@ if_vagrant && [ "$SCRIPT" == "/tmp/vagrant-shell" ] && { [ -d "$CD/ops.d" ] || C
 #       CD=$(cd `dirname "$0"`;pwd)
 # It will open a sub-shell to print the folder name of the running shell-script.
 in_sourcing && _bash_sh_load_import_files || main_do_sth "$@"
-#### HZ Tail END #### v20241209 ####
+#### HZ Tail END #### v20250531 ####
