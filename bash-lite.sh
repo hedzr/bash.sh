@@ -552,24 +552,26 @@ netmask_hex() {
 	lanip | tox
 }
 subnet_hex() {
+	local INC="$1"
 	tox1() {
-		# local IP S M A I II
+		local IP S M A I II
 		while IFS='/' read IP S; do
 			is_bash_strict && {
-				# tip "ip: $IP, S: $S"
+				# tip "x ip: $IP, S: $S"
 				M=$((0xffffffff ^ ((1 << (32 - S)) - 1)))
-				IFS=. read -ra A <<<"$IP"
-				# tip "A: ${A[@]}, M: $(printf '0x%08x' $M)"
-				I=$(printf '0x%02X%02X%02X%02X' ${A[0]} ${A[1]} ${A[2]} ${A[3]})
+				[ "$INC" != "" ] && M=$((M + INC)) || :
+				# tip "M: $(printf '0x%08x' $M)"
+				I=$(($(awk -F. '{printf "0x%02x%02x%02x%02x",$1,$2,$3,$4}' <<<"$IP")))
 				II=$((M & I))
+				# tip "I: $I, M: $M (S: $S), II: $II"
 				printf '0x%08x' $II
 			} || bash <<-EOF
+				INC=$INC
 				M=\$((0xffffffff ^ ((1 << (32 - $S)) - 1)))
-				IFS=. read -ra A <<<"$IP"
-				# tip "A: ${A[@]}, M: $(printf '0x%08x' $M)"
-				I=\$(printf '0x%02X%02X%02X%02X' \${A[0]} \${A[1]} \${A[2]} \${A[3]})
+				[ "\$INC" != "" ] && M=\$((M+INC)) || :
+				I=\$((\$(awk -F. '{printf "0x%02x%02x%02x%02x",\$1,\$2,\$3,\$4}' <<<"$IP")))
 				II=\$((M & I))
-				printf '0x%08x' \$II
+				printf '0x%08x' "\${II}"
 			EOF
 		done
 	}
@@ -651,6 +653,7 @@ else
 	lanip6_flat() { eval $ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
 	lanipall() { eval $ipcmd a | grep -E 'inet6? ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
 fi
+gw1() { hex2ip4 $(subnet_hex ${1:-1}); }
 subnet4() { hex2ip4 $(subnet_hex); }
 netmask() { hex2ip4 $(netmask_hex); }
 # alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
