@@ -1,5 +1,8 @@
 # HISTORY
 
+- v20250604
+  - improved `subnet_hex()` to allow adding machine ip-number
+
 - v20250531
   - improved `lanip6` & `wanip6`
 
