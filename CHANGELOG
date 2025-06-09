@@ -1,5 +1,9 @@
 # HISTORY
 
+- v20250609
+  - add `ii`, `colortabletruecolor`
+  - update `debug_info`
+
 - v20250604
   - improved `subnet_hex()` to allow adding machine ip-number
 
