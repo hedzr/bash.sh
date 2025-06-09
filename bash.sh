@@ -737,8 +737,90 @@ debug_info() {
 		                 if_hosttype = '$(if_hosttype)'
 	EOF
 	debug_end
-	:
+	# colortable256
+	colortabletruecolor
 }
+function ii() {
+	local c_green="\e[0;32m"
+	local c_red="\e[0;31m"
+	local c_lblue="\e[1;34m"
+	local c_clear="\e[0m"
+	printf_red "       You are logged on : ${c_green}$(hostname)"
+	printf_red " Additionnal information : ${c_green}$NC"
+	uname -a
+	# printf    "${c_red}         Users logged on : ${c_clear}$NC " ; w -h | head -1
+	printf_red "            Current date : ${c_green}$NC "
+	date
+	printf_red "           Machine stats : ${c_green}$NC"
+	uptime
+	# printf "\n${c_red}Current network location : ${c_clear}$NC " ; scselect
+	# printf    "${c_red}Public facing IP Address : ${c_clear}$c_green$(ip-wan)$c_clear / $c_green$(find_gw $(ip-wan))$c_clear"
+	printf_ref "        Local IP Address : ${c_clear}$c_green$(ip-local)$c_clear / $c_green$(find_gw $(ip-local))$c_clear"
+	# printf "\nLocal IP Address  : ${c_red}$(mylocalip)$c_clear / $c_red$(mylocalgw)$c_clear / $c_red$(mylocalni)$c_clear"
+	# printf "\nDNS Configurations:$NC " ; mylocaldns
+	echo ""
+	echo "[dot] use: 'ip-wan' to query the public ip address of mine."
+	echo "[dot] use: 'curl -sSL https://hedzr.com/bash/dot/installer | sudo bash -s' to upgrade \`ops\` commands."
+	echo "      avaliable commands: disc-info, ports, env_check, hostnames, ii, ip-wan, ip-lan, ip-gw, ip-mask, ip-subnet, ...."
+	echo ""
+}
+colortable256() {
+	local i o x=$(tput op) y=$(printf %76s)
+	for i in {0..256}; do
+		o=00$i
+		echo -e ${o:${#o}-3:3} $(
+			tput setaf $i
+			tput setab $i
+		)${y// /=}$x
+	done
+}
+colortable256colors() {
+	local i
+	for ((i = 16; i < 256; i++)); do
+		printf "\e[48;5;${i}m%03d" $i
+		printf '\e[0m'
+		[ ! $(((i - 15) % 6)) -eq 0 ] && printf ' ' || printf '\n'
+	done
+}
+colortabletruecolor() {
+	awk 'BEGIN{
+    s="/\\/\\/\\/\\/\\"; s=s s s s s s s s;
+    for (colnum = 0; colnum<77; colnum++) {
+        r = 255-(colnum*255/76);
+        g = (colnum*510/76);
+        b = (colnum*255/76);
+        if (g>255) g = 510-g;
+        printf "\033[48;2;%d;%d;%dm", r,g,b;
+        printf "\033[38;2;%d;%d;%dm", 255-r,255-g,255-b;
+        printf "%s\033[0m", substr(s,colnum+1,1);
+    }
+    printf "\n";
+}'
+}
+# colored_eval() {
+#   local none="\[\033[0m\]"
+#
+#   local black="\[\033[0;30m\]"
+#   local dark_gray="\[\033[1;30m\]"
+#   local blue="\[\033[0;34m\]"
+#   local light_blue="\[\033[1;34m\]"
+#   local green="\[\033[0;32m\]"
+#   local light_green="\[\033[1;32m\]"
+#   local cyan="\[\033[0;36m\]"
+#   local light_cyan="\[\033[1;36m\]"
+#   local red="\[\033[0;31m\]"
+#   local light_red="\[\033[1;31m\]"
+#   local purple="\[\033[0;35m\]"
+#   local light_purple="\[\033[1;35m\]"
+#   local brown="\[\033[0;33m\]"
+#   local yellow="\[\033[1;33m\]"
+#   local light_gray="\[\033[0;37m\]"
+#   local white="\[\033[1;37m\]"
+#
+#   local current_tty=`tty | sed -e "s/\/dev\/\(.*\)/\1/"`
+#
+#   eval "$@"
+# }
 join_lines() {
 	local delim="${1:-,}" ix=0
 	while read line; do
