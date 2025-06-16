@@ -706,7 +706,6 @@ debug_info() {
 		       is_zsh/is_zsh_t1: $(is_zsh && echo Y || echo '.') / $(is_zsh_t1 && echo Y || echo '.')   # $(is_zsh && echo "ZSH_EVAL_CONTEXT = $ZSH_EVAL_CONTEXT, ZSH_NAME/VERSION = $ZSH_NAME v$ZSH_VERSION" || :)
 		                is_fish: $(is_fish && echo Y || echo '.')       # FISH_VERSION = $FISH_VERSION
 		            in_sourcing: $(in_sourcing && echo Y || echo '.')
-		       if_vagrant/in_vm: $(if_vagrant && echo Y || echo '.') / $(in_vm && echo Y || echo '.')
 		              in_vscode: $(in_vscode && echo Y || echo '.')
 		           in_jetbrains: $(in_jetbrains && echo Y || echo '.')
 		          in_vim/neovim: $(in_vim && echo Y || echo '.') / $(in_neovim && echo Y || echo '.')
@@ -722,6 +721,7 @@ debug_info() {
 	EOF
 	fn_exists pmid && cat <<-EOF
 
+		  VM tests: in_vm='$(in_vm && echo Y || echo .)' in_orb='$(in_orb && echo Y || echo .)' in_vagrant='$(in_vagrant && echo Y || echo .)' in_vmware='$(in_vmware && echo Y || echo .)'
 		  OS tests: pmid='$(pmid)' osid='$(osid)' osidlike='$(osidlike)'
 		            oscodename='$(oscodename)' versionid='$(versionid)' variantid='$(variantid)'
 		            if_nix_typ='$(if_nix_typ)' (\$OSTYPE='$OSTYPE')
@@ -744,7 +744,7 @@ debug_info() {
 	colortabletruecolor
 	printf "## Welcome to bash.sh %s ##\n" "$BASH_SH_VERSION"
 }
-function ii() {
+ii() {
 	local c_green="\e[0;32m"
 	local c_red="\e[0;31m"
 	local c_lblue="\e[1;34m"
