@@ -1,3 +1,9 @@
+# -*- mode: bash; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: t-*-
+# vi: set ft=bash noet ci pi sts=0 sw=2 ts=2:
+# st:
+#
+#
+
 gob_lazy() {
 	gob_entry() { dbg "fn_name: $(fn_name), arg: $@" && commander $(strip_r $(fn_name) _entry) "$@"; }
 	gob_usage() {
@@ -56,7 +62,6 @@ gob_lazy() {
 
 			Examples:
 			  $ vm box size                    # prints the sizes of downloaded boxes
-
 		EOF
 	}
 	gob_cmdr_size() {
