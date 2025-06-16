@@ -40,6 +40,11 @@ bump() {
 		sed -i '' -E -e "s/v$YEAR[0-9]+/$VERSION/g" $f
 		sed -i '' -E "s/v$((YEAR - 1))[0-9]+/$VERSION/g" $f
 	done
+	# local src=bash.sh
+	# for f in $CD/bash*; do
+	# 	if [[ "$(basename $f)" != "$src" ]]; then
+	# 	fi
+	# done
 }
 
 bumpold() {
@@ -1238,9 +1243,12 @@ alias list-all-env-variables=list_all_env_variables list-all-variables=list_all_
 # is_darwin && realpathx() { [[ $1 == /* ]] && echo "$1" || { DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $1)"; }; } || realpathx() { readlink -f $*; }
 in_sourcing && {
 	SCRIPT=$(realpathx $(is_zsh_strict && echo "$0" || echo "$BASH_SOURCE")) && CD=$(dirname "$SCRIPT") && debug "$(safety ">> IN SOURCING (DEBUG=$DEBUG), \$0=$0, \$_=$_")"
-} || { SCRIPT=$(realpathx "$0") && CD=$(dirname "$SCRIPT") && debug "$(safety ">> '$SCRIPT' in '$CD', \$0='$0','$1'.")"; }
+} || {
+	path_in_orb_host "$0" && SCRIPT="$0" || SCRIPT=$(realpathx "$0")
+	CD=$(dirname "$SCRIPT") && debug "$(safety ">> '$SCRIPT' in '$CD', \$0='$0','$1'.")"
+}
 if_vagrant && [ "$SCRIPT" == "/tmp/vagrant-shell" ] && { [ -d "$CD/ops.d" ] || CD=/vagrant/bin; }
-[ -L "$SCRIPT" ] && debug "$(safety "linked script found")" && SCRIPT="$(realpathx "$SCRIPT")" && CD="$(dirname "$SCRIPT")"
+path_in_orb_host "$0" && : || { [ -L "$SCRIPT" ] && debug "$(safety "linked script found")" && SCRIPT="$(realpathx "$SCRIPT")" && CD="$(dirname "$SCRIPT")"; }
 # The better consice way to get baseDir, ie. $CD, is:
 #       CD=$(cd `dirname "$0"`;pwd)
 # It will open a sub-shell to print the folder name of the running shell-script.
