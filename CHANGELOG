@@ -1,5 +1,13 @@
 # HISTORY
 
+- v20250616
+  - improved detector of `$CD` in orb vm
+  - improved `debug_info`
+  - improved `lazy-loader`
+  - added `in_orb`, `path_in_orb_host` for orbstack
+  - add golang helper `gob` as a lazy command
+  - removed bash.config, change it to a link
+
 - v20250609
   - add `ii`, `colortabletruecolor`
   - update `debug_info`
