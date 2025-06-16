@@ -409,6 +409,8 @@ if_ubuntu() {
 }
 if_vagrant() { [ -d /vagrant ]; }
 in_vagrant() { [ -d /vagrant ]; }
+in_orb() { [[ -d /mnt/mac ]]; }
+path_in_orb_host() { [[ "$1" = /mnt/mac/* ]]; }
 if_centos() {
 	if [[ $OSTYPE == linux* ]]; then
 		if [ -f /etc/centos-release ]; then
@@ -418,6 +420,7 @@ if_centos() {
 		fi
 	fi
 }
+in_vmware() { hostnamectl | grep -E 'Virtualization: ' | grep -qEi 'vmware'; }
 in_vm() {
 	if cmd_exists hostnamectl; then
 		# dbg "checking hostnamectl"
