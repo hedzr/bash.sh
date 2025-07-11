@@ -37,8 +37,12 @@ bump() {
 	tip "  looking up at directory '$(safety $CD)'..."
 	for f in $CD/bash* $CD/simple*; do
 		echo "bumping for $(safety $f), YEAR = $YEAR ..."
-		sed -i '' -E -e "s/v$YEAR[0-9]+/$VERSION/g" $f
-		sed -i '' -E "s/v$((YEAR - 1))[0-9]+/$VERSION/g" $f
+		if [ -L "$f" ]; then
+			:
+		else
+			sed -i '' -E -e "s/v$YEAR[0-9]+/$VERSION/g" $f
+			sed -i '' -E "s/v$((YEAR - 1))[0-9]+/$VERSION/g" $f
+		fi
 	done
 	# local src=bash.sh
 	# for f in $CD/bash*; do
