@@ -2,7 +2,7 @@
 
 `bash.sh` is a starter template for shell developing.
 
-![image-20240817103856118](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/upgit/2024/08/20240819_1724026017.png)
+![image-20250711132419515](https://cdn.jsdelivr.net/gh/hzimg/blog-pics@master/upgit/2025/07/20250711_1752211477.png)
 
 File `bash.config` can be applied and sourced into your zshell environment directly. See [Import bash.config into your zsh env](#3-import-bashconfig-into-your-zsh-env). This will allow loading any tools lazily and automatically from `$HOME/.local/bin/ops.d/{lazy,apt,yum,zypper,ubuntu,opensuse-leap,...}`.
 
