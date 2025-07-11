@@ -1,15 +1,15 @@
 # HISTORY
 
 - v20250711
-  - fix bump()
-  - added SUDO prefix
-  - add which func if not exists
-  - protected false branches
-  - added is_rocky
-  - sometimes id_like might be 'rhel centos fedora'
-  - hostnamectl may need sudo permission
+  - fix `bump()` failed on link file
+  - added `SUDO` prefix
+  - add `which` func if not exists
+  - protected false branches in `debug_info`
+  - added `is_rocky` for rocky linux
+  - sometimes `id_like` might be 'rhel centos fedora'
+  - `hostnamectl` may need `sudo` permission
   - fix `sleepx()`
-  -
+  - add gob lazy commands
 
 - v20250616
   - improved detector of `$CD` in orb vm
