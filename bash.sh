@@ -1061,6 +1061,11 @@ subnet_hex() {
 	# tip "lanip: '$(lanip)'"
 	lanip | tox1
 }
+if fn_exists which; then
+	:
+else
+	which() { [ "$(whereis $1 | awk -F: '{print $2}')" != "" ]; }
+fi
 if is_darwin; then
 	readlinkx() {
 		local p="$@"
