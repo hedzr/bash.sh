@@ -78,6 +78,7 @@ help() {
 
 cool() { echo cool && ls -la | pad3 4 '-72' '' ' | desc here'; }
 sleeping() { echo sleeping; }
+sleepx() { tip "sleeping..." && (($#)) && \sleep "$@"; }
 
 #### write your functions here, and invoke them by: `./bash.sh <your-func-name>`
 
