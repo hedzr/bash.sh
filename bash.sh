@@ -516,7 +516,10 @@ is_homebrew() { which brew 1>/dev/null 2>&1; }
 is_pkg() { which pkg 1>/dev/null 2>&1; }
 # is_redhat_series() { is_yum || is_dnf; }
 # is_debian_series() { is_apt; }
-is_redhat_series() { [[ "$(osidlike)" == redhat ]]; }
+is_redhat_series() {
+	local t="$(osidlike)"
+	[[ $t == redhat ]] || [[ $t == 'rhel '* ]]
+}
 is_debian_series() { [[ "$(osidlike)" == debian ]]; }
 is_mandriva_series() { [[ "$(osidlike)" == mandriva* ]]; } # mandriva, mageia, ...
 is_arch_series() { [[ "$(osidlike)" == arch ]]; }
