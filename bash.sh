@@ -1237,6 +1237,7 @@ main_do_sth() {
 BASH_SH_VERSION=v20250616
 DEBUG=${DEBUG:-0}
 PROVISIONING=${PROVISIONING:-0}
+SUDO=sudo && [ "$(id -u)" = "0" ] && SUDO=
 # Instantly aliases cannot work in many cases such as conditional
 # constructs, loops, even in statement block. So this won't work sometimes:
 #     if [ true ]; then cmd-exist ls && echo 'ls exists' || echo 'ls not-exists'; fi
