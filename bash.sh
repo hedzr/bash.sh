@@ -426,13 +426,13 @@ if_centos() {
 		fi
 	fi
 }
-in_vmware() { hostnamectl | grep -E 'Virtualization: ' | grep -qEi 'vmware'; }
+in_vmware() { $SUDO hostnamectl | grep -E 'Virtualization: ' | grep -qEi 'vmware'; }
 in_vm() {
 	if cmd_exists hostnamectl; then
 		# dbg "checking hostnamectl"
-		if hostnamectl | grep -iE 'chassis: ' | grep -q ' vm'; then
+		if $SUDO hostnamectl | grep -iE 'chassis: ' | grep -q ' vm'; then
 			true
-		elif hostnamectl | grep -qE 'Virtualization: '; then
+		elif $SUDO hostnamectl | grep -qE 'Virtualization: '; then
 			true
 		fi
 	else
