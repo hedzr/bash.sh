@@ -1,5 +1,16 @@
 # HISTORY
 
+- v20250711
+  - fix bump()
+  - added SUDO prefix
+  - add which func if not exists
+  - protected false branches
+  - added is_rocky
+  - sometimes id_like might be 'rhel centos fedora'
+  - hostnamectl may need sudo permission
+  - fix `sleepx()`
+  -
+
 - v20250616
   - improved detector of `$CD` in orb vm
   - improved `debug_info`
