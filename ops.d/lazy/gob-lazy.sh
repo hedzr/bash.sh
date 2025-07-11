@@ -23,6 +23,8 @@ gob_lazy() {
 			  app-bundle-id                 find macOS app bundle id, eg: VSCodium
 			  rpad                          test rpad()
 
+			Examples:
+			  $ gob cmdr push-all            # push all for all repos (cmdr-series.v2)
 		EOF
 	}
 
@@ -56,12 +58,12 @@ gob_lazy() {
 			Usage: $0 $self <sub-command> [...]
 
 			Sub-commands:
-			  create-git-remotes             cmdr-series: frama, codeberg, github
+			  create-git-remotes <repo-name> cmdr-series: frama, codeberg, github
 			  push-all                       cmdr-series: push all for current repo
 			  push-all-modules               cmdr-series: push all for all repos
 
 			Examples:
-			  $ vm box size                    # prints the sizes of downloaded boxes
+			  $ gob cmdr push-all            # push all for all repos (cmdr-series.v2)
 		EOF
 	}
 	gob_cmdr_size() {
@@ -94,15 +96,15 @@ gob_lazy() {
 	cmdr_push_all_modules() {
 		pushd ~work/godev/cmdr.v2/cmdr >/dev/null
 		local repodir repo
-		for repodir in ../{cmdr,cmdr.loaders,cmdr.tests,libs.is,libs.logg,libs.diff,libs.store,libs.gsvc}; do
-			cd "$repodir" && echo && tip "ENTERING $repodir ------------" && echo &&
+		for repodir in ../{cmdr,cmdr.loaders,cmdr.tests,cmdr-docs,libs.is,libs.logg,libs.diff,libs.store,libs.gsvc}; do
+			[ -d "$repodir" ] && cd "$repodir" && echo && tip "ENTERING $repodir ------------" && echo &&
 				for repo in github frama codeberg; do
 					tip "pushing to remote repo '$repo'..."
 					git push $repo --all && git push $repo --tags
 				done
 		done
 		for repodir in ../../cmdr.works/{cmdr-cli,cmdr-go-starter,cmdr-templates,go-template}; do
-			cd "$repodir" && echo && tip "ENTERING $repodir ------------" && echo &&
+			[ -d "$repodir" ] && cd "$repodir" && echo && tip "ENTERING $repodir ------------" && echo &&
 				for repo in github frama codeberg; do
 					tip "pushing to remote repo '$repo'..."
 					git push $repo --all && git push $repo --tags

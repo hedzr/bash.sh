@@ -13,4 +13,5 @@ dns() { dns_lazy "$@"; }
 # would work properly.
 #
 # to get the help, run `gob --help` and `gob cmdr --help`, ...
+# or `gob`, `gob cmdr`.
 gob() { gob_lazy "$@"; }
