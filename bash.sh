@@ -495,6 +495,7 @@ variantid() { # server, desktop
 #
 is_fedora() { [[ "$(osid)" == fedora ]]; }
 is_centos() { [[ "$(osid)" == centos ]]; }
+is_rocky() { [[ "$(osid)" == rocky ]]; }
 is_redhat() { [[ "$(osid)" == redhat ]]; }
 is_debian() { [[ "$(osid)" == debian ]]; }
 is_ubuntu() { [[ "$(osid)" == ubuntu ]]; }
