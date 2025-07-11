@@ -729,7 +729,7 @@ debug_info() {
 		  Gateway / Mask: $(gw) / $(netmask)
 		   Subnet Prefix: $(subnet4)
 	EOF
-	fn_exists pmid && cat <<-EOF
+	fn_exists pmid || : && cat <<-EOF
 
 		  VM tests: in_vm='$(in_vm && echo Y || echo .)' in_orb='$(in_orb && echo Y || echo .)' in_vagrant='$(in_vagrant && echo Y || echo .)' in_vmware='$(in_vmware && echo Y || echo .)'
 		  OS tests: pmid='$(pmid)' osid='$(osid)' osidlike='$(osidlike)'
@@ -737,7 +737,7 @@ debug_info() {
 		            if_nix_typ='$(if_nix_typ)' (\$OSTYPE='$OSTYPE')
 		            is_suse_series='$(is_suse_series && echo Y || echo .)'
 	EOF
-	is_linux && cat <<-EOF
+	is_linux || : && cat <<-EOF
 
 		              lsb_release_cs = '$(lsb_release_cs)'
 		            uname_kernel(-s) = '$(uname_kernel)'
