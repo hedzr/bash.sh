@@ -96,7 +96,7 @@ gob_lazy() {
 	cmdr_push_all_modules() {
 		pushd ~work/godev/cmdr.v2/cmdr >/dev/null
 		local repodir repo
-		for repodir in ../{cmdr,cmdr.loaders,cmdr.tests,cmdr-docs,libs.is,libs.logg,libs.diff,libs.store,libs.gsvc}; do
+		for repodir in ../{cmdr,cmdr.loaders,cmdr.addons,cmdr.tests,cmdr-docs,libs.is,libs.logg,libs.diff,libs.store}; do
 			[ -d "$repodir" ] && cd "$repodir" && echo && tip "ENTERING $repodir ------------" && echo &&
 				for repo in github frama codeberg; do
 					tip "pushing to remote repo '$repo'..."
