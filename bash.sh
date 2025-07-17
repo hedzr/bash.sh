@@ -497,18 +497,25 @@ variantid() { # server, desktop
 	}
 }
 #
+is_alpine() { [[ "$(osid)" == alpine ]]; }
 is_fedora() { [[ "$(osid)" == fedora ]]; }
 is_centos() { [[ "$(osid)" == centos ]]; }
-is_rocky() { [[ "$(osid)" == rocky ]]; }
+is_rocky() { [[ "$(osid)" == rocky* ]]; }    # yet another centos
+is_alma() { [[ "$(osid)" == almalinux* ]]; } # yet another centos
+is_gento() { [[ "$(osid)" == gento ]]; }
+is_void() { [[ "$(osid)" == void ]]; } # a special linux distro
 is_redhat() { [[ "$(osid)" == redhat ]]; }
 is_debian() { [[ "$(osid)" == debian ]]; }
 is_ubuntu() { [[ "$(osid)" == ubuntu ]]; }
+is_devuan() { [[ "$(osid)" == devuan* ]]; } # yet another debian
 is_mageia() { [[ "$(osid)" == mageia ]]; }
 is_manjaro() { [[ "$(osid)" == manjaro ]]; }
 is_opensuse() { [[ "$(osid)" == opensuse* ]]; }
+is_arch() { [[ "$(osid)" == arch* ]]; }
 is_archlinux() { [[ "$(osid)" == arch* ]]; }
 is_archlinux_arm() { [[ "$(osid)" == archarm* ]]; }
 is_kalilinux() { [[ "$(osid)" == kali* ]]; }
+is_kali() { [[ "$(osid)" == kali ]]; }
 # is_debian_series() { [[ "$(osid)" == debian || "$(osid)" == ubuntu ]]; }
 # is_redhat_series() { [[ "$(osid)" == redhat || "$(osid)" == centos || "$(osid)" == fedora ]]; }
 is_yum() { which yum 1>/dev/null 2>&1; }
