@@ -58,12 +58,15 @@ gob_lazy() {
 			Usage: $0 $self <sub-command> [...]
 
 			Sub-commands:
-			  create-git-remotes <repo-name> cmdr-series: frama, codeberg, github
-			  push-all                       cmdr-series: push all for current repo
-			  push-all-modules               cmdr-series: push all for all repos
+			  create-git-remotes <repo-name> [group-name]     cmdr-series: frama, codeberg, github
+			  push-all                                        cmdr-series: push all for current repo
+			  push-all-modules                                cmdr-series: push all for all repos
 
 			Examples:
-			  $ gob cmdr push-all            # push all for all repos (cmdr-series.v2)
+			  $ gob cmdr push-all
+			    push all for all repos (cmdr-series.v2)
+			  $ gob cmdr create-git-remotes mere1x merelab
+			    create remotes to merelab/mere1x, for github, codeberg, and frama
 		EOF
 	}
 	gob_cmdr_size() {
@@ -74,10 +77,14 @@ gob_lazy() {
 	gob_cmdr_create_git_remotes() { cmdr_create_git_remotes "$@"; }
 	cmdr_create_git_remotes() {
 		local key repo="${1:-gsvc}" && (($#)) && shift
-		for key in 'github github.com hedzr' 'frama framagit.org cmdr-series' 'codeberg codeberg.org cmdr-series'; do
+		local group="${1:-cmdr-series}" && (($#)) && shift
+		local ghg="$group" && [ "$group" = 'cmdr-series' ] && ghg=hedzr || :
+		local ghgroup="${1:-$ghg}" && (($#)) && shift || :
+		for key in "github github.com ${ghgroup}" "frama framagit.org ${group}" "codeberg codeberg.org ${group}"; do
 			eval "rr=($key)"
 			tip "setting up remote repo / ${rr[1]} / ${rr[2]}"
-			git remote add "${rr[1]}" "git@${rr[2]}:${rr[3]}/$repo.git"
+			git remote add "${rr[1]}" "git@${rr[2]}:${rr[3]}/$repo.git" ||
+				git remote set-url "${rr[1]}" "git@${rr[2]}:${rr[3]}/$repo.git"
 		done
 		echo
 		git remote -v
@@ -103,7 +110,8 @@ gob_lazy() {
 					git push $repo --all && git push $repo --tags
 				done
 		done
-		for repodir in ../../cmdr.works/{cmdr-cli,cmdr-go-starter,cmdr-templates,go-template}; do
+		cd ~work/godev/cmdr.work/cmdr-cli # ,go-template
+		for repodir in ../../cmdr.work/{cmdr-cli,cmdr-go-starter,cmdr-templates}; do
 			[ -d "$repodir" ] && cd "$repodir" && echo && tip "ENTERING $repodir ------------" && echo &&
 				for repo in github frama codeberg; do
 					tip "pushing to remote repo '$repo'..."
@@ -209,5 +217,6 @@ gob_lazy() {
 	# 	go-lint=golint \
 	# 	app-bundle-id=app_bundle_id
 
+	# set -x
 	gob_entry "$@"
 }
