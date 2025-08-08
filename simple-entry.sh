@@ -12,9 +12,10 @@ sleep() { tip "sleeping..."; }
 
 dbg() { ((DEBUG)) && printf ">>> \e[0;38;2;133;133;133m$@\e[0m\n" || :; }
 tip() { printf "\e[0;38;2;133;133;133m>>> $@\e[0m\n"; }
+wrn() { printf "\e[0;38;2;172;172;22m... [WARN] \e[0;38;2;11;11;11m$@\e[0m\n"; }
 err() { printf "\e[0;33;1;133;133;133m>>> $@\e[0m\n" 1>&2; }
 fn_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(shell function)|(a function)'; }
-CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20250717 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
+CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20250808 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
 (($#)) && {
 	dbg "$# arg(s) | CD = $CD"
 	check_entry() {

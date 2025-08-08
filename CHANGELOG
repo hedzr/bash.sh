@@ -1,5 +1,9 @@
 # HISTORY
 
+- v20250808
+  - added color supports; added `wrn'
+  - update gob-lazy
+
 - v20250717
   - added `is_alpine`, `is_alma`, `is_gento`, `is_void`, `is_arch`, `is_kali`, `is_veruan`
   - update gob-lazy
