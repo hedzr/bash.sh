@@ -693,6 +693,66 @@ url_exists() { curl --head --silent -S --fail --output /dev/null "$@" 1>/dev/nul
 #
 #
 #
+# effects
+clr_reset_all="\e[0m"
+clr_bold="\e[1m"
+clr_dim="\e[2m"
+clr_italic="\e[3m"
+clr_underline="\e[4m"
+clr_blink="\e[5m"
+clr_rapic_blink="\e[6m"
+clr_invert="\e[7m"
+clr_hide="\e[8m"
+clr_strike="\e[9m"
+# reset effects
+clr_reset_bold="\e[21m"
+clr_reset_dim="\e[22m"
+clr_reset_italic="\e[23m"
+clr_reset_underline="\e[24m"
+clr_reset_blink="\e[25m"
+clr_reset_spacing="\e[26m"
+clr_reset_invert="\e[27m"
+clr_reset_hide="\e[28m"
+clr_reset_crossout="\e[29m"
+# 16-color fg
+black="\e[30m"
+red="\e[31m"
+green="\e[32m"
+yellow="\e[33m"
+blue="\e[34m"
+megenta="\e[35m"
+cyan="\e[36m"
+white="\e[37m"
+# 16-color bright fg
+bright_black="\e[90m"
+bright_red="\e[91m"
+bright_green="\e[92m"
+bright_yellow="\e[93m"
+bright_blue="\e[94m"
+bright_megenta="\e[95m"
+bright_cyan="\e[96m"
+bright_white="\e[97m"
+# 16-color bg
+bg_black="\e[40m"
+bg_red="\e[41m"
+bg_green="\e[42m"
+bg_yellow="\e[43m"
+bg_blue="\e[44m"
+bg_megenta="\e[45m"
+bg_cyan="\e[46m"
+bg_white="\e[47m"
+# 16-color bright bg
+bg_bright_black="\e[100m"
+bg_bright_red="\e[101m"
+bg_bright_green="\e[102m"
+bg_bright_yellow="\e[103m"
+bg_bright_blue="\e[104m"
+bg_bright_megenta="\e[105m"
+bg_bright_cyan="\e[106m"
+bg_bright_white="\e[107m"
+#
+#
+#
 headline() { printf "\e[0;1m$@\e[0m:\n"; }
 headline_begin() { printf "\e[0;1m"; } # for more color, see: shttps://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 headline_end() { printf "\e[0m:\n"; }  # https://misc.flogisoft.com/bash/tip_colors_and_formatting
@@ -704,6 +764,46 @@ printf_blue() { printf "\e[0;34m$@\e[0m:\n"; }
 printf_purple() { printf "\e[0;35m$@\e[0m:\n"; }
 printf_cyan() { printf "\e[0;36m$@\e[0m:\n"; }
 printf_white() { printf "\e[0;37m$@\e[0m:\n"; }
+println16() { # eg: println16 31 "hello"
+	local clr="${1:-31}" && (($#)) && shift
+	printf "\e[${clr}m$@\e[0m\n"
+}
+println256() { # eg: println256 255 "hello"
+	local byte="${1:-128}" && (($#)) && shift
+	printf "\e[38;5;${byte}m$@\e[0m\n"
+}
+printlnrgb() { # eg: printlnrgb 133 133 133 "hello"
+	local r="${1:-128}" && (($#)) && shift
+	local g="${1:-128}" && (($#)) && shift
+	local b="${1:-128}" && (($#)) && shift
+	printf "\e[38;2;${r};${g};${b}m$@\e[0m\n"
+}
+printlnrgb_special() {
+	local r="${1:-128}" && (($#)) && shift
+	local g="${1:-128}" && (($#)) && shift
+	local b="${1:-128}" && (($#)) && shift
+	printf "\e[38;0;${r};${g};${b}m$@\e[0m\n"
+}
+printlnrgb_transparent() {
+	local r="${1:-128}" && (($#)) && shift
+	local g="${1:-128}" && (($#)) && shift
+	local b="${1:-128}" && (($#)) && shift
+	printf "\e[38;1;${r};${g};${b}m$@\e[0m\n"
+}
+printlnrgb_cmy() {
+	local cs="${1:-128}" && (($#)) && shift
+	local r="${1:-128}" && (($#)) && shift
+	local g="${1:-128}" && (($#)) && shift
+	local b="${1:-128}" && (($#)) && shift
+	printf "\e[38;3;${r};${g};${b};${cs}m$@\e[0m\n"
+}
+printlnrgb_cmyb() {
+	local cs="${1:-128}" && (($#)) && shift
+	local r="${1:-128}" && (($#)) && shift
+	local g="${1:-128}" && (($#)) && shift
+	local b="${1:-128}" && (($#)) && shift
+	printf "\e[38;4;${r};${g};${b};${cs}m$@\e[0m\n"
+}
 h1() { printf "\e[30;104;1m\e[2K\n\e[A%s\e[00m\n\e[2K" "$@"; } # style first header
 h2() { printf "\e[30;104m\e[1K\n\e[A%s\e[00m\n\e[2K" "$@"; }   # style second header
 debug() { in_debug && printf "\e[0;38;2;133;133;133m$@\e[0m\n" || :; }
@@ -711,6 +811,7 @@ debug_begin() { printf "\e[0;38;2;133;133;133m"; }
 debug_end() { printf "\e[0m\n"; }
 dbg() { ((DEBUG)) && printf ">>> \e[0;38;2;133;133;133m$@\e[0m\n" || :; }
 tip() { printf "\e[0;38;2;133;133;133m>>> $@\e[0m\n"; }
+wrn() { printf "\e[0;38;2;172;172;22m... [WARN] \e[0;38;2;11;11;11m$@\e[0m\n"; }
 err() { printf "\e[0;33;1;133;133;133m>>> $@\e[0m\n" 1>&2; }
 mvif() {
 	local src="$1" dstdir="$2"
