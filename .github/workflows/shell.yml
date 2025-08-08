@@ -1,4 +1,4 @@
-name: Makefile CI
+name: Shellscript CI
 
 on:
   push:
@@ -46,5 +46,12 @@ jobs:
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
-        #body:
+        append_body: true
+        preserve_order: true
+        generate_release_notes: true
+        # discussion_category_name: Announcements
+        # body_path: relnotes.md
+        #   This release was created by: ${{ github.event.sender.login }}
+        body: |
+          Release of bash.sh, a shellscript toolset and starting point, built from commit ${{ env.SHORT_SHA }}, is now available.
 
