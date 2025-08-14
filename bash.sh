@@ -1175,8 +1175,10 @@ subnet_hex() {
 }
 if fn_exists which; then
 	:
-else
-	which() { [ "$(whereis $1 | awk -F: '{print $2}')" != "" ]; }
+elif fn_builtin_exists which; then
+	:
+elif is_darwin; then
+	which() { whereis "$@"; }
 fi
 if is_darwin; then
 	readlinkx() {
@@ -1349,7 +1351,8 @@ main_do_sth() {
 BASH_SH_VERSION=v20250808
 DEBUG=${DEBUG:-0}
 PROVISIONING=${PROVISIONING:-0}
-SUDO=sudo && [ "$(id -u)" = "0" ] && SUDO=
+SUDO=sudo && [ "$(id -u)" = "0" ] && SUDO= || :
+LS_OPT="--color" && is_darwin && LS_OPT="-G" || :
 # Instantly aliases cannot work in many cases such as conditional
 # constructs, loops, even in statement block. So this won't work sometimes:
 #     if [ true ]; then cmd-exist ls && echo 'ls exists' || echo 'ls not-exists'; fi
