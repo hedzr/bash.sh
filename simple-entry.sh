@@ -2,10 +2,27 @@
 
 ######### YOUR CODES HERE #########
 
-sleep() { tip "sleeping..."; }
+sleepx() { tip "sleeping..." && (($#)) && \sleep "$@"; }
 
 ######### SIMPLE BASH.SH FOOTER BEGIN #########
 
+is_darwin() { [[ $OSTYPE == darwin* ]]; }
+is_darwin_sillicon() { is_darwin && [[ $(uname_mach) == arm64 ]]; }
+is_linux() { [[ $OSTYPE == linux* ]]; }
+is_freebsd() { [[ $OSTYPE == freebsd* ]]; }
+is_win() { in_wsl; }
+in_wsl() { [[ "$(uname -r)" == *windows_standard* ]]; }
+
+is_git_clean() { git diff-index --quiet "$@" HEAD -- 2>/dev/null; }
+is_git_dirty() {
+	if is_git_clean "$@"; then
+		false
+	else
+		true
+	fi
+}
+
+###
 # The better consice way to get baseDir, ie. $CD, is:
 #       CD=$(cd `dirname "$0"`;pwd)
 # It will open a sub-shell to print the folder name of the running shell-script.
@@ -21,7 +38,7 @@ LS_OPT="--color" && is_darwin && LS_OPT="-G"
 (($#)) && {
 	dbg "$# arg(s) | CD = $CD"
 	check_entry() {
-		local prefix="$1" cmd="$2" && shift && shift
+		local prefix="${1:-boot}" cmd="${2:-first}" && shift && shift
 		if fn_exists "${prefix}_${cmd}_entry"; then
 			eval "${prefix}_${cmd}_entry" "$@"
 		elif fn_exists "${cmd}_entry"; then
