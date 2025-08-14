@@ -1,14 +1,12 @@
-cat <<-EOF >>/tmp/sourced.list
+# cat <<-EOF >>/tmp/sourced.list
 
+# 	----------------- $(date) ---- .zshenv >> bash.sh (bash.sh/ops.d/darwin/darwin-only.sh) -----------------
+# 	>> PATH.BEGIN:  $PATH
+# 	>> path_helper: $(/usr/libexec/path_helper -s)
+# 	>> CD:          $CD
+# 	>> SCRIPT:      $SCRIPT
 
-
-	----------------- $(date) ---- .zshenv >> bash.sh -----------------
-	>> PATH.BEGIN:  $PATH
-	>> path_helper: $(/usr/libexec/path_helper -s)
-	>> CD:          $CD
-	>> SCRIPT:      $SCRIPT
-
-EOF
+# EOF
 
 BSH_OS=darwin
 
@@ -16,11 +14,11 @@ BSH_OS=darwin
 #
 #
 if is_zsh; then
-	dbg "ZSH_EVAL_CONTEXT: $ZSH_EVAL_CONTEXT"
-	dbg "in_vscode: $(in_vscode && echo Y || echo .), in_jetbrains: $(in_jetbrains && echo Y || echo .)"
-	dbg "   in_wsl: $(in_wsl && echo Y || echo .)"
-	dbg "    stack: ${funcstack[@]}"
-	echo
+	# dbg "ZSH_EVAL_CONTEXT: $ZSH_EVAL_CONTEXT"
+	# dbg "in_vscode: $(in_vscode && echo Y || echo .), in_jetbrains: $(in_jetbrains && echo Y || echo .)"
+	# dbg "   in_wsl: $(in_wsl && echo Y || echo .)"
+	# dbg "    stack: ${funcstack[@]}"
+	# echo
 
 	local dir dir_saved f
 
