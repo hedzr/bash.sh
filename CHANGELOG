@@ -1,5 +1,12 @@
 # HISTORY
 
+- v20250815
+  - improved detector for CD & SCRIPT
+  - improved simple-entry.sh
+  - add LS_OPT definition
+  - cleanup dbg codes in darwin-only.sh
+  - fix which()
+
 - v20250808
   - added color supports; added `wrn'
   - update gob-lazy
