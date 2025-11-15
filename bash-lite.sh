@@ -162,6 +162,12 @@ if is_zsh_strict; then
 else
 	fn_aliased_exists() { LC_ALL=C alias $1 1>/dev/null 2>&1; }
 fi
+if fn_defined which; then
+	: # dbg "'which' has been defined."
+else
+	which() { cmd_exists "$@"; }
+fi
+which2() { [ "$(whereis -b $1 | awk '{print $2}')" != "" ]; }
 fn_name() {
 	is_zsh && local fn_="${funcstack[2]}"
 	if [ "$fn_" = "" ]; then

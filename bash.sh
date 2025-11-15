@@ -358,6 +358,12 @@ if is_zsh_strict; then
 else
 	fn_aliased_exists() { LC_ALL=C alias $1 1>/dev/null 2>&1; }
 fi
+if fn_defined which; then
+	: # dbg "'which' has been defined."
+else
+	which() { cmd_exists "$@"; }
+fi
+which2() { [ "$(whereis -b $1 | awk '{print $2}')" != "" ]; }
 fn_name() {
 	is_zsh && local fn_="${funcstack[2]}"
 	if [ "$fn_" = "" ]; then
@@ -594,12 +600,12 @@ is_bsd_series() { [[ "$(osid)" == *bsd* ]]; }
 #
 #
 #
-lsb_release_cs() { which lsb_release 1>/dev/null 2>&1 && lsb_release -cs; } # focal, ... # = oscodename
-uname_kernel() { uname -s; }                                                # Linux
-uname_cpu() { uname -p; }                                                   # processor: x86_64
-uname_mach() { uname -m; }                                                  # machine:   x86_64, ...
-uname_rev() { uname -r; }                                                   # kernel-release: 5.8.15-301.fc33.x86_64
-uname_ver() { uname -v; }                                                   # kernel-version:
+lsb_release_cs() { cmd_exists lsb_release && lsb_release -cs; } # focal, ... # = oscodename
+uname_kernel() { uname -s; }                                    # Linux
+uname_cpu() { uname -p; }                                       # processor: x86_64
+uname_mach() { uname -m; }                                      # machine:   x86_64, ...
+uname_rev() { uname -r; }                                       # kernel-release: 5.8.15-301.fc33.x86_64
+uname_ver() { uname -v; }                                       # kernel-version:
 lscpu_call() { lscpu $*; }
 lshw_cpu() { $SUDO lshw -c cpu; }
 i386_amd64() {
@@ -1222,11 +1228,6 @@ subnet_hex() {
 	# tip "lanip: '$(lanip)'"
 	lanip | tox1
 }
-if fn_defined which; then
-	dbg "'which' has been defined."
-else
-	which() { whereis "$@"; }
-fi
 if is_darwin; then
 	readlinkx() {
 		local p="$@"
