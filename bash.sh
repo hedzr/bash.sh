@@ -525,14 +525,15 @@ is_kalilinux() { [[ "$(osid)" == kali* ]]; }
 is_kali() { [[ "$(osid)" == kali ]]; }
 # is_debian_series() { [[ "$(osid)" == debian || "$(osid)" == ubuntu ]]; }
 # is_redhat_series() { [[ "$(osid)" == redhat || "$(osid)" == centos || "$(osid)" == fedora ]]; }
-is_yum() { which yum 1>/dev/null 2>&1; }
-is_dnf() { which dnf 1>/dev/null 2>&1; }
-is_apt() { which apt-get 1>/dev/null 2>&1; }
-is_pacman() { which pacman 1>/dev/null 2>&1; }
-is_zypp() { which zypper 1>/dev/null 2>&1; }
-is_zypper() { which zypper 1>/dev/null 2>&1; }
-is_homebrew() { which brew 1>/dev/null 2>&1; }
-is_pkg() { which pkg 1>/dev/null 2>&1; }
+is_rpm() { cmd_exists rpm; }
+is_yum() { cmd_exists yum; }       # which yum 1>/dev/null 2>&1; }
+is_dnf() { cmd_exists dnf; }       # which dnf 1>/dev/null 2>&1; }
+is_apt() { cmd_exists apt; }       # which apt-get 1>/dev/null 2>&1; }
+is_pacman() { cmd_exists pacman; } # which pacman 1>/dev/null 2>&1; }
+is_zypp() { cmd_exists zypper; }   # which zypper 1>/dev/null 2>&1; }
+is_zypper() { cmd_exists zypper; } # which zypper 1>/dev/null 2>&1; }
+is_homebrew() { cmd_exists brew; } # which brew 1>/dev/null 2>&1; }
+is_pkg() { cmd_exists pkg; }       # which pkg 1>/dev/null 2>&1; }
 # is_redhat_series() { is_yum || is_dnf; }
 # is_debian_series() { is_apt; }
 is_redhat_series() {
