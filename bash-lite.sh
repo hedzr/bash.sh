@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20250815
+#   Version: v20251115
 #   License: MIT
 #   Site: https://github/hedzr/bash.sh
 #
@@ -106,7 +106,7 @@ _my_main_do_sth() {
 
 ########################################################
 
-#### HZ Tail BEGIN #### v20250815 ####
+#### HZ Tail BEGIN #### v20251115 ####
 in_debug() { (($DEBUG)); }
 in_provisioning() { (($PROVISIONING)); } ## return exit status as true if $PROVISIONING is not equal to 0
 is_root() { [ "$(id -u)" = "0" ]; }
@@ -733,7 +733,7 @@ main_do_sth() {
 	fi
 	((${HAS_END:-0})) && { debug_begin && echo -n 'Success!' && debug_end; } || return $res_ # { [ $# -eq 0 ] && :; }
 }
-BASH_SH_VERSION=v20250815
+BASH_SH_VERSION=v20251115
 DEBUG=${DEBUG:-0}
 # trans_readlink() { DIR="${1%/*}" && (cd $DIR && pwd -P); }
 # is_darwin && realpathx() { [[ $1 == /* ]] && echo "$1" || { DIR="${1%/*}" && DIR=$(cd $DIR && pwd -P) && echo "$DIR/$(basename $1)"; }; } || realpathx() { readlink -f $*; }
@@ -743,4 +743,4 @@ in_sourcing && {
 if_vagrant && [ "$SCRIPT" == "/tmp/vagrant-shell" ] && { [ -d $CD/ops.d ] || CD=/vagrant/bin; }
 [ -L "$SCRIPT" ] && debug linked script found && SCRIPT=$(realpathx "$SCRIPT") && CD=$(dirname "$SCRIPT")
 in_sourcing || main_do_sth "$@"
-#### HZ Tail END #### v20250815 ####
+#### HZ Tail END #### v20251115 ####

@@ -1,5 +1,13 @@
 # HISTORY
 
+- v20251115
+  - added `fn_exists`
+  - added `in_vmware`
+  - fix `is_apt`, `is_dnf`, ...
+  - improved `i386_amd64`
+  - fix `which`
+  - added `ask_yesno`, `ask_yesno_timeout` to more.sh
+
 - v20250815
   - improved detector for CD & SCRIPT
   - improved simple-entry.sh
