@@ -130,20 +130,20 @@ gob_lazy() {
 			# for mod in $(cat /tmp/mod.list); do
 			# 	tip "...checking module '$mod'..." 1>&2
 			# 	if [ "$(pwd)" = "$mod" ]; then
-			# 		go list -f '{{.Name}} {{.Dir}}' ./... | grep -Eo '^main[ \t]+(.*)' | awk '{print $2}'
+			# 		go list -f '{{.Name}} {{.Dir}}' ./... | grep -Eo '^main[[:space:]]+(.*)' | awk '{print $2}'
 			# 	elif [ "$mod" != "" ]; then
 			# 		pushd "$mod" >/dev/null &&
-			# 			go list -f '{{.Name}} {{.Dir}}' ./... | grep -Eo '^main[ \t]+(.*)' | awk '{print $2}' &&
+			# 			go list -f '{{.Name}} {{.Dir}}' ./... | grep -Eo '^main[[:space:]]+(.*)' | awk '{print $2}' &&
 			# 			popd >/dev/null
 			# 	fi
 			# done
 			for mod in $(go list -f '{{.Dir}}' -m); do
 				tip "...checking module '$mod'..." 1>&2
 				if [ "$(pwd)" = "$mod" ]; then
-					go mod tidy && go list -f '{{.Name}} {{.Dir}}' ./... | grep -Eo '^main[ \t]+(.*)' | awk '{print $2}'
+					go mod tidy && go list -f '{{.Name}} {{.Dir}}' ./... | grep -Eo '^main[[:space:]]+(.*)' | awk '{print $2}'
 				elif [ "$mod" != "" ]; then
 					pushd "$mod" >/dev/null &&
-						go mod tidy && go list -f '{{.Name}} {{.Dir}}' ./... | grep -Eo '^main[ \t]+(.*)' | awk '{print $2}' &&
+						go mod tidy && go list -f '{{.Name}} {{.Dir}}' ./... | grep -Eo '^main[[:space:]]+(.*)' | awk '{print $2}' &&
 						popd >/dev/null
 				fi
 			done
