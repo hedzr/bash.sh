@@ -222,6 +222,13 @@ if_centos() {
 		fi
 	fi
 }
+in_vmware() {
+	if cmd_exists hostnamectl; then
+		$SUDO hostnamectl | grep -E 'Virtualization: ' | grep -qEi 'vmware'
+	else
+		false
+	fi
+}
 in_vm() {
 	if cmd_exists hostnamectl; then
 		# dbg "checking hostnamectl"
