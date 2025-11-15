@@ -1,5 +1,10 @@
 # HISTORY
 
+- v20251116
+  - added `repl_bashsh_block`
+  - fix ERE space
+  - fix `which`
+
 - v20251115
   - added `fn_exists`
   - added `in_vmware`
