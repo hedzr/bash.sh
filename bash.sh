@@ -255,6 +255,50 @@ _bash_sh_load_env_files() {
 	:
 }
 
+# replace bash.sh code-block for you.
+#
+# usage:
+#
+#    your_ops_script="$somewhere/ops"
+#    bashsh_file="$some-tmp-folder/bash.sh"
+#    repl_bashsh_block "$your_ops_script" "$bashsh_file"
+#
+# this helper will upgrade bash.sh code-block between
+# "#### HZ Tail BEGIN #### v" and "#### HZ Tail END #### v"
+# with the newest source (specified in $bashsh_file)
+#
+# if the immediate files should be kept, specify the 3rd
+# arg to 0:
+#
+#    repl_bashsh_block "$your_ops_script" "$bashsh_file" 0
+#
+repl_bashsh_block() {
+	local CD="$(cd $(dirname "$0") && pwd)"
+	local tgt_file="${1:-$CD/bin/ops}"
+	local bashsh_file="${2:-$CD/../../../../ops.work/bash.sh-dev/bash.sh/bash.sh}"
+	local no_keep_imm="${3:-1}"
+	local begin_str="#### HZ Tail BEGIN #### v"
+	local end_str="#### HZ Tail END #### v"
+	if [ -f "$bashsh_file" ]; then
+		ls -la $bashsh_file
+		# grep -E "${begin_str}"'(.*)'"${end_str}" $bashshfile >repl.1.log
+		echo "sed -n '/${begin_str}/,/${end_str}/p' $bashsh_file >repl.1.log"
+		eval "sed -n '/${begin_str}/,/${end_str}/p' $bashsh_file >repl.1.log"
+		# sed '/begin_pattern/,/end_pattern/s/original_text/replacement_text/g' filename
+		eval "sed '/${begin_str}/,/${end_str}/d' $tgt_file >repl.2.log"
+		ls -la repl.*.log
+		mv $tgt_file{,.bak}
+		cat repl.2.log repl.1.log >$tgt_file
+		tip "replaced ok. The differences between $tgt_file and $tgt_file.bak are:"
+		(($NO_DIFF)) && : || {
+			if cmd_exists diff; then
+				diff $tgt_file $tgt_file.bak
+			fi
+		}
+		(($no_keep_imm)) && rm repl.*.log $tgt_file.bak || :
+	fi
+}
+
 ########################################################
 
 #### HZ Tail BEGIN #### v20251115 ####
