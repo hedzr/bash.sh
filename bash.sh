@@ -560,16 +560,13 @@ lscpu_call() { lscpu $*; }
 lshw_cpu() { $SUDO lshw -c cpu; }
 i386_amd64() {
 	ar=""
-	case $(uname -m) in
-	i386 | i686) ar="386" ;;
-	x86_64) ar="amd64" ;;
-	armv7*) ar="arm" ;;
-	arm)
-		is_debian_series && {
-			dpkg --print-architecture | grep -q "arm64" && ar="arm64" || ar="arm"
-		} || { ar="arm64"; }
-		;;
-	esac
+	if is_debian_series; then
+		ar=$(dpkg --print-architecture)
+	# elif is_rpm; then
+	# 	ar=$(rpm --eval '%{_arch}')
+	else
+		arch | grep -qE 'aarch64|arm64' && ar="arm64" || ar="armel"
+	fi
 	echo $ar
 }
 x86_64() { uname -m; }
