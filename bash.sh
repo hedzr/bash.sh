@@ -1178,11 +1178,9 @@ subnet_hex() {
 	# tip "lanip: '$(lanip)'"
 	lanip | tox1
 }
-if fn_exists which; then
-	:
-elif fn_builtin_exists which; then
-	:
-elif is_darwin; then
+if fn_defined which; then
+	dbg "'which' has been defined."
+else
 	which() { whereis "$@"; }
 fi
 if is_darwin; then
