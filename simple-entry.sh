@@ -97,7 +97,7 @@ if_sysv() { [[ -f /etc/init.d/cron && ! -L /etc/init.d/cron ]]; }
 # It will open a sub-shell to print the folder name of the running shell-script.
 
 ###
-CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20251116 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
+CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20251117 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
 SUDO=sudo && { [ "$(id -u)" = "0" ] && SUDO= || :; }
 LS_OPT="--color" && { is_darwin && LS_OPT="-G" || :; }
 (($#)) && {

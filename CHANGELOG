@@ -1,5 +1,9 @@
 # HISTORY
 
+- v20251117
+  - update `simple-entry.sh`
+  - fix `repl_bashsh_block`
+
 - v20251116
   - added `repl_bashsh_block`
   - fix ERE space
