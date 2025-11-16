@@ -264,7 +264,7 @@ _bash_sh_load_env_files() {
 #    repl_bashsh_block "$your_ops_script" "$bashsh_file"
 #
 # this helper will upgrade bash.sh code-block between
-# "#### HZ Tail BEGIN #### v" and "#### HZ Tail END #### v"
+# "#### HZ Tail BEGIN ####" and "#### HZ Tail END ####"
 # with the newest source (specified in $bashsh_file)
 #
 # if the immediate files should be kept, specify the 3rd
@@ -277,8 +277,9 @@ repl_bashsh_block() {
 	local tgt_file="${1:-$CD/bin/ops}"
 	local bashsh_file="${2:-$CD/../../../../ops.work/bash.sh-dev/bash.sh/bash.sh}"
 	local no_keep_imm="${3:-1}"
-	local begin_str="#### HZ Tail BEGIN #### v"
-	local end_str="#### HZ Tail END #### v"
+	local tag="#### HZ Tail"
+	local begin_str="$tag BEGIN #### v"
+	local end_str="$tag END #### v"
 	if [ -f "$bashsh_file" ]; then
 		ls -la $bashsh_file
 		# grep -E "${begin_str}"'(.*)'"${end_str}" $bashshfile >repl.1.log
