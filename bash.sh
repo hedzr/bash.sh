@@ -297,6 +297,8 @@ repl_bashsh_block() {
 			fi
 		}
 		(($no_keep_imm)) && rm repl.*.log $tgt_file.bak || :
+	else
+		wrn "$bashsh_file is not existed."
 	fi
 }
 
