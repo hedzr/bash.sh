@@ -1,5 +1,8 @@
 # HISTORY
 
+- v20251123
+  - improved simple-entry.sh
+
 - v20251118
   - improved `repl_bashsh_block`
 

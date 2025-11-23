@@ -39,7 +39,7 @@ jobs:
 
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
-      if: startsWith(github.ref, 'refs/tags/v')
+      if: startsWith(github.ref, 'refs/tags/v') && false
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ./bash.sh
@@ -55,3 +55,36 @@ jobs:
         body: |
           Release of bash.sh, a shellscript toolset and starting point, built from commit ${{ env.SHORT_SHA }}, is now available.
 
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v2.4.1 # pin to v2.2.1 to solve 422 error, see its issue #616
+      if: ${{ startsWith(github.ref, 'refs/tags/v')
+      env:
+        # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        generate_release_notes: true
+        # discussion_category_name: Announcements
+        # tag_name: ${{ github.ref }}
+        tag_name: ${{ github.event.release.tag_name }}
+        # release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+        append_body: true
+        preserve_order: true
+        # body_path: relnotes.md
+        body: |
+          Release of bash.sh, a shellscript toolset and starting point, built from commit ${{ env.SHORT_SHA }}, is now available.
+
+          ${{ github.event.head_commit.message }}
+
+        # body: |
+        #   This release was created by: ${{ github.event.sender.login }}
+        #   Release of ${{ github.ref }}, built from commit ${{ env.SHORT_SHA }}, is now available.
+        # files: |
+        #  ./cmdr-*.*
+        #   build/*-*${{ matrix.config.build_type }}*-*.*
+        # files: |
+        #    build/packages/*${{ matrix.config.artifact }}
+        files: |
+          ./bash.sh
