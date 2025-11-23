@@ -39,7 +39,7 @@ jobs:
 
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
-      if: startsWith(github.ref, 'refs/tags/v') }} && false
+      if: startsWith(github.ref, 'refs/tags/v') && false
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ./bash.sh
@@ -58,7 +58,7 @@ jobs:
     - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v2.4.1 # pin to v2.2.1 to solve 422 error, see its issue #616
-      if: ${{ startsWith(github.ref, 'refs/tags/v')
+      if: ${{ startsWith(github.ref, 'refs/tags/v') }}
       env:
         # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_TOKEN: ${{ github.token }}
