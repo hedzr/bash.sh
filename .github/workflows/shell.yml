@@ -39,7 +39,7 @@ jobs:
 
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
-      if: startsWith(github.ref, 'refs/tags/v') && false
+      if: startsWith(github.ref, 'refs/tags/v') }} && false
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ./bash.sh
@@ -86,5 +86,6 @@ jobs:
         #   build/*-*${{ matrix.config.build_type }}*-*.*
         # files: |
         #    build/packages/*${{ matrix.config.artifact }}
+
         files: |
           ./bash.sh
