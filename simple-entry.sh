@@ -91,16 +91,36 @@ if_upstart() { [[ $(/sbin/init --version) =~ upstart ]]; }
 if_systemd() { [[ $(systemctl) =~ -\.mount ]]; }
 if_sysv() { [[ -f /etc/init.d/cron && ! -L /etc/init.d/cron ]]; }
 
-###
+# ###
 # The better consice way to get baseDir, ie. $CD, is:
 #       CD=$(cd `dirname "$0"`;pwd)
 # It will open a sub-shell to print the folder name of the running shell-script.
+
+# ###
+# cmd="$1" && (($#)) && shift
+# if fn_exists "$cmd"; then
+# 	eval $cmd "$@"
+# 	unset cmd
+# else
+# 	xcmd="cmake-$cmd"
+# 	if fn_exists "$xcmd"; then eval $xcmd "$@"; else
+# 		xcmd="build-$cmd"
+# 		if fn_exists "$xcmd"; then eval $xcmd "$@"; else
+# 			xcmd="build-c$cmd"
+# 			if fn_exists "$xcmd"; then eval $xcmd "$@"; else
+# 				echo "Error: No such command or function: '$cmd'" >&2
+# 				exit 1
+# 			fi
+# 		fi
+# 	fi
+# 	unset cmd xcmd
+# fi
 
 ###
 CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20251118 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
 SUDO=sudo && { [ "$(id -u)" = "0" ] && SUDO= || :; }
 LS_OPT="--color" && { is_darwin && LS_OPT="-G" || :; }
-(($#)) && {
+if (($#)); then
 	dbg "$# arg(s) | CD = $CD"
 	check_entry() {
 		local prefix="${1:-boot}" cmd="${2:-first}" && shift && shift
@@ -125,5 +145,7 @@ LS_OPT="--color" && { is_darwin && LS_OPT="-G" || :; }
 		fi
 	}
 	check_entry "${FN_PREFIX:-boot}" "$@"
-} || { dbg "empty: $# | CD = $CD"; }
+else
+	dbg "empty: $# | CD = $CD | DEBUG = $DEBUG"
+fi
 ######### SIMPLE BASH.SH FOOTER END #########
