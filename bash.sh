@@ -364,7 +364,7 @@ fi
 if fn_defined which; then
 	: # dbg "'which' has been defined."
 else
-	which() { cmd_exists "$@"; }
+	which() { command -v "$@"; }
 fi
 which2() { [ "$(whereis -b $1 | awk '{print $2}')" != "" ]; }
 fn_name() {
