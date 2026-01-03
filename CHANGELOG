@@ -1,5 +1,9 @@
 # HISTORY
 
+- v20260103
+  - improved simple-entry.sh
+  - fix `which()`, our script needs its stdout
+
 - v20251123
   - improved simple-entry.sh
 
