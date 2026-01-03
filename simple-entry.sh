@@ -147,5 +147,11 @@ if (($#)); then
 	check_entry "${FN_PREFIX:-boot}" "$@"
 else
 	dbg "empty: $# | CD = $CD | DEBUG = $DEBUG"
+	if fn_exists boot_usages; then
+		eval boot_usages "$@"
+	else
+		err "no default entry function 'boot_usages' found."
+		exit 1
+	fi
 fi
 ######### SIMPLE BASH.SH FOOTER END #########
