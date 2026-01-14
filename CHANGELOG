@@ -1,5 +1,8 @@
 # HISTORY
 
+- v20260115
+  - added `is_xdg_ready`
+
 - v20260103
   - improved simple-entry.sh
   - fix `which()`, our script needs its stdout

@@ -118,7 +118,7 @@ if_sysv() { [[ -f /etc/init.d/cron && ! -L /etc/init.d/cron ]]; }
 # fi
 
 ###
-CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20260103 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
+CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20260115 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
 SUDO=sudo && { [ "$(id -u)" = "0" ] && SUDO= || :; }
 LS_OPT="--color" && { is_darwin && LS_OPT="-G" || :; }
 if (($#)); then
