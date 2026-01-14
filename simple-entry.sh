@@ -31,6 +31,7 @@ fn_builtin_exists() { LC_ALL=C type $1 2>/dev/null | grep -q 'shell builtin'; }
 fn_defined() { LC_ALL=C type $1 2>/dev/null | grep -qE '( shell function)|( a function)|( shell builtin)'; }
 
 ###
+is_xdg_ready() { [[ -n "${XDG_CONFIG_HOME-}" ]]; } # when xdg-config presents, prefer using XDG_xxx
 is_darwin() { [[ $OSTYPE == darwin* ]]; }
 is_darwin_sillicon() { is_darwin && [[ $(uname_mach) == arm64 ]]; }
 is_linux() { [[ $OSTYPE == linux* ]]; }

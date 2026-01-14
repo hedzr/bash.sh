@@ -317,6 +317,7 @@ is_zsh_strict() { [[ -n "$ZSH_NAME" && "$SHELL" = */zsh ]]; }
 is_zsh_t1() { [[ "$SHELL" = */zsh ]]; }
 is_zsh_t2() { [ -n "$ZSH_NAME" ]; }
 is_fish() { [ -n "$FISH_VERSION" ]; }
+is_xdg_ready() { [[ -n "${XDG_CONFIG_HOME-}" ]]; } # when xdg-config presents, prefer using XDG_xxx
 is_darwin() { [[ $OSTYPE == darwin* ]]; }
 is_darwin_sillicon() { is_darwin && [[ $(uname_mach) == arm64 ]]; }
 is_linux() { [[ $OSTYPE == linux* ]]; }
