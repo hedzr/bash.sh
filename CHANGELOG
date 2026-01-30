@@ -1,5 +1,10 @@
 # HISTORY
 
+- v20260131
+  - added `mach_is` (usage: mach_is arm64|x64|x86|...)
+  - improved `i386_amd64`
+  - improved simple-entry.sh
+
 - v20260115
   - added `is_xdg_ready`
 
