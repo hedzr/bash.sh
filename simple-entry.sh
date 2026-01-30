@@ -21,14 +21,22 @@ is_git_dirty() {
 	fi
 }
 
-dbg() { ((DEBUG)) && printf ">>> \e[0;38;2;133;133;133m$@\e[0m\n" || :; }
-tip() { printf "\e[0;38;2;133;133;133m>>> $@\e[0m\n"; }
-wrn() { printf "\e[0;38;2;172;172;22m... [WARN] \e[0;38;2;11;11;11m$@\e[0m\n"; }
-err() { printf "\e[0;33;1;133;133;133m>>> $@\e[0m\n" 1>&2; }
+###
 cmd_exists() { command -v $1 >/dev/null; } # it detects any builtin or external commands, aliases, and any functions
 fn_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(shell function)|(a function)'; }
 fn_builtin_exists() { LC_ALL=C type $1 2>/dev/null | grep -q 'shell builtin'; }
 fn_defined() { LC_ALL=C type $1 2>/dev/null | grep -qE '( shell function)|( a function)|( shell builtin)'; }
+
+###
+h1() { printf "\e[30;104;1m\e[2K\n\e[A%s\e[00m\n\e[2K" "$@"; } # style first header
+h2() { printf "\e[30;104m\e[1K\n\e[A%s\e[00m\n\e[2K" "$@"; }   # style second header
+debug() { in_debug && printf "\e[0;38;2;133;133;133m$@\e[0m\n" || :; }
+debug_begin() { printf "\e[0;38;2;133;133;133m"; }
+debug_end() { printf "\e[0m\n"; }
+dbg() { ((DEBUG)) && printf ">>> \e[0;38;2;133;133;133m$@\e[0m\n" || :; }
+tip() { printf "\e[0;38;2;133;133;133m>>> $@\e[0m\n"; }
+wrn() { printf "\e[0;38;2;172;172;22m... [WARN] \e[0;38;2;11;11;11m$@\e[0m\n"; }
+err() { printf "\e[0;33;1;133;133;133m>>> $@\e[0m\n" 1>&2; }
 
 ###
 is_xdg_ready() { [[ -n "${XDG_CONFIG_HOME-}" ]]; } # when xdg-config presents, prefer using XDG_xxx
@@ -88,9 +96,41 @@ in_vm() {
 		false
 	fi
 }
+#
+#
 if_upstart() { [[ $(/sbin/init --version) =~ upstart ]]; }
 if_systemd() { [[ $(systemctl) =~ -\.mount ]]; }
 if_sysv() { [[ -f /etc/init.d/cron && ! -L /etc/init.d/cron ]]; }
+#
+#
+mach_is() { # if mach_is arm64; then echo "under arm-64bit"; fi;
+	local ar="$(uname -m | grep -qE 'aarch64|arm64' && ar="arm64" || cat)"
+	case "$1" in
+	arm64* | aarch64*)
+		[[ "$ar" == "arm64" ]]
+		;;
+	arm32* | armv7* | armv8* | armhf* | aarch32*)
+		[[ "$ar" == "$1"* ]]
+		;;
+	x86-64* | x86_64* | x64*)
+		[[ "$ar" == "x86_64" ]]
+		;;
+	i386* | i686* | x86*)
+		[[ "$ar" == "i386" || "$ar" == "i686" || "$ar" == "x86" ]]
+		;;
+	# riscv32|risc64|mips32|mips64|solaris)
+	*)
+		[[ "$ar"* == "$1" ]]
+		;;
+	esac
+}
+if_hosttype() { # usage:     if_hosttype x64 && echo x64 || echo x86 | BUT, it only fit for intel cpu
+	case "$HOSTTYPE" in
+	*x86_64*) sys="x64" ;;
+	*) sys="x86" ;;
+	esac
+	[[ "${sys}" == "$1" ]]
+}
 
 # ###
 # The better consice way to get baseDir, ie. $CD, is:
