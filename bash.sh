@@ -623,8 +623,29 @@ i386_amd64() {
 	fi
 	echo $ar
 }
-x86_64() { uname -m; }
-if_hosttype() { # usage: if_hosttype x64 && echo x64 || echo x86 | BUT, it only fit for intel cpu
+x86_64() { uname -m; } # machine:   x86_64, arm64(macOS)/aarch64(Linux), ...
+mach_is() {            # if mach_is arm64; then echo "under arm-64bit"; fi;
+	local ar=$(i386_amd64)
+	case "$1" in
+	arm64* | aarch64*)
+		[[ "$ar" == "arm64" ]]
+		;;
+	arm32* | armv7* | armv8* | armhf* | aarch32*)
+		[[ "$ar" == "$1"* ]]
+		;;
+	x86-64* | x86_64* | x64*)
+		[[ "$ar" == "x86_64" ]]
+		;;
+	i386* | i686* | x86*)
+		[[ "$ar" == "i386" || "$ar" == "i686" || "$ar" == "x86" ]]
+		;;
+	# riscv32|risc64|mips32|mips64|solaris)
+	*)
+		[[ "$ar"* == "$1" ]]
+		;;
+	esac
+}
+if_hosttype() { # usage:     if_hosttype x64 && echo x64 || echo x86 | BUT, it only fit for intel cpu
 	case "$HOSTTYPE" in
 	*x86_64*) sys="x64" ;;
 	*) sys="x86" ;;
