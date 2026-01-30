@@ -607,20 +607,32 @@ is_bsd_series() { [[ "$(osid)" == *bsd* ]]; }
 lsb_release_cs() { cmd_exists lsb_release && lsb_release -cs; } # focal, ... # = oscodename
 uname_kernel() { uname -s; }                                    # Linux
 uname_cpu() { uname -p; }                                       # processor: x86_64
-uname_mach() { uname -m; }                                      # machine:   x86_64, ...
+uname_mach() { uname -m; }                                      # machine:   x86_64, arm64(macOS)/aarch64(Linux), ...
 uname_rev() { uname -r; }                                       # kernel-release: 5.8.15-301.fc33.x86_64
 uname_ver() { uname -v; }                                       # kernel-version:
 lscpu_call() { lscpu $*; }
 lshw_cpu() { $SUDO lshw -c cpu; }
-i386_amd64() {
-	ar=""
-	if is_debian_series; then
-		ar=$(dpkg --print-architecture)
-	# elif is_rpm; then
-	# 	ar=$(rpm --eval '%{_arch}')
-	else
-		arch | grep -qE 'aarch64|arm64' && ar="arm64" || ar="armel"
-	fi
+i386_amd64() { # return machine-type: x86_64, arm64, ...
+	local ar
+	case "${MACHTYPE}" in
+	arm64-* | aarch64-*)
+		ar="arm64"
+		;;
+	x86_64-*)
+		ar="x86_64"
+		;;
+	*)
+		# if is_debian_series; then
+		# 	ar=$(dpkg --print-architecture)
+		# # elif is_rpm; then
+		# # 	ar=$(rpm --eval '%{_arch}')
+		# else
+		# 	# arch | grep -qE 'aarch64|arm64' && ar="arm64" || ar="armel"
+		# 	ar="$(uname -m | grep -qE 'aarch64|arm64' && ar="arm64" || cat)"
+		# fi
+		ar="$(uname -m | grep -qE 'aarch64|arm64' && ar="arm64" || cat)"
+		;;
+	esac
 	echo $ar
 }
 x86_64() { uname -m; } # machine:   x86_64, arm64(macOS)/aarch64(Linux), ...
