@@ -158,7 +158,7 @@ if_hosttype() { # usage:     if_hosttype x64 && echo x64 || echo x86 | BUT, it o
 # fi
 
 ### final version
-CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20260131 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
+CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20260222 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
 SUDO=sudo && { [ "$(id -u)" = "0" ] && SUDO= || :; }
 LS_OPT="--color" && { is_darwin && LS_OPT="-G" || :; }
 if (($#)); then
