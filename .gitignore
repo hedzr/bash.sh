@@ -38,3 +38,4 @@ iso/
 custom.sh
 # script/custom/*
 !script/custom/.gitkeep
+tmp.bash

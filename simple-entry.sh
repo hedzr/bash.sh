@@ -132,12 +132,12 @@ if_hosttype() { # usage:     if_hosttype x64 && echo x64 || echo x86 | BUT, it o
 	[[ "${sys}" == "$1" ]]
 }
 
-# ###
+# ### version 1
 # The better consice way to get baseDir, ie. $CD, is:
 #       CD=$(cd `dirname "$0"`;pwd)
 # It will open a sub-shell to print the folder name of the running shell-script.
 
-# ###
+# ### version 2
 # cmd="$1" && (($#)) && shift
 # if fn_exists "$cmd"; then
 # 	eval $cmd "$@"
@@ -157,7 +157,7 @@ if_hosttype() { # usage:     if_hosttype x64 && echo x64 || echo x86 | BUT, it o
 # 	unset cmd xcmd
 # fi
 
-###
+### final version
 CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20260131 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
 SUDO=sudo && { [ "$(id -u)" = "0" ] && SUDO= || :; }
 LS_OPT="--color" && { is_darwin && LS_OPT="-G" || :; }
