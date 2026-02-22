@@ -89,15 +89,15 @@ _my_main_do_sth() {
 	# for linux only:
 	# local cmd=${1:-sleeping} && shift || :
 
-	# eval "$cmd $@" || :
+	# "$cmd" "$@" || :
 
 	fn_exists "$cmd" && {
 		debug "$cmd - $@"
-		eval $cmd "$@"
+		$cmd "$@"
 	} || {
-		xcmd="lite-$cmd" && fn_exists "$xcmd" && eval $xcmd "$@" || {
-			xcmd="try-lite-$cmd" && fn_exists "$xcmd" && eval $xcmd "$@" || {
-				xcmd="build-c$cmd" && fn_exists "$xcmd" && eval $xcmd "$@"
+		xcmd="lite-$cmd" && fn_exists "$xcmd" && $xcmd "$@" || {
+			xcmd="try-lite-$cmd" && fn_exists "$xcmd" && $xcmd "$@" || {
+				xcmd="build-c$cmd" && fn_exists "$xcmd" && $xcmd "$@"
 			}
 		}
 	}
@@ -500,8 +500,8 @@ safety() {
 		# in bash/sh mode
 		[ -f /tmp/hash.list ] || zsh -c "hash -d|sed 's/=/:/'|tr -d \"'\"|IFS=\$':' sort -k2 -r" >/tmp/hash.list
 		while IFS=$':' read to from; do
-			from="$(eval printf '%s' $from)"
-			to="$(eval printf '%s' $to)"
+			from="$(printf '%s' $from)"
+			to="$(printf '%s' $to)"
 			# echo "  $from -> $to" 1>&2
 			# echo "$input" | sed -E 's,'"$from"',~'"$to"',g' 1>&2
 			input="$(printf "$input" | sed -E 's,'"$from"',~'"$to"',g')"
@@ -538,7 +538,7 @@ for_each_days() {
 	dbg "func: $func, days: $DAYS1"
 	# local TILLDAYS=$((DAYS1 + 365))
 	for ((i = $DAYS1; i < $TILLDAYS; i++)); do
-		eval $func "$(datename $i)" "$@"
+		$func "$(datename $i)" "$@"
 	done
 }
 commander() {
@@ -551,18 +551,18 @@ commander() {
 		# if [ "$(type -t ${commander_self}_${commander_cmd}_entry)" == "function" ]; then
 		if fn_exists ${commander_self}_${commander_cmd}_entry; then
 			dbg "try invoking: ${commander_self}_${commander_cmd}_entry | $@"
-			eval ${commander_self}_${commander_cmd}_entry "$@"
+			${commander_self}_${commander_cmd}_entry "$@"
 		elif fn_exists ${commander_self}-${commander_cmd}-entry; then
-			eval ${commander_self}-${commander_cmd}-entry "$@"
+			${commander_self}-${commander_cmd}-entry "$@"
 		elif fn_exists ${commander_self}-${commander_cmd}; then
-			eval ${commander_self}-${commander_cmd} "$@"
+			${commander_self}-${commander_cmd} "$@"
 		elif fn_exists ${commander_self}-${commander_cmd//_/-}; then
-			eval ${commander_self}-${commander_cmd//_/-} "$@"
+			${commander_self}-${commander_cmd//_/-} "$@"
 		elif fn_exists ${commander_self}_${commander_cmd//-/_}; then
-			eval ${commander_self}_${commander_cmd//-/_} "$@"
+			${commander_self}_${commander_cmd//-/_} "$@"
 		else
 			dbg "try invoking: ${commander_self}_${commander_cmd} | $@"
-			eval ${commander_self}_${commander_cmd} "$@"
+			${commander_self}_${commander_cmd} "$@"
 		fi
 		;;
 	esac
@@ -678,13 +678,13 @@ if is_darwin; then
 else
 	ipcmd="$(which ip 1>/dev/null 2>&1 && echo 'sudo ip' || echo ifconfig)"
 	realpathx() { readlink -f "$@"; }
-	default_dev() { eval $ipcmd route show default | grep -oE 'dev \w+' | awk '{print $2}'; }
+	default_dev() { $ipcmd route show default | grep -oE 'dev \w+' | awk '{print $2}'; }
 	if is_suse_series; then
 		gw() { which netstat 1>/dev/null 2>&1 && netstat -r -n | grep -P '^0.0.0.0' | awk '{print $2}' || {
-			if eval "$ipcmd route show" | grep -qP '^default'; then
-				eval "$ipcmd route show default" | awk '{print $3}'
+			if "$ipcmd route show" | grep -qP '^default'; then
+				"$ipcmd route show default" | awk '{print $3}'
 			else
-				local xx=$(eval "$ipcmd route show" | awk '{print $1}')
+				local xx=$("$ipcmd route show" | awk '{print $1}')
 				if [[ "$xx" = */* ]]; then
 					cut -d'/' -f1 <<<"$xx" | sed 's/.0$/.1/'
 				else
@@ -693,11 +693,11 @@ else
 			fi
 		}; }
 	else
-		gw() { eval "$ipcmd route show default" | awk '{print $3}'; }
+		gw() { "$ipcmd route show default" | awk '{print $3}'; }
 	fi
-	lanip() { eval $ipcmd a | grep -E 'inet ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
-	lanip6_flat() { eval $ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
-	lanipall() { eval $ipcmd a | grep -E 'inet6? ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
+	lanip() { $ipcmd a | grep -E 'inet ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
+	lanip6_flat() { $ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
+	lanipall() { $ipcmd a | grep -E 'inet6? ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
 fi
 gw1() { hex2ip4 $(subnet_hex ${1:-1}); }
 subnet4() { hex2ip4 $(subnet_hex); }
@@ -708,7 +708,7 @@ lanip6() {
 	if is_darwin; then
 		local ipinf=$(ifconfig | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
 	else
-		local ipinf=$(eval $ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
+		local ipinf=$($ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
 	fi
 	ipinf=$(grep -v ' deprecated ' <<<"$ipinf")
 	local dyn=$(grep ' dynamic' <<<"$ipinf" | awk '{print $2}')
@@ -727,7 +727,7 @@ wanip6() {
 	if is_darwin; then
 		local ipinf=$(ifconfig | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
 	else
-		local ipinf=$(eval $ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
+		local ipinf=$($ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
 	fi
 	ipinf=$(grep -v ' deprecated ' <<<"$ipinf")
 	local pub=$(grep ' temporary' <<<"$ipinf" | awk '{print $2}')

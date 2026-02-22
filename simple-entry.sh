@@ -140,15 +140,15 @@ if_hosttype() { # usage:     if_hosttype x64 && echo x64 || echo x86 | BUT, it o
 # ### version 2
 # cmd="$1" && (($#)) && shift
 # if fn_exists "$cmd"; then
-# 	eval $cmd "$@"
+# 	$cmd "$@"
 # 	unset cmd
 # else
 # 	xcmd="cmake-$cmd"
-# 	if fn_exists "$xcmd"; then eval $xcmd "$@"; else
+# 	if fn_exists "$xcmd"; then $xcmd "$@"; else
 # 		xcmd="build-$cmd"
-# 		if fn_exists "$xcmd"; then eval $xcmd "$@"; else
+# 		if fn_exists "$xcmd"; then $xcmd "$@"; else
 # 			xcmd="build-c$cmd"
-# 			if fn_exists "$xcmd"; then eval $xcmd "$@"; else
+# 			if fn_exists "$xcmd"; then $xcmd "$@"; else
 # 				echo "Error: No such command or function: '$cmd'" >&2
 # 				exit 1
 # 			fi
@@ -166,19 +166,19 @@ if (($#)); then
 	check_entry() {
 		local prefix="${1:-boot}" cmd="${2:-first}" && shift && shift
 		if fn_exists "${prefix}_${cmd}_entry"; then
-			eval "${prefix}_${cmd}_entry" "$@"
+			"${prefix}_${cmd}_entry" "$@"
 		elif fn_exists "${cmd}_entry"; then
-			eval "${cmd}_entry" "$@"
+			"${cmd}_entry" "$@"
 		else
 			prefix="${prefix}_${cmd}"
 			if fn_exists $prefix; then
-				eval $prefix "$@"
+				$prefix "$@"
 			elif fn_exists ${prefix//_/-}; then
-				eval ${prefix//_/-} "$@"
+				${prefix//_/-} "$@"
 			elif fn_exists $cmd; then
-				eval $cmd "$@"
+				$cmd "$@"
 			elif fn_exists ${cmd//_/-}; then
-				eval ${cmd//_/-} "$@"
+				${cmd//_/-} "$@"
 			else
 				err "command not found: $cmd $@"
 				return 1
@@ -189,7 +189,7 @@ if (($#)); then
 else
 	dbg "empty: $# | CD = $CD | DEBUG = $DEBUG"
 	if fn_exists boot_usages; then
-		eval boot_usages "$@"
+		boot_usages "$@"
 	else
 		err "no default entry function 'boot_usages' found."
 		exit 1

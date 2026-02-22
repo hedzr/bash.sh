@@ -14,10 +14,13 @@ else
 fi
 command_not_found_handler() {
 	local command_not_found_handler_cmd="$1" && shift # a args=()
-	local command_not_found_handler_arg="$@"
+	local command_not_found_handler_arg=("$@")
 	local command_not_found_handler_processed=0
 
-	dbg "  ..[command_not_found_handler] $command_not_found_handler_cmd + $command_not_found_handler_arg"
+	if (($DEBUG)); then
+		dbg "  ..[command_not_found_handler] $command_not_found_handler_cmd + "
+		for it in "${command_not_found_handler_arg[@]}"; do dbg "  ..[command_not_found_handler] --cmd-not-found-handler-- $it"; done
+	fi
 
 	_bash_sh_lazy_try_source_in() {
 		local dx="$1" f f1
@@ -44,7 +47,7 @@ command_not_found_handler() {
 				fi
 				if (($command_not_found_handler_processed)); then
 					lazy_loaded+=($f)
-					eval $command_not_found_handler_cmd "$command_not_found_handler_arg"
+					"$command_not_found_handler_cmd" "${command_not_found_handler_arg[@]}"
 				fi
 			fi
 		fi
@@ -56,7 +59,7 @@ command_not_found_handler() {
 		if ! (($command_not_found_handler_processed)); then
 			for dx in "$dir/.zsh/lazy" "$dir/ops.d/lazy"; do
 				if [ -d $dx ]; then
-					dbg "lazy-loader [1st]: dir: $dx, cmd: $command_not_found_handler_cmd, args: $command_not_found_handler_arg"
+					dbg "lazy-loader [1st]: dir: $dx, cmd: $command_not_found_handler_cmd, args: ${command_not_found_handler_arg[@]}"
 					_bash_sh_lazy_try_source_in "$dx"
 				fi
 			done
@@ -70,7 +73,7 @@ command_not_found_handler() {
 			if ! (($command_not_found_handler_processed)); then
 				local dx="$dir/lazy"
 				if [ -d $dx ]; then
-					dbg "lazy-loader [2nd]: dir: $dx, cmd: $command_not_found_handler_cmd, args: $command_not_found_handler_arg"
+					dbg "lazy-loader [2nd]: dir: $dx, cmd: $command_not_found_handler_cmd, args: ${command_not_found_handler_arg[@]}"
 					_bash_sh_lazy_try_source_in "$dx"
 				fi
 			fi
@@ -82,7 +85,7 @@ command_not_found_handler() {
 	if (($command_not_found_handler_processed)); then
 		return 0
 	else
-		err "COMMAND NOT FOUND: You tried to run '$command_not_found_handler_cmd' with args '$command_not_found_handler_arg'"
+		err "COMMAND NOT FOUND: You tried to run '$command_not_found_handler_cmd' with args ${command_not_found_handler_arg[@]}"
 		if [ -x /usr/bin/python3 ]; then
 			if [ -x /usr/bin/command-not-found ]; then
 				/usr/bin/command-not-found "${command_not_found_handler_cmd}" $(pmid) || :

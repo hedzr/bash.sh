@@ -76,8 +76,8 @@ help() {
 	EOF
 	err "Here Am I."
 	echo OK
-	eval in-vscode && echo "in-VSCODE" || echo "_ $?"
-	eval fn-exists in-vscode && echo "Y" || echo "N"
+	in-vscode && echo "in-VSCODE" || echo "_ $?"
+	fn-exists in-vscode && echo "Y" || echo "N"
 }
 
 cool() { echo cool && ls -la | pad3 4 '-72' '' ' | desc here'; }
@@ -111,30 +111,30 @@ _my_main_do_sth() {
 	local xcmd="${cmd//-/_}"
 	dbg ": trying cmd: $xcmd ..."
 	if fn_exists "$xcmd"; then
-		eval $xcmd "$@" #&& dbg ":DONE:$cmd"
+		$xcmd "$@" #&& dbg ":DONE:$cmd"
 	elif fn_exists "boot_$xcmd"; then
-		eval boot_$xcmd "$@" #&& dbg ":DONE:$cmd"
+		boot_$xcmd "$@" #&& dbg ":DONE:$cmd"
 	elif fn_aliased_exists "$xcmd"; then
-		eval $xcmd "$@" #&& dbg ":DONE:$cmd"
+		$xcmd "$@" #&& dbg ":DONE:$cmd"
 	else
 		xcmd="${cmd//_/-}"
 		dbg ": trying cmd: $xcmd ..."
 		if fn_exists "$xcmd"; then
-			eval $xcmd "$@" #&& dbg ":DONE:$cmd"
+			$xcmd "$@" #&& dbg ":DONE:$cmd"
 		elif fn_exists "boot-$xcmd"; then
-			eval boot-$xcmd "$@" #&& dbg ":DONE:$cmd"
+			boot-$xcmd "$@" #&& dbg ":DONE:$cmd"
 		elif fn_aliased_exists "$xcmd"; then
-			eval $xcmd "$@" #&& dbg ":DONE:$cmd"
+			$xcmd "$@" #&& dbg ":DONE:$cmd"
 		else
 			local f="$CD/ops.d/run/$cmd.sh"
 			# dbg "  ..finding $f"
 			if [ -f "$f" ]; then
 				dbg "  ..sourcing $(safety $f).." && source "$f" && dbg "  ..OK"
 				if fn_exists "${cmd}_entry"; then
-					# dbg "  ..eval '${cmd}_entry' $@"
+					# dbg "  ..'${cmd}_entry' $@"
 					${cmd}_entry "$@"
 				else
-					eval $cmd "$@"
+					$cmd "$@"
 				fi
 			else
 				err "command '$cmd' has not been defined. (CD=$(safety $CD))"
@@ -149,7 +149,7 @@ _my_main_do_sth() {
 			headline "Sourcing and Running after.sh ..."
 			source "$CD/after.sh"
 			if fn_exists "after_provision"; then
-				eval "after_provision" "$@"
+				"after_provision" "$@"
 			else
 				:
 			fi
@@ -158,7 +158,7 @@ _my_main_do_sth() {
 			headline "Sourcing and Running user-customizations.sh ..."
 			source "$CD/user-customizations.sh"
 			if fn_exists "user_custom"; then
-				eval "user_custom" "$@"
+				"user_custom" "$@"
 			else
 				:
 			fi
@@ -284,9 +284,9 @@ repl_bashsh_block() {
 		ls -la $bashsh_file
 		# grep -E "${begin_str}"'(.*)'"${end_str}" $bashshfile >repl.1.log
 		echo "sed -n '/${begin_str}/,/${end_str}/p' $bashsh_file >repl.1.log"
-		eval "sed -n '/${begin_str}/,/${end_str}/p' $bashsh_file >repl.1.log"
+		"sed -n '/${begin_str}/,/${end_str}/p' $bashsh_file >repl.1.log"
 		# sed '/begin_pattern/,/end_pattern/s/original_text/replacement_text/g' filename
-		eval "sed '/${begin_str}/,/${end_str}/d' $tgt_file >repl.2.log"
+		"sed '/${begin_str}/,/${end_str}/d' $tgt_file >repl.2.log"
 		ls -la repl.*.log
 		mv $tgt_file{,.bak}
 		cat repl.2.log repl.1.log >$tgt_file
@@ -1128,8 +1128,8 @@ safety() {
 		# in bash/sh mode
 		[ -f /tmp/hash.list ] || zsh -c "hash -d|sed 's/=/:/'|tr -d \"'\"|IFS=\$':' sort -k2 -r" >/tmp/hash.list
 		while IFS=$':' read to from; do
-			from="$(eval printf '%s' $from)"
-			to="$(eval printf '%s' $to)"
+			from="$(printf '%s' $from)"
+			to="$(printf '%s' $to)"
 			# echo "  $from -> $to" 1>&2
 			# echo "$input" | sed -E 's,'"$from"',~'"$to"',g' 1>&2
 			input="$(printf "$input" | sed -E 's,'"$from"',~'"$to"',g')"
@@ -1169,7 +1169,7 @@ else
 		dbg "func: $func, days: $DAYS1"
 		# # local TILLDAYS=$((DAYS1 + 365))
 		# for ((i = $DAYS1; i < $TILLDAYS; i++)); do
-		# 	eval $func "$(datename $i)" "$@"
+		# 	$func "$(datename $i)" "$@"
 		# done
 	}
 fi
@@ -1183,18 +1183,18 @@ commander() {
 		# if [ "$(type -t ${commander_self}_${commander_cmd}_entry)" == "function" ]; then
 		if fn_exists ${commander_self}_${commander_cmd}_entry; then
 			dbg "try invoking: ${commander_self}_${commander_cmd}_entry | $@"
-			eval ${commander_self}_${commander_cmd}_entry "$@"
+			${commander_self}_${commander_cmd}_entry "$@"
 		elif fn_exists ${commander_self}-${commander_cmd}-entry; then
-			eval ${commander_self}-${commander_cmd}-entry "$@"
+			${commander_self}-${commander_cmd}-entry "$@"
 		elif fn_exists ${commander_self}-${commander_cmd}; then
-			eval ${commander_self}-${commander_cmd} "$@"
+			${commander_self}-${commander_cmd} "$@"
 		elif fn_exists ${commander_self}-${commander_cmd//_/-}; then
-			eval ${commander_self}-${commander_cmd//_/-} "$@"
+			${commander_self}-${commander_cmd//_/-} "$@"
 		elif fn_exists ${commander_self}_${commander_cmd//-/_}; then
-			eval ${commander_self}_${commander_cmd//-/_} "$@"
+			${commander_self}_${commander_cmd//-/_} "$@"
 		else
 			dbg "try invoking: ${commander_self}_${commander_cmd} | $@"
-			eval ${commander_self}_${commander_cmd} "$@"
+			${commander_self}_${commander_cmd} "$@"
 		fi
 		;;
 	esac
@@ -1336,13 +1336,13 @@ if is_darwin; then
 else
 	ipcmd="$(which ip 1>/dev/null 2>&1 && echo 'sudo ip' || echo ifconfig)"
 	realpathx() { readlink -f "$@"; }
-	default_dev() { eval $ipcmd route show default | grep -oE 'dev \w+' | awk '{print $2}'; }
+	default_dev() { $ipcmd route show default | grep -oE 'dev \w+' | awk '{print $2}'; }
 	if is_suse_series; then
 		gw() { which netstat 1>/dev/null 2>&1 && netstat -r -n | grep -P '^0.0.0.0' | awk '{print $2}' || {
-			if eval "$ipcmd route show" | grep -qP '^default'; then
-				eval "$ipcmd route show default" | awk '{print $3}'
+			if "$ipcmd route show" | grep -qP '^default'; then
+				"$ipcmd route show default" | awk '{print $3}'
 			else
-				local xx=$(eval "$ipcmd route show" | awk '{print $1}')
+				local xx=$("$ipcmd route show" | awk '{print $1}')
 				if [[ "$xx" = */* ]]; then
 					cut -d'/' -f1 <<<"$xx" | sed 's/.0$/.1/'
 				else
@@ -1351,11 +1351,11 @@ else
 			fi
 		}; }
 	else
-		gw() { eval "$ipcmd route show default" | awk '{print $3}'; }
+		gw() { "$ipcmd route show default" | awk '{print $3}'; }
 	fi
-	lanip() { eval $ipcmd a | grep -E 'inet ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
-	lanip6_flat() { eval $ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
-	lanipall() { eval $ipcmd a | grep -E 'inet6? ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
+	lanip() { $ipcmd a | grep -E 'inet ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
+	lanip6_flat() { $ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
+	lanipall() { $ipcmd a | grep -E 'inet6? ' | grep -vE '127.0.0.1|::1|%lo|fe80::' | awk '{print $2}'; }
 	subnet4() { hex2ip4 $(subnet_hex); }
 fi
 gw1() { hex2ip4 $(subnet_hex ${1:-1}); }
@@ -1366,7 +1366,7 @@ lanip6() {
 	if is_darwin; then
 		local ipinf=$(ifconfig | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
 	else
-		local ipinf=$(eval $ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
+		local ipinf=$($ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
 	fi
 	ipinf=$(grep -v ' deprecated ' <<<"$ipinf")
 	local dyn=$(grep ' dynamic' <<<"$ipinf" | awk '{print $2}')
@@ -1385,7 +1385,7 @@ wanip6() {
 	if is_darwin; then
 		local ipinf=$(ifconfig | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
 	else
-		local ipinf=$(eval $ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
+		local ipinf=$($ipcmd a | grep 'inet6 ' | grep -vE '127.0.0.1|::1|%lo|fe80::')
 	fi
 	ipinf=$(grep -v ' deprecated ' <<<"$ipinf")
 	local pub=$(grep ' temporary' <<<"$ipinf" | awk '{print $2}')
@@ -1442,7 +1442,7 @@ LS_OPT="--color" && is_darwin && LS_OPT="-G" || :
 # constructs, loops, even in statement block. So this won't work sometimes:
 #     if [ true ]; then cmd-exist ls && echo 'ls exists' || echo 'ls not-exists'; fi
 # To use the following kebab aliases, a safety way is by eval:
-#     if [ true ]; then eval cmd-exist ls && echo 'ls exists' || echo 'ls not-exists'; fi
+#     if [ true ]; then cmd-exist ls && echo 'ls exists' || echo 'ls not-exists'; fi
 alias char-repeat=char_repeat
 alias cmd-exists=cmd_exists fn-aliased-exists=fn_aliased_exists fn-builtin-exists=fn_builtin_exists fn-exists=fn_exists fn-name=fn_name fn-name-dyn=fn_name_dyn
 alias for-each-days=for_each_days foreach-days=for_each_days home-dir=home_dir homedir=home_dir
