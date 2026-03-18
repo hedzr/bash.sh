@@ -9,7 +9,7 @@ set -e
 
 sleepx() { tip "sleeping..." && (($#)) && \sleep "$@"; }
 
-######### SIMPLE BASH.SH FOOTER BEGIN #########
+#### SIMPLE BASH.SH FOOTER BEGIN #### HZ Tail BEGIN #### v20260222 ####
 
 ###
 is_git_clean() { git diff-index --quiet "$@" HEAD -- 2>/dev/null; }
@@ -161,38 +161,54 @@ if_hosttype() { # usage:     if_hosttype x64 && echo x64 || echo x86 | BUT, it o
 CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20260222 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
 SUDO=sudo && { [ "$(id -u)" = "0" ] && SUDO= || :; }
 LS_OPT="--color" && { is_darwin && LS_OPT="-G" || :; }
-if (($#)); then
-	dbg "$# arg(s) | CD = $CD"
-	check_entry() {
-		local prefix="${1:-boot}" cmd="${2:-first}" && shift && shift
-		if fn_exists "${prefix}_${cmd}_entry"; then
-			"${prefix}_${cmd}_entry" "$@"
-		elif fn_exists "${cmd}_entry"; then
-			"${cmd}_entry" "$@"
+check_entry() {
+	local prefix="${1:-boot}" cmd="${2:-first}" && shift && shift
+	install_cmd_not_found_handler
+	if fn_exists "${prefix}_${cmd}_entry"; then
+		"${prefix}_${cmd}_entry" "$@"
+	elif fn_exists "${cmd}_entry"; then
+		"${cmd}_entry" "$@"
+	else
+		prefix="${prefix}_${cmd}"
+		if fn_exists $prefix; then
+			$prefix "$@"
+		elif fn_exists ${prefix//_/-}; then
+			${prefix//_/-} "$@"
+		elif fn_exists $cmd; then
+			$cmd "$@"
+		elif fn_exists ${cmd//_/-}; then
+			${cmd//_/-} "$@"
 		else
-			prefix="${prefix}_${cmd}"
-			if fn_exists $prefix; then
-				$prefix "$@"
-			elif fn_exists ${prefix//_/-}; then
-				${prefix//_/-} "$@"
-			elif fn_exists $cmd; then
-				$cmd "$@"
-			elif fn_exists ${cmd//_/-}; then
-				${cmd//_/-} "$@"
+			if fn_exists first_entry; then
+				first_entry "$cmd" "$@"
 			else
 				err "command not found: $cmd $@"
 				return 1
 			fi
 		fi
-	}
+	fi
+}
+install_cmd_not_found_handler() {
+	# install command-not-found handler for lazy-loading commands (such as `include`)
+	if [[ "$BASH_SH" != "" ]]; then
+		local f="$(dirname $BASH_SH)/ops.d/lazy-loader.sh"
+		if [ -f "$f" ]; then
+			source "$f"
+		fi
+	fi
+}
+if (($#)); then
+	dbg "$# arg(s) | CD = $CD"
 	check_entry "${FN_PREFIX:-boot}" "$@"
 else
-	dbg "empty: $# | CD = $CD | DEBUG = $DEBUG"
+	dbg "args empty | CD = $CD | DEBUG = $DEBUG"
+	# set -x
 	if fn_exists boot_usages; then
-		boot_usages "$@"
+		# boot_usages "$@"
+		check_entry "${FN_PREFIX:-boot}" "usages" "$@"
 	else
 		err "no default entry function 'boot_usages' found."
 		exit 1
 	fi
 fi
-######### SIMPLE BASH.SH FOOTER END #########
+#### SIMPLE BASH.SH FOOTER END #### HZ Tail END #### v20260222 ####
