@@ -74,10 +74,10 @@ help() {
 
 		D:
 	EOF
-	err "Here Am I."
+	tip "Here Am I."
 	echo OK
-	in-vscode && echo "in-VSCODE" || echo "_ $?"
-	fn-exists in-vscode && echo "Y" || echo "N"
+	in_vscode && echo "in-VSCODE" || echo "_ $?"
+	fn_exists in-vscode && echo "Y" || echo "N"
 }
 
 cool() { echo cool && ls -la | pad3 4 '-72' '' ' | desc here'; }
