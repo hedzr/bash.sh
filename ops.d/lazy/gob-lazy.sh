@@ -49,7 +49,7 @@ gob_lazy() {
         printf "%s\033[0m", substr(s,colnum+1,1);
     }
     printf "\n";
-}'
+    }'
 	}
 
 	gob_cmdr_entry() { commander $(strip_r $(fn_name) _entry) "$@"; }
