@@ -9,7 +9,7 @@ set -e
 
 sleepx() { tip "sleeping..." && (($#)) && \sleep "$@"; }
 
-#### SIMPLE BASH.SH FOOTER BEGIN #### HZ Tail BEGIN #### v20260222 ####
+#### SIMPLE BASH.SH FOOTER BEGIN #### HZ Tail BEGIN #### v20260318 ####
 
 ###
 is_git_clean() { git diff-index --quiet "$@" HEAD -- 2>/dev/null; }
@@ -158,7 +158,7 @@ if_hosttype() { # usage:     if_hosttype x64 && echo x64 || echo x86 | BUT, it o
 # fi
 
 ### final version
-CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20260222 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
+CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20260318 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
 SUDO=sudo && { [ "$(id -u)" = "0" ] && SUDO= || :; }
 LS_OPT="--color" && { is_darwin && LS_OPT="-G" || :; }
 check_entry() {
@@ -211,4 +211,4 @@ else
 		exit 1
 	fi
 fi
-#### SIMPLE BASH.SH FOOTER END #### HZ Tail END #### v20260222 ####
+#### SIMPLE BASH.SH FOOTER END #### HZ Tail END #### v20260318 ####

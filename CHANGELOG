@@ -1,5 +1,13 @@
 # HISTORY
 
+- v20260318
+  - simple-entry: improved prologue codes
+    - added `install_cmd_not_found_handler`
+    - improved characteristic lines
+  - improved `gob-lazy.sh`
+  - improved `lazy-loader`
+  - fix `help()`
+
 - v20260222
   - fix expanding `$@` args with spaces
     - improved `commander`
