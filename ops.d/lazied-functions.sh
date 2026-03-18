@@ -15,3 +15,7 @@ dns() { dns_lazy "$@"; }
 # to get the help, run `gob --help` and `gob cmdr --help`, ...
 # or `gob`, `gob cmdr`.
 gob() { gob_lazy "$@"; }
+# include 'bash.sh'
+# include 'simple-entry'
+# include 'tiny-entry'
+# include() { include_lazy "$@"; }
