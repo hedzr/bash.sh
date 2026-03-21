@@ -8,7 +8,7 @@
 #
 # bash.sh:
 #   Standard Template for bash/zsh developing.
-#   Version: v20260318
+#   Version: v20260321
 #   License: MIT
 #   Site: https://github.com/hedzr/bash.sh
 #
@@ -304,7 +304,7 @@ repl_bashsh_block() {
 
 ########################################################
 
-#### HZ Tail BEGIN #### v20260318 ####
+#### HZ Tail BEGIN #### v20260321 ####
 in_debug() { (($DEBUG)); }
 in_provisioning() { (($PROVISIONING)); } ## return exit status as true if $PROVISIONING is not equal to 0
 is_root() { [ "$(id -u)" = "0" ]; }
@@ -1436,7 +1436,7 @@ main_do_sth() {
 	# disabling this logic is still simple by defining HAS_END=1.
 	((${HAS_END:-0})) && { debug_begin && echo -n 'Success!' && debug_end; } || return $result_code # { [ $# -eq 0 ] && :; }
 }
-BASH_SH_VERSION=v20260318
+BASH_SH_VERSION=v20260321
 DEBUG=${DEBUG:-0}
 PROVISIONING=${PROVISIONING:-0}
 SUDO=sudo && [ "$(id -u)" = "0" ] && SUDO= || :
@@ -1467,4 +1467,4 @@ path_in_orb_host "$0" && : || { [ -L "$SCRIPT" ] && debug "$(safety "linked scri
 #       CD=$(cd `dirname "$0"`;pwd)
 # It will open a sub-shell to print the folder name of the running shell-script.
 in_sourcing && _bash_sh_load_import_files || main_do_sth "$@"
-#### HZ Tail END #### v20260318 ####
+#### HZ Tail END #### v20260321 ####

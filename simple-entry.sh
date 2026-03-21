@@ -9,7 +9,7 @@ set -e
 
 sleepx() { tip "sleeping..." && (($#)) && \sleep "$@"; }
 
-#### SIMPLE BASH.SH FOOTER BEGIN #### HZ Tail BEGIN #### v20260318 ####
+#### SIMPLE BASH.SH FOOTER BEGIN #### HZ Tail BEGIN #### v20260321 ####
 
 in_debug() { (($DEBUG)); }
 is_root() { [ "$(id -u)" = "0" ]; }
@@ -315,7 +315,7 @@ sample_first_entry() {
 }
 
 ### final version
-CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20260318 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
+CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20260321 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
 SUDO=sudo && { [ "$(id -u)" = "0" ] && SUDO= || :; }
 LS_OPT="--color" && { is_darwin && LS_OPT="-G" || :; }
 check_entry() {
@@ -362,4 +362,4 @@ else
 		exit 1
 	fi
 fi
-#### SIMPLE BASH.SH FOOTER END #### HZ Tail END #### v20260318 ####
+#### SIMPLE BASH.SH FOOTER END #### HZ Tail END #### v20260321 ####

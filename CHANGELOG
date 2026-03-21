@@ -1,5 +1,19 @@
 # HISTORY
 
+- v20260321
+  - bash.sh:
+    - added `in_array` into bash.sh
+    - added `in_clion` into bash.sh
+  - bash-lite.sh:
+    - rewrite `_my_main_do_sth`
+    - added `in_array` into bash.sh
+    - added `in_clion` into bash.sh
+  - simple-entry: improved prologue codes
+    - added `sample_first_entry` to show you how to parse cmdline args
+    - added some key funcs into simple-entry.sh
+    - added `in_array` into simple-entry.sh
+    - improved `check_entry`
+
 - v20260318
   - simple-entry: improved prologue codes
     - added `install_cmd_not_found_handler`
