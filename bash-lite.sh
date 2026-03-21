@@ -85,23 +85,67 @@ cool() { echo cool; }
 sleeping() { echo sleeping; }
 
 _my_main_do_sth() {
-	local xcmd cmd=${1:-sleeping} && { [[ $# -ge 1 ]] && shift; } || :
+	# local xcmd cmd=${1:-sleeping} && { [[ $# -ge 1 ]] && shift; } || :
 	# for linux only:
 	# local cmd=${1:-sleeping} && shift || :
-
+	#
 	# "$cmd" "$@" || :
 
-	fn_exists "$cmd" && {
-		debug "$cmd - $@"
-		$cmd "$@"
-	} || {
-		xcmd="lite-$cmd" && fn_exists "$xcmd" && $xcmd "$@" || {
-			xcmd="try-lite-$cmd" && fn_exists "$xcmd" && $xcmd "$@" || {
-				xcmd="build-c$cmd" && fn_exists "$xcmd" && $xcmd "$@"
-			}
-		}
+	if ! (($#)); then
+		tip "Using BUILDDIR=${BUILDDIR}, INSTALLDIR=${INSTALLDIR} ..."
+		sleeping "$@"
+		return
+	fi
+
+	local _RM_CNT=0
+	select_switches() {
+		_RM_CNT=0
+		case $1 in
+		m | module) if ! in_array "$2" MODS; then MODS=(${MODS[@]} $2) && _RM_CNT=1; fi ;;
+		dbg | dbg-info | di) debug_info ;;
+		esac
 	}
-	unset cmd xcmd
+
+	local i unk_args=()
+	while (($#)); do
+		case $1 in
+		--*) local sw="${1#--}" && shift && select_switches "$sw" "$@" && for ((i = 0; i < $_RM_CNT; i++)); do shift; done ;;
+		-*) local sw="${1#-}" && shift && select_switches "$sw" "$@" && for ((i = 0; i < $_RM_CNT; i++)); do shift; done ;;
+		clean | cleanup | reset)
+			[ -d ${BUILDDIR} ] && rm -rf ${BUILDDIR}
+			;;
+		"gcc") GCC=1 ;;
+		"llvm") GCC=0 ;;
+		"debug" | "dbg")
+			BUILD_TYPE=Debug
+			BUILD_SHARED_LIBS=OFF
+			BUILD_STATIC_LIBS=OFF
+			INSTALLDIR=install/$DIR/interface
+			BUILDDIR=builddir/$DIR/$BUILD_TYPE
+			;;
+		"release" | "rel")
+			BUILD_TYPE=Release
+			BUILDDIR=builddir/$DIR/$BUILD_TYPE
+			;;
+		usage | info | help | h)
+			sample_usages_help
+			exit 0
+			;;
+		*)
+			# tip "[*] chk $1..."
+			unk_args=("${unk_args[@]}" "$1")
+			;;
+		esac
+	done
+
+	if ((${#unk_args[@]} == 0)); then
+		tip "Using BUILDDIR=${BUILDDIR}, INSTALLDIR=${INSTALLDIR} ..."
+		echo "$@"
+	else
+		wrn "UNKNOWN ARGS FOUND: ${unk_args[@]}"
+		boot_usages_help
+		false
+	fi
 }
 
 ########################################################
