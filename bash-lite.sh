@@ -135,6 +135,7 @@ in_sourcing() {
 }
 in_vscode() { [[ "$TERM_PROGRAM" == "vscode" ]]; } # or VSCODE_INJECTION=1
 in_jetbrains() { [[ "$TERMINAL_EMULATOR" == *JetBrains* ]]; }
+in_clion() { [[ ${__CFBundleIdentifier} == "com.jetbrains.CLion" ]]; }
 in_vim() { [[ "$VIM" != "" ]] && [[ "$VIMRUNTIME" != "" ]]; }
 in_neovim() { [[ "$NVIM" != "" ]] || [[ "$NVIM_LOG_FILE" != "" ]] || [[ "$NVIM_LISTEN_ADDRESS" != "" ]]; }
 is_interactive_shell() { [[ $- == *i* ]]; }
