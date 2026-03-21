@@ -89,6 +89,8 @@ cmd_exists() { command -v $1 >/dev/null; } # it detects any builtin or external 
 fn_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(shell function)|(a function)'; }
 fn_builtin_exists() { LC_ALL=C type $1 2>/dev/null | grep -q 'shell builtin'; }
 fn_defined() { LC_ALL=C type $1 2>/dev/null | grep -qE '( shell function)|( a function)|( shell builtin)'; }
+# MODS=("a" "v" "z") && in_array 'z' MODS && echo Y || echo N
+in_array() { local a=$2[@] && [[ " ${a[*]} " =~ " ${1} " ]]; }
 
 ###
 h1() { printf "\e[30;104;1m\e[2K\n\e[A%s\e[00m\n\e[2K" "$@"; } # style first header
