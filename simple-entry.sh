@@ -227,31 +227,22 @@ CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20260318 && DEBUG=${DEBUG:
 SUDO=sudo && { [ "$(id -u)" = "0" ] && SUDO= || :; }
 LS_OPT="--color" && { is_darwin && LS_OPT="-G" || :; }
 check_entry() {
-	local prefix="${1:-boot}" cmd="${2:-first}" && shift && shift
 	install_cmd_not_found_handler
-	if fn_exists "${prefix}_${cmd}_entry"; then
-		"${prefix}_${cmd}_entry" "$@"
-	elif fn_exists "${cmd}_entry"; then
-		"${cmd}_entry" "$@"
-	else
-		prefix="${prefix}_${cmd}"
-		if fn_exists $prefix; then
-			$prefix "$@"
-		elif fn_exists ${prefix//_/-}; then
-			${prefix//_/-} "$@"
-		elif fn_exists $cmd; then
-			$cmd "$@"
-		elif fn_exists ${cmd//_/-}; then
-			${cmd//_/-} "$@"
-		else
-			if fn_exists first_entry; then
-				first_entry "$cmd" "$@"
-			else
-				err "command not found: $cmd $@"
-				return 1
+	local prefix="${1:-boot}" cmd="${2:-first}" && shift && shift
+	local cx cc="${prefix}_${cmd}_entry" cp="${prefix}_${cmd}" processed=0
+	# checking /(<prefix>[_-])?<cmd>([_-]entry)?/ ...
+	# so, for prefix='boot' and cmd='usages', both these function names are ok:
+	#   boot[_-]usages[_-]entry, boot[_-]usages, usages, ...
+	# and '-' and '_' also be alternatived, for a cmd='some-ok', these works:
+	#   boot-some-ok, boot_some_ok, some-ok, some_ok, ...
+	for cx in "$cc" "${cc//-/_}" "${cc//_/-}" "$cp" "${cp//_/-}" "${cp//-/_}" "$cmd" "${cmd//_/-}" "${cmd//-/_}" "first_entry"; do
+		if ! (($processed)); then
+			# dbg "  . checking '$cx' ..."
+			if fn_exists "$cx"; then
+				unset prefix cmd cc cp f && processed=1 && "$cx" "$@"
 			fi
 		fi
-	fi
+	done
 }
 install_cmd_not_found_handler() {
 	# install command-not-found handler for lazy-loading commands (such as `include`)
@@ -262,6 +253,9 @@ install_cmd_not_found_handler() {
 		fi
 	fi
 }
+# if you wanna send all args into boot_first_entry(), uncomment
+# the following line and remove the rest.
+# check_entry "${FN_PREFIX:-boot}" "${FN_NAME:-first}" "$@"
 if (($#)); then
 	dbg "$# arg(s) | CD = $CD"
 	check_entry "${FN_PREFIX:-boot}" "$@"
@@ -270,7 +264,7 @@ else
 	# set -x
 	if fn_exists boot_usages; then
 		# boot_usages "$@"
-		check_entry "${FN_PREFIX:-boot}" "usages" "$@"
+		check_entry "${FN_PREFIX:-boot}" "${FN_NAME:-usages}" "$@"
 	else
 		err "no default entry function 'boot_usages' found."
 		exit 1
