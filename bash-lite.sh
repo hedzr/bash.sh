@@ -154,6 +154,8 @@ else
 	alias is_not_stdin=true
 	alias is_ttya=false
 fi
+# MODS=("a" "v" "z") && in_array 'z' MODS && echo Y || echo N
+in_array() { local a=$2[@] && [[ " ${a[*]} " =~ " ${1} " ]]; }
 cmd_exists() { command -v $1 >/dev/null; } # it detects any builtin or external commands, aliases, and any functions
 fn_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(shell function)|(a function)'; }
 fn_builtin_exists() { LC_ALL=C type $1 2>/dev/null | grep -q 'shell builtin'; }
