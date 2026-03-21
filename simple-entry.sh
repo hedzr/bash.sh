@@ -11,6 +11,69 @@ sleepx() { tip "sleeping..." && (($#)) && \sleep "$@"; }
 
 #### SIMPLE BASH.SH FOOTER BEGIN #### HZ Tail BEGIN #### v20260318 ####
 
+in_debug() { (($DEBUG)); }
+is_root() { [ "$(id -u)" = "0" ]; }
+is_bash() { is_bash_t1 || is_bash_t2; }
+is_zsh() { [[ -n "$ZSH_NAME" || "$SHELL" = */zsh ]]; }
+#
+in_vscode() { [[ "$TERM_PROGRAM" == "vscode" ]]; } # or VSCODE_INJECTION=1
+in_jetbrains() { [[ "$TERMINAL_EMULATOR" == *JetBrains* ]]; }
+in_clion() { [[ ${__CFBundleIdentifier} == "com.jetbrains.CLion" ]]; }
+#
+is_win() { in_wsl; }
+in_wsl() { [[ "$(uname -r)" == *windows_standard* ]]; }
+osidlike() { # redhat / debian / centos / fedora / redhat / mandriva fedora / arch ...
+	[[ -f /etc/os-release ]] && {
+		grep -Eo '^ID_LIKE="?(.+)"?' /etc/os-release | sed -r -e 's/^ID_LIKE="?([^"]+)"?/\1/'
+	} || {
+		is_darwin && echo "darwin" || {
+			is_win && echo "windows" || echo "unknown-os"
+		}
+	}
+}
+#
+is_debian_series() { [[ "$(osidlike)" == debian ]]; }
+is_mandriva_series() { [[ "$(osidlike)" == mandriva* ]]; } # mandriva, mageia, ...
+is_arch_series() { [[ "$(osidlike)" == arch ]]; }
+is_fedora_series() { [[ "$(osidlike)" == *fedora* ]]; }
+is_suse_series() { [[ "$(osidlike)" == suse* ]]; }
+is_opensuse_series() { [[ "$(osidlike)" == *opensuse* ]]; }
+is_bsd_series() { [[ "$(osid)" == *bsd* ]]; }
+#
+headline() { printf "\e[0;1m$@\e[0m:\n"; }
+fn_name() {
+	is_zsh && local fn_="${funcstack[2]}"
+	if [ "$fn_" = "" ]; then
+		is_bash && echo "${FUNCNAME[1]}"
+	else
+		echo "$fn_"
+	fi
+	# is_zsh && echo "${funcstack[2]}" || {
+	# 	is_bash && echo "${FUNCNAME[1]}"
+	# }
+}
+currentShell=
+fn_name_dyn() {
+	if is_darwin; then
+		is_zsh && local fn_="${funcstack[2]}"
+		if [ "$fn_" = "" ]; then
+			is_bash && echo "${FUNCNAME[1]}"
+		else
+			echo "$fn_"
+		fi
+		return
+	fi
+	# local currentShell=$(ps -p $$ | awk "NR==2" | awk '{ print $4 }' | tr -d '-')
+	currentShell=${currentShell:-$(find_shell_by_pidtree)}
+	if [[ $currentShell == *'bash' ]]; then
+		echo ${FUNCNAME[1]}
+	elif [[ $currentShell == *'zsh' ]]; then
+		echo ${funcstack[2]}
+	else
+		echo "unknown func name ($currentShell)"
+	fi
+}
+
 ###
 is_git_clean() { git diff-index --quiet "$@" HEAD -- 2>/dev/null; }
 is_git_dirty() {
