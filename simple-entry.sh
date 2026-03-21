@@ -222,6 +222,98 @@ if_hosttype() { # usage:     if_hosttype x64 && echo x64 || echo x86 | BUT, it o
 # 	unset cmd xcmd
 # fi
 
+sample_usages_help() {
+	cat <<-EOF
+		   Usage: $0 [clean|help] [[gcc|llvm] [debug|release] [shared|static|interface]]
+	EOF
+}
+sample_first_entry() {
+	local BUILDDIR=builddir/$DIR
+	local INSTALLDIR=install/$DIR
+
+	local BUILD_TYPE=Release
+	local BUILD_SHARED_LIBS=OFF
+	local BUILD_STATIC_LIBS=OFF
+	local INSTALLDIR=install/$DIR/interface
+
+	local GCC=1
+
+	if ! (($#)); then
+		tip "Using BUILDDIR=${BUILDDIR}, INSTALLDIR=${INSTALLDIR} ..."
+		sleeping "$@"
+		return
+	fi
+
+	local _RM_CNT=0
+	select_switches() {
+		_RM_CNT=0
+		case $1 in
+		m | module) if ! in_array "$2" MODS; then MODS=(${MODS[@]} $2) && _RM_CNT=1; fi ;;
+		esac
+	}
+
+	local unk_args=()
+	while (($#)); do
+		case $1 in
+		--*) local sw="${1#--}" && shift && select_switches "$sw" "$@" && for ((i = 0; i < $_RM_CNT; i++)); do shift; done ;;
+		-*) local sw="${1#-}" && shift && select_switches "$sw" "$@" && for ((i = 0; i < $_RM_CNT; i++)); do shift; done ;;
+
+		clean | cleanup | reset)
+			[ -d ${BUILDDIR} ] && rm -rf ${BUILDDIR}
+			;;
+
+		"gcc") GCC=1 ;;
+		"llvm") GCC=0 ;;
+
+		"debug" | "dbg")
+			BUILD_TYPE=Debug
+			BUILD_SHARED_LIBS=OFF
+			BUILD_STATIC_LIBS=OFF
+			INSTALLDIR=install/$DIR/interface
+			;;
+		"release" | "rel")
+			BUILD_TYPE=Release
+			;;
+
+		"shared")
+			BUILD_TYPE=Release
+			BUILD_SHARED_LIBS=ON
+			BUILD_STATIC_LIBS=OFF
+			INSTALLDIR=install/$DIR/shared
+			;;
+		"static")
+			BUILD_TYPE=Release
+			BUILD_SHARED_LIBS=OFF
+			BUILD_STATIC_LIBS=ON
+			INSTALLDIR=install/$DIR/static
+			;;
+		"interface")
+			BUILD_TYPE=Release
+			BUILD_SHARED_LIBS=OFF
+			BUILD_STATIC_LIBS=OFF
+			INSTALLDIR=install/$DIR/interface
+			;;
+
+		usage | info | help | h)
+			sample_usages_help
+			exit 0
+			;;
+		*)
+			unk_args=("${unk_args[@]}" "$1")
+			;;
+		esac
+		shift
+	done
+
+	if ((${#unk_args[@]} == 0)); then
+		echo "$@"
+	else
+		wrn "UNKNOWN ARGS FOUND: ${unk_args[@]}"
+		sample_usages_help
+		false
+	fi
+}
+
 ### final version
 CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20260318 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
 SUDO=sudo && { [ "$(id -u)" = "0" ] && SUDO= || :; }
