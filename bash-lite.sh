@@ -200,7 +200,9 @@ else
 	alias is_ttya=false
 fi
 # MODS=("a" "v" "z") && in_array 'z' MODS && echo Y || echo N
-in_array() { local a=$2[@] && [[ " ${a[*]} " =~ " ${1} " ]]; }
+in_array() { local a=$2[@] && local b=("${!a}") && [[ " ${b[*]} " =~ " ${1} " ]]; }
+array_is_empty() { local a=$1[@] && local b=("${!a}") && [ ${#b[@]} -eq 0 ]; }
+#
 cmd_exists() { command -v $1 >/dev/null; } # it detects any builtin or external commands, aliases, and any functions
 fn_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(shell function)|(a function)'; }
 fn_builtin_exists() { LC_ALL=C type $1 2>/dev/null | grep -q 'shell builtin'; }
@@ -448,7 +450,7 @@ debug_begin() { printf "\e[0;38;2;133;133;133m"; }
 debug_end() { printf "\e[0m\n"; }
 dbg() { ((DEBUG)) && printf ">>> \e[0;38;2;133;133;133m$@\e[0m\n" || :; }
 tip() { printf "\e[0;38;2;133;133;133m>>> $@\e[0m\n"; }
-wrn() { printf "\e[0;38;2;172;172;22m... [WARN] \e[0;38;2;11;11;11m$@\e[0m\n"; }
+wrn() { printf "\e[0;38;2;172;172;22m... [WARN] \e[0;38;2;187;187;33m$@\e[0m\n"; }
 err() { printf "\e[0;33;1;133;133;133m>>> $@\e[0m\n" 1>&2; }
 mvif() {
 	local src="$1" dstdir="$2"

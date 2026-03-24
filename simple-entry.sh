@@ -90,7 +90,8 @@ fn_exists() { LC_ALL=C type $1 2>/dev/null | grep -qE '(shell function)|(a funct
 fn_builtin_exists() { LC_ALL=C type $1 2>/dev/null | grep -q 'shell builtin'; }
 fn_defined() { LC_ALL=C type $1 2>/dev/null | grep -qE '( shell function)|( a function)|( shell builtin)'; }
 # MODS=("a" "v" "z") && in_array 'z' MODS && echo Y || echo N
-in_array() { local a=$2[@] && [[ " ${a[*]} " =~ " ${1} " ]]; }
+in_array() { local a=$2[@] && local b=("${!a}") && [[ " ${b[*]} " =~ " ${1} " ]]; }
+array_is_empty() { local a=$1[@] && local b=("${!a}") && [ ${#b[@]} -eq 0 ]; }
 
 ###
 h1() { printf "\e[30;104;1m\e[2K\n\e[A%s\e[00m\n\e[2K" "$@"; } # style first header
