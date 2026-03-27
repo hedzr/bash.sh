@@ -1,5 +1,10 @@
 # HISTORY
 
+- v20260327
+  - added `array_is_empty`
+  - simple-entry: cleanup sample codes
+  - simple-entry: improved `check_entry`
+
 - v20260321
   - bash.sh:
     - added `in_array` into bash.sh

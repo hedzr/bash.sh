@@ -107,7 +107,7 @@ sample_first_entry() {
 
 sleepx() { tip "sleeping..." && (($#)) && \sleep "$@"; }
 
-#### SIMPLE BASH.SH FOOTER BEGIN #### HZ Tail BEGIN #### v20260321 ####
+#### SIMPLE BASH.SH FOOTER BEGIN #### HZ Tail BEGIN #### v20260327 ####
 
 in_debug() { (($DEBUG)); }
 is_root() { [ "$(id -u)" = "0" ]; }
@@ -322,7 +322,7 @@ if_hosttype() { # usage:     if_hosttype x64 && echo x64 || echo x86 | BUT, it o
 # fi
 
 ### final version
-CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20260321 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
+CD="$(cd $(dirname "$0") && pwd)" && BASH_SH_VERSION=v20260327 && DEBUG=${DEBUG:-0} && PROVISIONING=${PROVISIONING:-0}
 SUDO=sudo && { [ "$(id -u)" = "0" ] && SUDO= || :; }
 LS_OPT="--color" && { is_darwin && LS_OPT="-G" || :; }
 
@@ -367,4 +367,4 @@ check_entry "${FN_PREFIX:-boot}" "${FN_NAME:-first}" "$@"
 # 		exit 1
 # 	fi
 # fi
-#### SIMPLE BASH.SH FOOTER END #### HZ Tail END #### v20260321 ####
+#### SIMPLE BASH.SH FOOTER END #### HZ Tail END #### v20260327 ####
