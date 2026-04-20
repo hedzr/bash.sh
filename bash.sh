@@ -517,16 +517,23 @@ if_sysv() { [[ -f /etc/init.d/cron && ! -L /etc/init.d/cron ]]; }
 #
 #
 pmid() { # apt, yum, dnf, brew, ...
-	is_apt && echo "apt" && return
-	is_dnf && echo "dnf" && return
-	is_yum && echo "yum" && return
-	is_pacman && echo "pacman" && return
-	is_zypp && echo "zypp" && return
-	is_homebrew && echo "brew" && return
-	# is_snap && echo "snap" && return
-	# is_chocolatey && echo "choco" && return
-	# is_scoop && echo "scoop" && return
-	# is_cargo && echo "cargo" && return
+	is_apt && echo "apt" && return || {
+		is_dnf && echo "dnf" && return || {
+			is_yum && echo "yum" && return || {
+				is_pacman && echo "pacman" && return || {
+					is_zypp && echo "zypp" && return || {
+						is_homebrew && echo "brew" && return || {
+							# is_snap && echo "snap" && return
+							# is_chocolatey && echo "choco" && return
+							# is_scoop && echo "scoop" && return
+							# is_cargo && echo "cargo" && return
+							:
+						}
+					}
+				}
+			}
+		}
+	}
 	echo "???"
 }
 osid() { # fedora / ubuntu / debian / mageia / manjaro / arch ...
