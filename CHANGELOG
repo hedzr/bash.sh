@@ -1,5 +1,10 @@
 # HISTORY
 
+- v20260618
+  - added `cpu_arch`, `is(_not)?_x86`, `is_aarch64`, ...
+  - improved `osidlike`
+  - added `lsb_release_sc`
+
 - v20260327
   - added `array_is_empty`
   - simple-entry: cleanup sample codes
