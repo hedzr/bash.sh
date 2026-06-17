@@ -609,8 +609,8 @@ is_redhat_series() {
 	local t="$(osidlike)"
 	[[ $t == redhat ]] || [[ $t == 'rhel '* ]]
 }
-is_debian_series() { [[ "$(osidlike)" == debian ]]; }
-is_mandriva_series() { [[ "$(osidlike)" == mandriva* ]]; } # mandriva, mageia, ...
+is_debian_series() { [[ "$(osidlike)" == debian || "$(osid)" == debian ]]; } # Debian no idlike
+is_mandriva_series() { [[ "$(osidlike)" == mandriva* ]]; }                   # mandriva, mageia, ...
 is_arch_series() { [[ "$(osidlike)" == arch ]]; }
 is_fedora_series() { [[ "$(osidlike)" == *fedora* ]]; }
 is_suse_series() { [[ "$(osidlike)" == suse* ]]; }
@@ -619,7 +619,8 @@ is_bsd_series() { [[ "$(osid)" == *bsd* ]]; }
 #
 #
 #
-lsb_release_cs() { cmd_exists lsb_release && lsb_release -cs; } # focal, ... # = oscodename
+lsb_release_cs() { cmd_exists lsb_release && lsb_release -cs; } # focal, forky, ... # = oscodename
+lsb_release_sc() { cmd_exists lsb_release && lsb_release -sc; } # focal, forky, ... # = oscodename
 uname_kernel() { uname -s; }                                    # Linux
 uname_cpu() { uname -p; }                                       # processor: x86_64
 uname_mach() { uname -m; }                                      # machine:   x86_64, arm64(macOS)/aarch64(Linux), ...
