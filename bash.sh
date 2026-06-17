@@ -647,8 +647,18 @@ i386_amd64() { # return machine-type: x86_64, arm64, ...
 	esac
 	echo $ar
 }
-x86_64() { uname -m; } # machine:   x86_64, arm64(macOS)/aarch64(Linux), ...
-mach_is() {            # if mach_is arm64; then echo "under arm-64bit"; fi;
+x86_64() { uname -m; }   # machine:   x86_64, arm64(macOS)/aarch64(Linux), ...
+cpu_arch() { uname -m; } # return x86_64, aarch64, ...
+is_x86() {
+	local a=$(cpu_arch)
+	[[ "$a" == "i386" || "$a" == "i686" || "$a" == "x86_64" ]]
+}
+is_not_x86() {
+	local a=$(cpu_arch)
+	[[ "$a" != "i386" && "$a" != "i686" && "$a" != "x86_64" ]]
+}
+is_aarch64() { [[ "$(cpu_arch)" == "aarch64" ]]; }
+mach_is() { # if mach_is arm64; then echo "under arm-64bit"; fi;
 	local ar=$(i386_amd64)
 	case "$1" in
 	arm64* | aarch64*)
