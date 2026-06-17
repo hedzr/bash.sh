@@ -547,7 +547,8 @@ osid() { # fedora / ubuntu / debian / mageia / manjaro / arch ...
 }
 osidlike() { # redhat / debian / centos / fedora / redhat / mandriva fedora / arch ...
 	[[ -f /etc/os-release ]] && {
-		grep -Eo '^ID_LIKE="?(.+)"?' /etc/os-release | sed -r -e 's/^ID_LIKE="?([^"]+)"?/\1/'
+		is_debian && echo "debian" ||
+			grep -Eo '^ID_LIKE="?(.+)"?' /etc/os-release | sed -r -e 's/^ID_LIKE="?([^"]+)"?/\1/'
 	} || {
 		is_darwin && echo "darwin" || {
 			is_win && echo "windows" || echo "unknown-os"
@@ -584,7 +585,9 @@ is_devuan() { [[ "$(osid)" == devuan* ]]; } # yet another debian
 is_mageia() { [[ "$(osid)" == mageia ]]; }
 is_manjaro() { [[ "$(osid)" == manjaro ]]; }
 is_opensuse() { [[ "$(osid)" == opensuse* ]]; }
-is_arch() { [[ "$(osid)" == arch* ]]; }
+is_opensuse_leap() { [[ "$(osid)" == opensuse-leap ]]; }
+is_opensuse_tumbleweed() { [[ "$(osid)" != opensuse-leap ]]; }
+# is_arch() { [[ "$(osid)" == arch* ]]; }
 is_archlinux() { [[ "$(osid)" == arch* ]]; }
 is_archlinux_arm() { [[ "$(osid)" == archarm* ]]; }
 is_kalilinux() { [[ "$(osid)" == kali* ]]; }

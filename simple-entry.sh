@@ -122,7 +122,8 @@ is_win() { in_wsl; }
 in_wsl() { [[ "$(uname -r)" == *windows_standard* ]]; }
 osidlike() { # redhat / debian / centos / fedora / redhat / mandriva fedora / arch ...
 	[[ -f /etc/os-release ]] && {
-		grep -Eo '^ID_LIKE="?(.+)"?' /etc/os-release | sed -r -e 's/^ID_LIKE="?([^"]+)"?/\1/'
+		is_debian && echo "debian" ||
+			grep -Eo '^ID_LIKE="?(.+)"?' /etc/os-release | sed -r -e 's/^ID_LIKE="?([^"]+)"?/\1/'
 	} || {
 		is_darwin && echo "darwin" || {
 			is_win && echo "windows" || echo "unknown-os"
