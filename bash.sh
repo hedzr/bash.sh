@@ -703,7 +703,7 @@ is_git_dirty() {
 	fi
 }
 git_clone() {
-	local Deep="--depth=1" Help Dryrun Https Dir arg i=1 Verbose=0
+	local Deep="--depth=1" Help Dryrun Https Dir arg i=1 Verbose=0 Recursive=0
 	while [[ $# -gt 0 ]]; do
 		case $1 in
 		-h | --help)
@@ -711,7 +711,7 @@ git_clone() {
 			cat <<-EOT
 				git-clone helps cloneing git repo simply from github/gitlab/bitbucket
 
-				Usage: git-clone [-d|--deep] [-s|--https] [-o dir|--dir dir] repo
+				Usage: git-clone [-d|--deep] [-s|--https] [-r|--recursive] [-o dir|--dir dir] repo
 
 				Description:
 				  git-clone will pull the repo into 'user.repo/', for example:
@@ -726,6 +726,7 @@ git_clone() {
 				  '--deep' enables full fetch, default is shallow pull only
 				  '--https' enables https protocal, default is ssh protocol
 				  '--dir' specifies the cloned target directory, default is 'user.repo'
+				  '--recursive' enable fetching submodules at once
 
 				  'repo' can be these forms:
 				    hedzr/cmdr
@@ -745,18 +746,21 @@ git_clone() {
 
 			EOT
 			;;
+		-dr | --dry-run | --dryrun)
+			shift && Dryrun=1
+			;;
 		-d | --deep)
 			# strength=$OPTARG
 			shift && Deep=""
 			;;
-		-dr | --dry-run | --dryrun)
-			shift && Dryrun=1
+		-o | --dir | --output)
+			shift && Dir="$1" && shift
+			;;
+		-r | --recursive)
+			shift && Recursive=1
 			;;
 		-s | --https)
 			shift && Https=1
-			;;
-		-o | --dir | --output)
-			shift && Dir="$1" && shift
 			;;
 		-v | --verbose)
 			Verbose=1 && shift
@@ -774,11 +778,11 @@ git_clone() {
 
 	if [[ "$Help" != 1 ]]; then
 		local Sep='/' Prefix="${GIT_PREFIX:-git@}" Host="${GIT_HOST:-github.com}" h
-		[[ "$Https" -eq 1 ]] && Prefix="https://"
-		[[ "$Repo" =~ https://* ]] && Repo="${Repo//https:\/\//}"
+		[[ "$Https" -eq 1 ]] && Prefix="https://" || :
+		[[ "$Repo" =~ https://* ]] && Repo="${Repo//https:\/\//}" || :
 		for h in github.com gitlab.com bitbucket.com git.sr.ht gitee.com coding.net $GIT_HOSTS; do
-			[[ "$Repo" =~ $h/* ]] && Host=$h && Repo="${Repo//$h\//}"
-			[[ "$Repo" =~ $h:* ]] && Host=$h && Repo="${Repo//$h:/}"
+			if [[ "$Repo" =~ $h/* ]]; then Host=$h && Repo="${Repo//$h\//}"; fi
+			if [[ "$Repo" =~ $h:* ]]; then Host=$h && Repo="${Repo//$h:/}"; fi
 		done
 		Repo="${Repo%\#*}"
 		Repo="${Repo%\?*}"
@@ -788,23 +792,25 @@ git_clone() {
 		[[ "$Dir" == "" ]] && Dir="${Repo//\//.}"
 		[[ "$Prefix" == 'git@' ]] && Sep=':'
 		local Url="${Prefix}${Host}${Sep}${Repo}.git" Opts=""
-		(($Verbose)) && Opts="--verbose"
+		(($Verbose)) && Opts="--verbose" || Opts="-q"
+		(($Recursive)) && Opts="$Opts --recursive" || :
 		if [[ "$Dryrun" -ne 0 ]]; then
 			tip "Url: $Url | Deep?: '$Deep' | Opts: '$Opts'"
-			tip "Result: git clone $Deep -q $Opts "$Url" "$Dir""
+			tip "Result: git clone $Deep $Opts "$Url" "$Dir""
 		else
-			dbg "cloning from $Url ..." && git clone $Deep -q $Opts "$Url" "$Dir" && {
-				(($Verbose)) && local DEBUG=1
+			dbg "cloning from $Url ($Opts) ..."
+			if eval "git clone $Deep $Opts \"$Url\" \"$Dir\""; then
+				(($Verbose)) && local DEBUG="${DEBUG:-1}" || :
 				dbg "git clone $Url DONE."
 				(($Verbose)) && du -sh "$Dir" || :
-			}
+			fi
 		fi
 	fi
 }
 alias git-clone=git_clone
 alias git-clone-v='git_clone -v'
 alias git-clone-deep='git_clone -d'
-alias git-clone-deep-v='git_clone -d -v'
+alias git-clone-deep-v='git_clone -d -v -r'
 #
 #
 url_exists() { curl --head --silent -S --fail --output /dev/null "$@" 1>/dev/null 2>&1; }
