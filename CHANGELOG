@@ -1,5 +1,9 @@
 # HISTORY
 
+- v20260807
+  - improved `git_clone` (added arg `--recursive`)
+  - improved `proxy_set` (added subcmd `toggle`)
+
 - v20260618
   - added `cpu_arch`, `is(_not)?_x86`, `is_aarch64`, ...
   - improved `osidlike`
