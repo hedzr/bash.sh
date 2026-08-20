@@ -4,7 +4,7 @@ status_lazy() {
 	status_entry() { dbg "fn_name: $(fn_name), arg: $@" && commander $(strip_r $(fn_name) _entry) "$@"; }
 	status_usage() {
 		cat <<-EOF
-			Usage: $0 $self <sub-command> [...]
+			Usage: ${commander_self//_/ } <sub-command> [...]
 
 			Sub-commands:
 			  env                             prints env / env-check / check-env

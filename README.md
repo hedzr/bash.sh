@@ -187,7 +187,7 @@ dns() {
  dns_entry() { commander $(strip_r $(fn_name) _entry) "$@"; }
  dns_usage() {
   cat <<-EOF
-   Usage: $0 $self <sub-command> [...]
+   Usage: ${commander_self//_/ } <sub-command> [...]
    Sub-commands:
      ls [--all|-a|--cname|--txt|--one|-1] [string]   list all/most-of-all/generics matched dns-records
      dump                    [RESERVED] dump dns-records [just for dns01]
@@ -232,7 +232,7 @@ dns() {
  dns_fix_entry() { commander $(strip_r $(fn_name) _entry) "$@"; }
  dns_fix_usage() {
   cat <<-EOF
-   Usage: $0 $self <sub-command> [...]
+   Usage: ${commander_self//_/ } <sub-command> [...]
    Sub-commands:
      nameservers             [ali] general fix nameservers, step 1
      resolv_conf             [ali] for VPC envir

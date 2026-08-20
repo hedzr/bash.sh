@@ -8,7 +8,7 @@ gob_lazy() {
 	gob_entry() { dbg "fn_name: $(fn_name), arg: $@" && commander $(strip_r $(fn_name) _entry) "$@"; }
 	gob_usage() {
 		cat <<-EOF
-			Usage: $0 $self <sub-command> [...]
+			Usage: ${commander_self//_/ } <sub-command> [...]
 
 			Sub-commands:
 			  color-table                   resize lvm vol and fs size (expand to 100%)
@@ -54,8 +54,8 @@ gob_lazy() {
 
 	gob_cmdr_entry() { commander $(strip_r $(fn_name) _entry) "$@"; }
 	gob_cmdr_usage() {
-		cat <<-"EOF"
-			Usage: $0 $self <sub-command> [...]
+		cat <<-EOF
+			Usage: ${commander_self//_/ } <sub-command> [...]
 
 			Sub-commands:
 			  create-git-remotes <repo-name> [group-name]     cmdr-series: frama, codeberg, github
