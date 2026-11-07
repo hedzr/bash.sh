@@ -193,6 +193,7 @@ in_array() { local a=$2[@] && local b=("${!a}") && [[ " ${b[*]} " =~ " ${1} " ]]
 array_is_empty() { local a=$1[@] && local b=("${!a}") && [ ${#b[@]} -eq 0 ]; }
 
 ###
+headline() { printf "\e[0;1m$@\e[0m:\n"; }
 h1() { printf "\e[30;104;1m\e[2K\n\e[A%s\e[00m\n\e[2K" "$@"; } # style first header
 h2() { printf "\e[30;104m\e[1K\n\e[A%s\e[00m\n\e[2K" "$@"; }   # style second header
 debug() { in_debug && printf "\e[0;38;2;133;133;133m$@\e[0m\n" || :; }
