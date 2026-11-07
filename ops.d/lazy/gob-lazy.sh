@@ -52,6 +52,28 @@ gob_lazy() {
     }'
 	}
 
+	gob_mod_entry() { commander $(strip_r $(fn_name) _entry) "$@"; }
+	gob_mod_usage() {
+		cat <<-EOF
+			Usage: ${commander_self//_/ } <sub-command> [...]
+
+			Sub-commands:
+			  update                            enhanced version of 'go mod tidy'
+			  up                                update
+
+			Examples:
+			  $ gob mod update
+			    update all dependencies. (='go get -v -t -u ./... && go mod tidy')
+
+		EOF
+	}
+	gob_mod_up() {
+		go get -v -t -u ./... && go mod tidy
+	}
+	gob_mod_update() {
+		go get -v -t -u ./... && go mod tidy
+	}
+
 	gob_cmdr_entry() { commander $(strip_r $(fn_name) _entry) "$@"; }
 	gob_cmdr_usage() {
 		cat <<-EOF
@@ -74,29 +96,38 @@ gob_lazy() {
 		du -sh "$HOME/.vagrant.d/boxes/"* | sort -rh | sed -re "s,$HOME,~,"
 	}
 
+	local remotes=(github frama codeberg sr.ht)
+	local remotes_keys=()
 	gob_cmdr_create_git_remotes() { cmdr_create_git_remotes "$@"; }
 	cmdr_create_git_remotes() {
 		local key repo="${1:-gsvc}" && (($#)) && shift
 		local group="${1:-cmdr-series}" && (($#)) && shift
 		local ghg="$group" && [ "$group" = 'cmdr-series' ] && ghg=hedzr || :
 		local ghgroup="${1:-$ghg}" && (($#)) && shift || :
-		for key in "github github.com ${ghgroup}" "frama framagit.org ${group}" "codeberg codeberg.org ${group}"; do
+		for key in "github github.com ${ghgroup}" "frama framagit.org ${group}" "codeberg codeberg.org ${group}" "sr.ht git.sr.ht ~hedzr"; do
 			eval "rr=($key)"
-			tip "setting up remote repo / ${rr[1]} / ${rr[2]}"
-			git remote add "${rr[1]}" "git@${rr[2]}:${rr[3]}/$repo.git" ||
-				git remote set-url "${rr[1]}" "git@${rr[2]}:${rr[3]}/$repo.git"
+			local name="${rr[1]}" host="${rr[2]}" user="${rr[3]}"
+			tip "setting up remote repo / name: $name / host: $host"
+			git remote add "$name" "git@$host:$user/$repo.git" ||
+				git remote set-url "${name}" "git@${host}:${user}/$repo.git"
 		done
 		echo
 		git remote -v
 	}
 	gob_cmdr_push_all() { cmdr_push_all "$@"; }
 	gob_cmdr_push_all_modules() { cmdr_push_all_modules "$@"; }
+	push_to_remote() {
+		local repo="$1"
+		if git remote | grep -q "$repo"; then
+			tip "pushing to remote repo '$repo'..."
+			git push $repo --all && git push $repo --tags
+		fi
+	}
 	cmdr_push_all() {
 		# pushd ~work/godev/cmdr.v2/cmdr >/dev/null
 		local repo
-		for repo in github frama codeberg; do
-			tip "pushing to remote repo '$repo'..."
-			git push $repo --all && git push $repo --tags
+		for repo in ${remotes[@]}; do
+			push_to_remote "$repo"
 		done
 		# popd >/dev/null
 	}
@@ -105,17 +136,15 @@ gob_lazy() {
 		local repodir repo
 		for repodir in ../{cmdr,cmdr.loaders,cmdr.addons,cmdr.tests,cmdr-docs,libs.is,libs.logg,libs.diff,libs.store}; do
 			[ -d "$repodir" ] && cd "$repodir" && echo && tip "ENTERING $repodir ------------" && echo &&
-				for repo in github frama codeberg; do
-					tip "pushing to remote repo '$repo'..."
-					git push $repo --all && git push $repo --tags
+				for repo in ${remotes[@]}; do
+					push_to_remote "$repo"
 				done
 		done
 		cd ~work/godev/cmdr.work/cmdr-cli # ,go-template
 		for repodir in ../../cmdr.work/{cmdr-cli,cmdr-go-starter,cmdr-templates}; do
 			[ -d "$repodir" ] && cd "$repodir" && echo && tip "ENTERING $repodir ------------" && echo &&
-				for repo in github frama codeberg; do
-					tip "pushing to remote repo '$repo'..."
-					git push $repo --all && git push $repo --tags
+				for repo in ${remotes[@]}; do
+					push_to_remote "$repo"
 				done
 		done
 		popd >/dev/null
@@ -162,17 +191,30 @@ gob_lazy() {
 
 	gob_cover() {
 		local logdir=./logs
-		go test ./... -v -race -cover -coverprofile=$logdir/coverage-cl.txt -covermode=atomic -test.short -vet=off 2>&1 | tee $logdir/cover-cl.log && echo "RET-CODE OF TESTING: $?"
+		[ -d "$logdir" ] || mkdir -pv "$logdir"
+
+		go test ./... -test.fullpath=true -timeout 30m \
+			-v -race \
+			-cover -coverprofile=$logdir/coverage-cl.txt -covermode=atomic \
+			-test.short -vet=off 2>&1 |
+			tee $logdir/cover-cl.log && echo "RET-CODE OF TESTING: $?"
 	}
 	# eg: go-test TestLogDefault
 	# eg: go-test TestLogDefault ./slog/...
 	gob_test() {
-		local tname="$1" && (($#)) && shift
+		local tname="${1:-test}" && (($#)) && shift
 		local package="${1:-"./..."}" && (($#)) && shift
-		if [[ $tname = "" ]]; then
-			go test -v -test.v $package "$@" 2>&1 | tee -a ./logs/test.log
+		local logdir=./logs
+		[ -d "$logdir" ] || mkdir -pv "$logdir"
+
+		if [[ $tname = "test" ]]; then
+			go test -v -test.v $package "$@" 2>&1 |
+				tee -a $logdir/$tname.log
 		else
-			go test -v -test.v -test.run ^${tname}$ $package "$@" 2>&1 | tee ./logs/$tname.log
+			# -tags hzstudio,unit,integration,verbose
+			go test -test.fullpath=true -timeout 30m \
+				-v -test.v -test.run ^${tname}$ $package "$@" 2>&1 |
+				tee $logdir/$tname.log
 		fi
 	}
 
