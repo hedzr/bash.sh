@@ -32,6 +32,13 @@ command_not_found_handler() {
 		for it in "${command_not_found_handler_arg[@]}"; do dbg "  ..[command_not_found_handler] --cmd-not-found-handler-- $it"; done
 	fi
 
+	not_in_array() {
+		local find="$1"
+		shift
+		local arr=("$@")
+		[[ ! ${arr[*]} =~ (^|[[:space:]])"$find"($|[[:space:]]) ]]
+	}
+
 	_bash_sh_lazy_try_source_in() {
 		local dx="$1" f ff f1 f2
 		if [ -d $dx ]; then
